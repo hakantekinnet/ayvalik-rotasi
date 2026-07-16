@@ -21,94 +21,15 @@ export function MapView() {
   return (
     <div className="relative w-full">
       {/* Map Container */}
-      <div className="relative w-full aspect-[3/4] max-h-[65vh] rounded-3xl overflow-hidden shadow-lg">
-        {/* Sea Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#87CEEB] via-[#48B4D1] to-[#0891B2]">
-          {/* Wave Pattern Overlay */}
-          <svg
-            className="absolute bottom-0 left-0 w-full opacity-10"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,64 C150,100 350,0 500,60 C650,120 800,20 1000,80 C1100,100 1150,70 1200,64 L1200,120 L0,120 Z"
-              fill="white"
-            />
-          </svg>
-          <svg
-            className="absolute bottom-8 left-0 w-full opacity-8"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,80 C200,40 400,100 600,60 C800,20 1000,90 1200,50 L1200,120 L0,120 Z"
-              fill="white"
-            />
-          </svg>
-        </div>
+      <div className="relative w-full min-h-[60vh] rounded-3xl overflow-hidden shadow-lg">
+        {/* Map Image */}
+        <img
+          src="/ayvalik-harita-final.png"
+          alt="Stilize Ayvalık Haritası Final"
+          className="w-full h-full object-contain opacity-90 drop-shadow-lg"
+        />
 
-        {/*
-          =====================================================
-          AYVALIK MAP SVG — Scalable Blank Canvas
-          =====================================================
-          This SVG acts as the map layer. Replace the placeholder
-          content below with a real Ayvalık coastline SVG.
-
-          USAGE:
-          1. Export your SVG at any resolution (viewBox will scale).
-          2. Paste all <path>, <polygon>, <g> elements below.
-          3. Pins are positioned independently via percentage
-             coordinates, so they'll overlay correctly regardless
-             of SVG content.
-          =====================================================
-        */}
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 1000 1333"
-          preserveAspectRatio="xMidYMid meet"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Ayvalık Anakara */}
-          <path 
-            d="M650,150 C750,200 850,400 800,650 C750,900 850,1100 700,1200 C550,1300 350,1250 400,1100 C450,950 550,750 500,500 C450,250 550,100 650,150 Z" 
-            fill="currentColor" 
-            className="text-cyan-700/20 drop-shadow-md transition-all duration-700 hover:text-cyan-700/30" 
-          />
-
-          {/* Cunda Adası */}
-          <path 
-            d="M300,350 C420,320 480,450 400,550 C320,650 200,600 220,450 C240,300 180,380 300,350 Z" 
-            fill="currentColor" 
-            className="text-cyan-700/20 drop-shadow-md transition-all duration-700 hover:text-cyan-700/30" 
-          />
-
-          {/* Lale Adası Bağlantısı */}
-          <ellipse 
-            cx="480" cy="480" rx="35" ry="50" 
-            fill="currentColor" 
-            className="text-cyan-700/20 drop-shadow-sm" 
-          />
-
-          {/* Dekoratif Adacıklar */}
-          <circle cx="200" cy="700" r="15" fill="currentColor" className="text-olive-600/20" />
-          <circle cx="850" cy="300" r="12" fill="currentColor" className="text-olive-600/20" />
-          <circle cx="150" cy="500" r="20" fill="currentColor" className="text-olive-600/20" />
-        </svg>
-
-        {/* 
-          =====================================================
-          DYNAMIC MAP PINS
-          =====================================================
-          Pins are positioned using percentage-based coordinates
-          from each location's `coordinates: { x, y }` values.
-          
-          x = percentage from left (0–100)
-          y = percentage from top  (0–100)
-          
-          These sit on top of the SVG layer, so they work
-          regardless of the map artwork underneath.
-          =====================================================
-        */}
+        {/* Dynamic Map Pins — percentage-based overlay */}
         {locations.map((location, index) => (
           <motion.button
             key={location.id}
