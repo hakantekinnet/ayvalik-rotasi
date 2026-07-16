@@ -68,45 +68,31 @@ export function MapView() {
           preserveAspectRatio="xMidYMid meet"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* ================================================
-              INSERT REAL AYVALIK SVG PATH HERE
-              
-              Paste your SVG paths/groups below. Example:
-              <g id="ayvalik-coastline">
-                <path d="M..." fill="#E8DFC8" stroke="#D4C9AD" />
-                <path d="M..." fill="#DDD5BE" /> 
-              </g>
-              
-              The viewBox is set to 1000x1333 (3:4 ratio)
-              but you can change it to match your SVG source.
-              ================================================ */}
+          {/* Ayvalık Anakara */}
+          <path 
+            d="M650,150 C750,200 850,400 800,650 C750,900 850,1100 700,1200 C550,1300 350,1250 400,1100 C450,950 550,750 500,500 C450,250 550,100 650,150 Z" 
+            fill="currentColor" 
+            className="text-cyan-700/20 drop-shadow-md transition-all duration-700 hover:text-cyan-700/30" 
+          />
 
-          {/* Placeholder land mass — remove when inserting real SVG */}
-          <g id="placeholder-landmass" opacity="0.9">
-            {/* Main body hint */}
-            <rect
-              x="300"
-              y="100"
-              width="400"
-              height="1100"
-              rx="180"
-              fill="#E8DFC8"
-              stroke="#D4C9AD"
-              strokeWidth="2"
-              opacity="0.5"
-            />
-            {/* Island hint top-left */}
-            <ellipse
-              cx="250"
-              cy="380"
-              rx="120"
-              ry="80"
-              fill="#DDD5BE"
-              stroke="#D4C9AD"
-              strokeWidth="1.5"
-              opacity="0.5"
-            />
-          </g>
+          {/* Cunda Adası */}
+          <path 
+            d="M300,350 C420,320 480,450 400,550 C320,650 200,600 220,450 C240,300 180,380 300,350 Z" 
+            fill="currentColor" 
+            className="text-cyan-700/20 drop-shadow-md transition-all duration-700 hover:text-cyan-700/30" 
+          />
+
+          {/* Lale Adası Bağlantısı */}
+          <ellipse 
+            cx="480" cy="480" rx="35" ry="50" 
+            fill="currentColor" 
+            className="text-cyan-700/20 drop-shadow-sm" 
+          />
+
+          {/* Dekoratif Adacıklar */}
+          <circle cx="200" cy="700" r="15" fill="currentColor" className="text-olive-600/20" />
+          <circle cx="850" cy="300" r="12" fill="currentColor" className="text-olive-600/20" />
+          <circle cx="150" cy="500" r="20" fill="currentColor" className="text-olive-600/20" />
         </svg>
 
         {/* 
