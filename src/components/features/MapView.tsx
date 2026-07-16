@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { locations } from "@/data/locations";
@@ -12,6 +12,22 @@ export function MapView() {
     null
   );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-center the scrollable map on mount
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const { scrollWidth, clientWidth, scrollHeight, clientHeight } = scrollContainerRef.current;
+      const scrollLeft = (scrollWidth - clientWidth) / 2;
+      const scrollTop = (scrollHeight - clientHeight) / 2;
+
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTo({ left: scrollLeft, top: scrollTop, behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
 
   const handlePinClick = (location: Location) => {
     setSelectedLocation(location);
@@ -21,9 +37,9 @@ export function MapView() {
   return (
     <div className="relative w-full">
       {/* Outer Window — scrollable viewport */}
-      <div className="relative w-full h-[50vh] max-h-[450px] rounded-3xl overflow-auto shadow-xl border border-white/20 touch-pan-x touch-pan-y hide-scrollbar">
+      <div ref={scrollContainerRef} className="relative w-full max-w-4xl mx-auto h-[50vh] max-h-[500px] rounded-3xl overflow-auto shadow-xl border border-white/20 touch-pan-x touch-pan-y hide-scrollbar">
         {/* Inner Canvas — larger than viewport to enable panning */}
-        <div className="relative w-[200%] sm:w-[800px] aspect-[3/4] max-w-none">
+        <div className="relative w-[200%] md:w-[150%] lg:w-full aspect-[3/4] min-h-full">
           {/* Map Image */}
           <img
             src="/ayvalik-harita-final.png"
