@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ============================================
+   AYVALIK ROTASI — Design System (Tailwind v4)
+   ============================================ */
+
+/* --- Design Tokens --- */
+:root {
+  --background: #FAFAFA;
+  --foreground: #1A1A1A;
+  --foreground-muted: #6B7280;
+  --card-bg: #FFFFFF;
+  --card-border: #F0F0F0;
+  --aegean-50: #ECFEFF;
+  --aegean-100: #CFFAFE;
+  --aegean-200: #A5F3FC;
+  --aegean-300: #67E8F9;
+  --aegean-400: #22D3EE;
+  --aegean-500: #0891B2;
+  --aegean-600: #0E7490;
+  --aegean-700: #155E75;
+  --olive-50: #F7FEE7;
+  --olive-100: #ECFCCB;
+  --olive-200: #D9F99D;
+  --olive-300: #BEF264;
+  --olive-400: #A3E635;
+  --olive-500: #6B8E23;
+  --olive-600: #4D7C0F;
+  --olive-700: #365314;
+  --instagram-pink: #E1306C;
+  --instagram-purple: #833AB4;
+  --whatsapp-green: #25D366;
+}
+
+/* --- Tailwind v4 Theme Extension --- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+
+  --color-aegean-50: var(--aegean-50);
+  --color-aegean-100: var(--aegean-100);
+  --color-aegean-200: var(--aegean-200);
+  --color-aegean-300: var(--aegean-300);
+  --color-aegean-400: var(--aegean-400);
+  --color-aegean-500: var(--aegean-500);
+  --color-aegean-600: var(--aegean-600);
+  --color-aegean-700: var(--aegean-700);
+
+  --color-olive-50: var(--olive-50);
+  --color-olive-100: var(--olive-100);
+  --color-olive-200: var(--olive-200);
+  --color-olive-300: var(--olive-300);
+  --color-olive-400: var(--olive-400);
+  --color-olive-500: var(--olive-500);
+  --color-olive-600: var(--olive-600);
+  --color-olive-700: var(--olive-700);
+
+  --color-instagram-pink: var(--instagram-pink);
+  --color-instagram-purple: var(--instagram-purple);
+  --color-whatsapp-green: var(--whatsapp-green);
+
+  --font-sans: var(--font-geist-sans), 'Inter', system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+  --font-heading: 'Plus Jakarta Sans', var(--font-geist-sans), system-ui, sans-serif;
+
+  --animate-skeleton: skeleton 1.5s ease-in-out infinite;
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-bounce-subtle: bounceSubtle 0.4s ease-out;
+
+  @keyframes skeleton {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounceSubtle {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+}
+
+/* --- Base Styles --- */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Bottom nav safe area padding */
+.pb-safe-nav {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+/* Heading font utility */
+.font-heading {
+  font-family: var(--font-heading);
+}
