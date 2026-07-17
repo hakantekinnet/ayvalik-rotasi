@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ayvalık Rotası | Keşfet, Paylaş, Oyla",
+  title: "Ayvalık Rotası",
   description:
-    "Ayvalık'ın en güzel rotalarını keşfedin, haberleri takip edin ve favori mekanlarınıza oy verin. Ayvalık Rotası ile Ege'nin incisini cebinize taşıyın.",
+    "Ege'nin incisi Ayvalık'ı keşfet. Plajlar, tarihi mekanlar ve en iyi rotalar.",
   keywords: [
     "Ayvalık",
     "Cunda",
@@ -28,10 +28,14 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Ayvalık Rotası" }],
   openGraph: {
-    title: "Ayvalık Rotası",
-    description: "Ayvalık'ı keşfetmenin en güzel yolu",
+    title: "Ayvalık Rotası - Ege'nin İncisini Keşfet",
+    description:
+      "Ayvalık'ın gizli kalmış plajlarını, tarihi sokaklarını ve en iyi lezzet duraklarını interaktif harita ile keşfet.",
     type: "website",
     locale: "tr_TR",
+    images: [
+      "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200&auto=format&fit=crop",
+    ],
   },
 };
 
