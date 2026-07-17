@@ -176,21 +176,21 @@ export function MapView({ activeCategory = null }: MapViewProps) {
             </p>
           </div>
         </div>
-
-        {/* Locate Me FAB */}
-        <button
-          onClick={handleLocateMe}
-          disabled={isLocating}
-          className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/50 text-xs font-semibold text-aegean-700 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-200 disabled:opacity-60"
-        >
-          {isLocating ? (
-            <Loader2 size={14} className="animate-spin" />
-          ) : (
-            <Crosshair size={14} />
-          )}
-          {isLocating ? "Aranıyor…" : "📍 Konum"}
-        </button>
       </div>
+
+      {/* Locate Me FAB — floats over the map viewport */}
+      <button
+        onClick={handleLocateMe}
+        disabled={isLocating}
+        className="absolute bottom-6 right-6 z-[60] bg-white text-gray-800 font-medium py-3 px-5 rounded-full shadow-lg border border-gray-100 flex items-center gap-2 active:scale-95 transition-transform"
+      >
+        {isLocating ? (
+          <Loader2 size={16} className="animate-spin" />
+        ) : (
+          <Crosshair size={16} />
+        )}
+        {isLocating ? "Aranıyor…" : "📍 Konum"}
+      </button>
 
       {/* Location Bottom Sheet */}
       <LocationCard
