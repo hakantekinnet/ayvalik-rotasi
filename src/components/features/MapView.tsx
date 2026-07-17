@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin } from "lucide-react";
+import { MapPin, Crosshair, Loader2 } from "lucide-react";
 import { locations } from "@/data/locations";
 import { LocationCard } from "@/components/ui/LocationCard";
 import { LocationData } from "@/lib/types";
@@ -16,7 +16,49 @@ export function MapView({ activeCategory = null }: MapViewProps) {
     null
   );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ top: string; left: string } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Placeholder: convert real GPS coordinates to map percentages
+  // TODO: Calibrate with the actual bounding box of the Ayvalık map image
+  const mapGpsToPixels = (lat: number, lng: number): { top: string; left: string } => {
+    // Approximate bounding box for Ayvalık region
+    const bounds = {
+      north: 39.38,
+      south: 39.28,
+      west: 26.64,
+      east: 26.78,
+    };
+    const y = ((bounds.north - lat) / (bounds.north - bounds.south)) * 100;
+    const x = ((lng - bounds.west) / (bounds.east - bounds.west)) * 100;
+    return {
+      top: `${Math.max(0, Math.min(100, y))}%`,
+      left: `${Math.max(0, Math.min(100, x))}%`,
+    };
+  };
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      alert("Tarayıcınız konum özelliğini desteklemiyor.");
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const mapped = mapGpsToPixels(latitude, longitude);
+        setUserLocation(mapped);
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        alert("Konum alınamadı. Lütfen konum izni verdiğinizden emin olun.");
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   // Auto-center the scrollable map on mount
   useEffect(() => {
@@ -112,6 +154,21 @@ export function MapView({ activeCategory = null }: MapViewProps) {
             ))}
           </AnimatePresence>
 
+          {/* User Location Dot */}
+          {userLocation && (
+            <div
+              className="absolute z-50 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg"
+              style={{
+                top: userLocation.top,
+                left: userLocation.left,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <div className="absolute inset-0 w-full h-full bg-blue-400 rounded-full animate-ping opacity-50" />
+              <div className="absolute inset-0 w-full h-full bg-blue-500 rounded-full animate-pulse" />
+            </div>
+          )}
+
           {/* Map Legend */}
           <div className="absolute bottom-4 left-4 glass rounded-xl px-3 py-2 shadow-md">
             <p className="text-[10px] text-foreground-muted font-medium">
@@ -119,6 +176,20 @@ export function MapView({ activeCategory = null }: MapViewProps) {
             </p>
           </div>
         </div>
+
+        {/* Locate Me FAB */}
+        <button
+          onClick={handleLocateMe}
+          disabled={isLocating}
+          className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 px-3 py-2 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/50 text-xs font-semibold text-aegean-700 hover:bg-white hover:shadow-xl active:scale-95 transition-all duration-200 disabled:opacity-60"
+        >
+          {isLocating ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Crosshair size={14} />
+          )}
+          {isLocating ? "Aranıyor…" : "📍 Konum"}
+        </button>
       </div>
 
       {/* Location Bottom Sheet */}
