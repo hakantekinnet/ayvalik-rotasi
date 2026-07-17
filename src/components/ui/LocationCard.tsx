@@ -91,7 +91,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            className="fixed bottom-0 left-0 right-0 z-[70] w-full max-w-md mx-auto bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 z-[70] w-full max-w-md mx-auto bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-y-auto overscroll-contain pointer-events-auto"
           >
             {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-2">
@@ -106,7 +106,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
               <X size={18} className="text-foreground-muted" />
             </button>
 
-            <div className="px-5 pb-10 overflow-y-auto">
+            <div className="px-5 pb-12">
               {/* Category Badge */}
               <div className="mb-3">
                 <span
