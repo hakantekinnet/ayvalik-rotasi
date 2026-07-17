@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { X, Play, ExternalLink } from "lucide-react";
+import { X, Play, ExternalLink, Upload } from "lucide-react";
 import Image from "next/image";
 import { LocationData } from "@/lib/types";
 
@@ -185,6 +185,28 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
               <p className="text-foreground-muted text-sm leading-relaxed mb-6">
                 {location.description}
               </p>
+
+              {/* Community Photo Upload — Benim Kadrajım */}
+              <div className="mt-2 border-t border-gray-100 pt-6 mb-6">
+                <h3 className="text-lg font-extrabold text-gray-900 mb-2">
+                  📸 Benim Kadrajım
+                </h3>
+                <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+                  Bu mekanda çektiğin en güzel kareyi yükle, Ayvalık Rotası
+                  topluluğuyla ve Instagram sayfamızda yer alma şansını yakala!
+                </p>
+                <div className="w-full border-2 border-dashed border-[#0F766E]/40 bg-[#0F766E]/5 rounded-3xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-[#0F766E]/10 transition-all duration-300 active:scale-95 group">
+                  <div className="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center mb-4 group-hover:-translate-y-1 transition-transform">
+                    <Upload size={24} className="text-[#0F766E]" />
+                  </div>
+                  <span className="text-[#0F766E] font-bold text-base">
+                    Fotoğraf Seç veya Sürükle
+                  </span>
+                  <span className="text-xs text-gray-500 mt-2 font-medium">
+                    Maksimum 5MB (JPEG, PNG)
+                  </span>
+                </div>
+              </div>
 
               {/* CTA Button — Premium Instagram Reels */}
               <motion.a
