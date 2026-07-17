@@ -1,10 +1,10 @@
-import { NewsFeed } from "@/components/features/NewsFeed";
+import { NewsView } from "@/components/features/NewsView";
 
 export default function FeedPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="px-5 pt-12 pb-4">
+      <header className="px-5 pt-12 pb-2">
         <h1 className="font-heading text-2xl font-extrabold text-foreground tracking-tight">
           Haberler
         </h1>
@@ -13,10 +13,8 @@ export default function FeedPage() {
         </p>
       </header>
 
-      {/* Feed */}
-      <section className="px-4 pb-6">
-        <NewsFeed />
-      </section>
+      {/* News Dashboard View */}
+      <NewsView />
     </div>
   );
 }
