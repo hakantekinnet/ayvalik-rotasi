@@ -1,6 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { MapView } from "@/components/features/MapView";
 
 export default function HomePage() {
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const handleCategoryClick = (category: string) => {
+    setActiveCategory((prev) => (prev === category ? null : category));
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -22,7 +31,7 @@ export default function HomePage() {
 
       {/* Map Section */}
       <section className="px-4">
-        <MapView />
+        <MapView activeCategory={activeCategory} />
       </section>
 
       {/* Quick Info */}
@@ -32,22 +41,33 @@ export default function HomePage() {
         </h2>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { emoji: "🏖️", label: "Plajlar", count: "12" },
-            { emoji: "🏛️", label: "Tarihi", count: "8" },
-            { emoji: "🌅", label: "Manzara", count: "6" },
+            { emoji: "🏖️", label: "Plajlar", category: "Plaj", count: "12" },
+            { emoji: "🏛️", label: "Tarihi", category: "Tarihi", count: "8" },
+            { emoji: "🌅", label: "Manzara", category: "Manzara", count: "6" },
           ].map((item) => (
-            <div
+            <button
               key={item.label}
-              className="bg-card-bg rounded-xl border border-card-border p-3 text-center hover:shadow-sm transition-shadow"
+              onClick={() => handleCategoryClick(item.category)}
+              className={`rounded-xl border p-3 text-center transition-all duration-300 cursor-pointer ${
+                activeCategory === item.category
+                  ? "bg-aegean-50 border-aegean-400 shadow-md shadow-aegean-500/15 ring-1 ring-aegean-400/50"
+                  : "bg-card-bg border-card-border hover:shadow-sm"
+              }`}
             >
               <span className="text-2xl">{item.emoji}</span>
-              <p className="text-xs font-semibold text-foreground mt-1">
+              <p
+                className={`text-xs font-semibold mt-1 transition-colors duration-300 ${
+                  activeCategory === item.category
+                    ? "text-aegean-700"
+                    : "text-foreground"
+                }`}
+              >
                 {item.label}
               </p>
               <p className="text-[10px] text-foreground-muted">
                 {item.count} nokta
               </p>
-            </div>
+            </button>
           ))}
         </div>
       </section>

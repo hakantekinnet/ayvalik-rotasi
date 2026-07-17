@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { locations } from "@/data/locations";
 import { LocationCard } from "@/components/ui/LocationCard";
 import { LocationData } from "@/lib/types";
 
-export function MapView() {
+interface MapViewProps {
+  activeCategory?: string | null;
+}
+
+export function MapView({ activeCategory = null }: MapViewProps) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
     null
   );
@@ -34,6 +38,10 @@ export function MapView() {
     setIsSheetOpen(true);
   };
 
+  const filteredLocations = locations.filter(
+    (location) => !activeCategory || location.category === activeCategory
+  );
+
   return (
     <div className="relative w-full">
       {/* Outer Window — scrollable viewport */}
@@ -48,63 +56,66 @@ export function MapView() {
           />
 
           {/* Dynamic Map Pins — percentage-based, pan with canvas */}
-          {locations.map((location, index) => (
-            <motion.button
-              key={location.id}
-              initial={{ scale: 0, y: -20 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 20,
-                delay: 0.3 + index * 0.12,
-              }}
-              whileHover={{ scale: 1.2, y: -4 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => handlePinClick(location)}
-              className="absolute group"
-              style={{
-                left: location.left,
-                top: location.top,
-                transform: "translate(-50%, -100%)",
-              }}
-            >
-              {/* Pin Shadow */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-1 bg-black/20 rounded-full blur-[2px]" />
-              {/* Pin */}
-              <div className="relative">
-                <MapPin
-                  size={28}
-                  className="text-aegean-600 drop-shadow-lg"
-                  fill="#0891B2"
-                  strokeWidth={1.5}
-                  stroke="white"
-                />
-                {/* Pulse ring */}
-                <motion.div
-                  animate={{
-                    scale: [1, 1.8, 1],
-                    opacity: [0.6, 0, 0.6],
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    delay: index * 0.4,
-                  }}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-aegean-400"
-                />
-              </div>
-              {/* Tooltip */}
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-white/95 rounded-lg shadow-lg text-[10px] font-semibold text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                {location.title}
-              </div>
-            </motion.button>
-          ))}
+          <AnimatePresence>
+            {filteredLocations.map((location, index) => (
+              <motion.button
+                key={location.id}
+                initial={{ scale: 0, opacity: 0, y: -20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0, opacity: 0, y: -10 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                  delay: 0.05 + index * 0.06,
+                }}
+                whileHover={{ scale: 1.2, y: -4 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => handlePinClick(location)}
+                className="absolute group"
+                style={{
+                  left: location.left,
+                  top: location.top,
+                  transform: "translate(-50%, -100%)",
+                }}
+              >
+                {/* Pin Shadow */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-1 bg-black/20 rounded-full blur-[2px]" />
+                {/* Pin */}
+                <div className="relative">
+                  <MapPin
+                    size={28}
+                    className="text-aegean-600 drop-shadow-lg"
+                    fill="#0891B2"
+                    strokeWidth={1.5}
+                    stroke="white"
+                  />
+                  {/* Pulse ring */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.8, 1],
+                      opacity: [0.6, 0, 0.6],
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      delay: index * 0.4,
+                    }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-aegean-400"
+                  />
+                </div>
+                {/* Tooltip */}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-white/95 rounded-lg shadow-lg text-[10px] font-semibold text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  {location.title}
+                </div>
+              </motion.button>
+            ))}
+          </AnimatePresence>
 
           {/* Map Legend */}
           <div className="absolute bottom-4 left-4 glass rounded-xl px-3 py-2 shadow-md">
             <p className="text-[10px] text-foreground-muted font-medium">
-              📍 {locations.length} keşfedilecek nokta
+              📍 {filteredLocations.length} / {locations.length} nokta
             </p>
           </div>
         </div>
