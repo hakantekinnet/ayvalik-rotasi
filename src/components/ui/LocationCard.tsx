@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { X, Play, ExternalLink, Upload, Loader2 } from "lucide-react";
+import { X, Upload, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { LocationData } from "@/lib/types";
 
@@ -54,12 +54,6 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
     Tarihi: "bg-amber-100 text-amber-700",
     Manzara: "bg-purple-100 text-purple-700",
     Mekan: "bg-orange-100 text-orange-700",
-  };
-
-  // Build the Instagram redirect URL — accepts both reel URLs and profile URLs
-  const getInstagramRedirectUrl = (url: string): string => {
-    if (url.startsWith("http")) return url;
-    return `https://www.instagram.com${url}`;
   };
 
   const hasImages = location?.images && location.images.length > 0;
@@ -286,25 +280,6 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                 </div>
               )}
 
-              {/* CTA Button — Premium Instagram Reels */}
-              <motion.a
-                href={location.reelsUrl ? getInstagramRedirectUrl(location.reelsUrl) : "#"}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileTap={{ scale: 0.97 }}
-                whileHover={{ scale: 1.02 }}
-                className="group relative flex items-center justify-center gap-3 w-full py-4 px-6 bg-gradient-to-r from-aegean-500 via-aegean-600 to-aegean-700 text-white rounded-2xl font-semibold text-sm shadow-xl shadow-aegean-600/30 hover:shadow-aegean-600/50 transition-all duration-300 overflow-hidden"
-              >
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                <div className="relative flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm">
-                    <Play size={16} fill="white" className="ml-0.5" />
-                  </div>
-                  <span>Instagram Reels&apos;de İzle</span>
-                  <ExternalLink size={14} className="opacity-60" />
-                </div>
-              </motion.a>
             </div>
           </motion.div>
         </>
