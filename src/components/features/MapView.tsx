@@ -11,6 +11,16 @@ interface MapViewProps {
   activeCategory?: string | null;
 }
 
+const categories = ["Tümü", "🏖️ Plajlar", "🏛️ Tarih", "🍽️ Lezzet", "📸 Manzara"];
+
+const categoryMap: Record<string, string | null> = {
+  "Tümü": null,
+  "🏖️ Plajlar": "Plaj",
+  "🏛️ Tarih": "Tarihi",
+  "🍽️ Lezzet": "Mekan",
+  "📸 Manzara": "Manzara",
+};
+
 export function MapView({ activeCategory = null }: MapViewProps) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
     null
@@ -18,6 +28,7 @@ export function MapView({ activeCategory = null }: MapViewProps) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{ top: string; left: string } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("Tümü");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Placeholder: convert real GPS coordinates to map percentages
@@ -80,12 +91,33 @@ export function MapView({ activeCategory = null }: MapViewProps) {
     setIsSheetOpen(true);
   };
 
+  // Local filter bar takes precedence; falls back to parent prop
+  const effectiveCategory = categoryMap[activeFilter] ?? activeCategory;
   const filteredLocations = locations.filter(
-    (location) => !activeCategory || location.category === activeCategory
+    (location) => !effectiveCategory || location.category === effectiveCategory
   );
 
   return (
     <div className="relative w-full">
+      {/* Floating Category Filter Bar */}
+      <div className="absolute top-4 left-0 w-full z-[60] px-4 overflow-x-auto hide-scrollbar pointer-events-none">
+        <div className="flex gap-2 w-max pointer-events-auto">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveFilter(cat)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow-sm backdrop-blur-md transition-all duration-300 ease-out border ${
+                activeFilter === cat
+                  ? "bg-[#0F766E]/90 text-white border-transparent scale-105"
+                  : "bg-white/70 text-gray-700 border-white/60 hover:bg-white/90 active:scale-95"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Outer Window — scrollable viewport */}
       <div ref={scrollContainerRef} className="relative w-full max-w-4xl mx-auto h-[50vh] max-h-[500px] rounded-3xl overflow-auto shadow-xl border border-white/20 touch-pan-x touch-pan-y hide-scrollbar">
         {/* Inner Canvas — larger than viewport to enable panning */}
