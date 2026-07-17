@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { X, Play, ExternalLink } from "lucide-react";
 import { LocationData } from "@/lib/types";
@@ -13,8 +12,8 @@ interface LocationCardProps {
 }
 
 export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y > 100 || info.velocity.y > 500) {
@@ -22,11 +21,31 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
     }
   };
 
-  // Reset image state when location changes
-  const handleOpen = () => {
-    setImageLoaded(false);
-    setImageError(false);
+  // Reset carousel position when location changes
+  const handleExitComplete = () => {
+    setActiveImageIndex(0);
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
+    }
   };
+
+  // Track active image via scroll position
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const container = scrollRef.current;
+    const scrollLeft = container.scrollLeft;
+    const itemWidth = container.offsetWidth * 0.85 + 12; // 85% width + 12px gap
+    const index = Math.round(scrollLeft / itemWidth);
+    setActiveImageIndex(index);
+  }, []);
+
+  // Reset index when location changes while open
+  useEffect(() => {
+    setActiveImageIndex(0);
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
+    }
+  }, [location?.id]);
 
   const categoryColors: Record<string, string> = {
     Plaj: "bg-aegean-100 text-aegean-700",
@@ -37,14 +56,14 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
 
   // Build the Instagram redirect URL — accepts both reel URLs and profile URLs
   const getInstagramRedirectUrl = (url: string): string => {
-    // If it's already a full URL, use it directly
     if (url.startsWith("http")) return url;
-    // If it's a relative path like /reel/ABC123, prepend instagram.com
     return `https://www.instagram.com${url}`;
   };
 
+  const hasImages = location?.images && location.images.length > 0;
+
   return (
-    <AnimatePresence onExitComplete={handleOpen}>
+    <AnimatePresence onExitComplete={handleExitComplete}>
       {isOpen && location && (
         <>
           {/* Backdrop */}
@@ -87,44 +106,6 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             </button>
 
             <div className="px-5 pb-10 overflow-y-auto">
-              {/* Image with Skeleton Loader */}
-              <div className="relative w-full h-52 rounded-2xl overflow-hidden mb-4 bg-gray-100">
-                {/* Skeleton loader — shown while image loads */}
-                {!imageLoaded && !imageError && (
-                  <div className="absolute inset-0 bg-gray-100 animate-pulse">
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 animate-[skeleton_1.5s_ease-in-out_infinite]" />
-                  </div>
-                )}
-
-                {/* Error fallback — shown when image fails */}
-                {imageError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-aegean-50 to-aegean-100">
-                    <div className="text-center">
-                      <span className="text-3xl mb-1 block">📷</span>
-                      <span className="text-xs text-aegean-600 font-medium">
-                        {location.title}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Actual Image — Next.js optimized */}
-                {!imageError && location.imageUrl && (
-                  <Image
-                    src={location.imageUrl}
-                    alt={location.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 500px"
-                    className={`object-cover transition-opacity duration-500 ${
-                      imageLoaded ? "opacity-100" : "opacity-0"
-                    }`}
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => setImageError(true)}
-                    priority
-                  />
-                )}
-              </div>
-
               {/* Category Badge */}
               <div className="mb-3">
                 <span
@@ -142,22 +123,80 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                 {location.title}
               </h2>
 
+              {/* Image Gallery Carousel */}
+              {hasImages && (
+                <div className="mb-4">
+                  <div
+                    ref={scrollRef}
+                    onScroll={handleScroll}
+                    className="flex w-full overflow-x-auto snap-x snap-mandatory gap-3 hide-scrollbar"
+                  >
+                    {location.images!.map((src, idx) => (
+                      <img
+                        key={idx}
+                        src={src}
+                        alt={`${location.title} - ${idx + 1}`}
+                        className="w-[85%] flex-shrink-0 aspect-[4/3] object-cover rounded-2xl snap-center shadow-sm border border-gray-100"
+                        loading={idx === 0 ? "eager" : "lazy"}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Dot Indicators */}
+                  {location.images!.length > 1 && (
+                    <div className="flex items-center justify-center gap-1.5 mt-3">
+                      {location.images!.map((_, idx) => (
+                        <div
+                          key={idx}
+                          className={`rounded-full transition-all duration-300 ${
+                            idx === activeImageIndex
+                              ? "w-5 h-1.5 bg-aegean-500"
+                              : "w-1.5 h-1.5 bg-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Fallback when no images */}
+              {!hasImages && (
+                <div className="relative w-full h-44 rounded-2xl overflow-hidden mb-4 bg-gradient-to-br from-aegean-50 to-aegean-100">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <span className="text-3xl mb-1 block">📷</span>
+                      <span className="text-xs text-aegean-600 font-medium">
+                        {location.title}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Description */}
               <p className="text-foreground-muted text-sm leading-relaxed mb-6">
                 {location.description}
               </p>
 
-              {/* CTA Button — Dynamic Instagram URL */}
+              {/* CTA Button — Premium Instagram Reels */}
               <motion.a
                 href={location.reelsUrl ? getInstagramRedirectUrl(location.reelsUrl) : "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center justify-center gap-3 w-full py-3.5 px-6 bg-gradient-to-r from-aegean-500 to-aegean-600 text-white rounded-2xl font-semibold text-sm shadow-lg shadow-aegean-500/25 hover:shadow-aegean-500/40 transition-shadow"
+                whileHover={{ scale: 1.02 }}
+                className="group relative flex items-center justify-center gap-3 w-full py-4 px-6 bg-gradient-to-r from-aegean-500 via-aegean-600 to-aegean-700 text-white rounded-2xl font-semibold text-sm shadow-xl shadow-aegean-600/30 hover:shadow-aegean-600/50 transition-all duration-300 overflow-hidden"
               >
-                <Play size={18} fill="white" />
-                Instagram Reels&apos;de İzle
-                <ExternalLink size={14} className="opacity-60" />
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <div className="relative flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm">
+                    <Play size={16} fill="white" className="ml-0.5" />
+                  </div>
+                  <span>Instagram Reels&apos;de İzle</span>
+                  <ExternalLink size={14} className="opacity-60" />
+                </div>
               </motion.a>
             </div>
           </motion.div>

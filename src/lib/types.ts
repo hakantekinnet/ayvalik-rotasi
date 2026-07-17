@@ -11,7 +11,7 @@ export interface LocationData {
   description: string;
   top: string;
   left: string;
-  imageUrl?: string;
+  images?: string[];
   reelsUrl?: string;
 }
 
