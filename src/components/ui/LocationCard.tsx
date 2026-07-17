@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { X, Play, ExternalLink, Upload } from "lucide-react";
+import { X, Play, ExternalLink, Upload, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { LocationData } from "@/lib/types";
 
@@ -14,6 +14,7 @@ interface LocationCardProps {
 
 export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
@@ -62,6 +63,24 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
   };
 
   const hasImages = location?.images && location.images.length > 0;
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    setIsUploading(true);
+    const file = e.target.files[0];
+    try {
+      const response = await fetch(
+        `/api/upload?filename=${encodeURIComponent(file.name)}`,
+        { method: "POST", body: file }
+      );
+      if (!response.ok) throw new Error("Upload failed");
+      alert("Fotoğraf efsane duruyor! Başarıyla yüklendi.");
+    } catch {
+      alert("Yükleme sırasında bir hata oluştu. Lütfen tekrar dene.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <AnimatePresence onExitComplete={handleExitComplete}>
@@ -199,17 +218,34 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                   Bu mekanda çektiğin en güzel kareyi yükle, Ayvalık Rotası
                   topluluğuyla ve Instagram sayfamızda yer alma şansını yakala!
                 </p>
-                <div className="w-full border-2 border-dashed border-[#0F766E]/40 bg-[#0F766E]/5 rounded-3xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-[#0F766E]/10 transition-all duration-300 active:scale-95 group">
+                <label
+                  className={`w-full border-2 border-dashed border-[#0F766E]/40 bg-[#0F766E]/5 rounded-3xl p-6 flex flex-col items-center justify-center transition-all duration-300 ${
+                    isUploading
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer hover:bg-[#0F766E]/10 active:scale-95 group"
+                  }`}
+                >
+                  <input
+                    type="file"
+                    accept="image/jpeg, image/png"
+                    className="hidden"
+                    onChange={handleUpload}
+                    disabled={isUploading}
+                  />
                   <div className="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center mb-4 group-hover:-translate-y-1 transition-transform">
-                    <Upload size={24} className="text-[#0F766E]" />
+                    {isUploading ? (
+                      <Loader2 size={24} className="text-[#0F766E] animate-spin" />
+                    ) : (
+                      <Upload size={24} className="text-[#0F766E]" />
+                    )}
                   </div>
                   <span className="text-[#0F766E] font-bold text-base">
-                    Fotoğraf Seç veya Sürükle
+                    {isUploading ? "Yükleniyor..." : "Fotoğraf Seç veya Sürükle"}
                   </span>
                   <span className="text-xs text-gray-500 mt-2 font-medium">
                     Maksimum 5MB (JPEG, PNG)
                   </span>
-                </div>
+                </label>
               </div>
 
               {/* CTA Button — Premium Instagram Reels */}
