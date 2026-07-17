@@ -62,7 +62,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/40 z-50"
+            className="fixed inset-0 bg-black/40 z-[60]"
             onClick={onClose}
           />
 
@@ -80,7 +80,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl shadow-2xl max-h-[85vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 z-[70] w-full max-w-md mx-auto bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-hidden"
           >
             {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-2">
@@ -95,7 +95,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
               <X size={18} className="text-foreground-muted" />
             </button>
 
-            <div className="px-5 pb-8 overflow-y-auto">
+            <div className="px-5 pb-10 overflow-y-auto">
               {/* Image with Skeleton Loader */}
               <div className="relative w-full h-52 rounded-2xl overflow-hidden mb-4 bg-gray-100">
                 {/* Skeleton loader — shown while image loads */}
