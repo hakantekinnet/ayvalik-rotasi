@@ -4,14 +4,15 @@
 // These interfaces are designed to map directly
 // to a headless CMS schema (Supabase, Sanity, etc.)
 
-export interface Location {
+export interface LocationData {
   id: string;
-  name: string;
+  title: string;
+  category: "Plaj" | "Tarihi" | "Manzara" | "Mekan";
   description: string;
-  image: string;
-  coordinates: { x: number; y: number }; // Percentage-based for SVG map
-  instagramUrl: string;
-  category: "beach" | "historic" | "nature" | "food" | "viewpoint";
+  top: string;
+  left: string;
+  imageUrl?: string;
+  reelsUrl?: string;
 }
 
 export interface NewsArticle {

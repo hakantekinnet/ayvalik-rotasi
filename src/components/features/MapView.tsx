@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { locations } from "@/data/locations";
 import { LocationCard } from "@/components/ui/LocationCard";
-import { Location } from "@/lib/types";
+import { LocationData } from "@/lib/types";
 
 export function MapView() {
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
     null
   );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -29,7 +29,7 @@ export function MapView() {
     }
   }, []);
 
-  const handlePinClick = (location: Location) => {
+  const handlePinClick = (location: LocationData) => {
     setSelectedLocation(location);
     setIsSheetOpen(true);
   };
@@ -64,8 +64,8 @@ export function MapView() {
               onClick={() => handlePinClick(location)}
               className="absolute group"
               style={{
-                left: `${location.coordinates.x}%`,
-                top: `${location.coordinates.y}%`,
+                left: location.left,
+                top: location.top,
                 transform: "translate(-50%, -100%)",
               }}
             >
@@ -96,7 +96,7 @@ export function MapView() {
               </div>
               {/* Tooltip */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-white/95 rounded-lg shadow-lg text-[10px] font-semibold text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                {location.name}
+                {location.title}
               </div>
             </motion.button>
           ))}

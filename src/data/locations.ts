@@ -1,64 +1,44 @@
-import { Location } from "@/lib/types";
+import { LocationData } from "@/lib/types";
 
-export const locations: Location[] = [
+export const locations: LocationData[] = [
   {
-    id: "cunda-island",
-    name: "Cunda Adası",
+    id: "1",
+    title: "Ayvalık Eski Şehir",
+    category: "Tarihi",
     description:
-      "Ayvalık'ın incisi Cunda, taş evleri, dar sokakları ve muhteşem deniz manzarasıyla büyüler. Taze deniz ürünleri ve zeytinyağlı mezeler eşliğinde unutulmaz bir deneyim.",
-    image: "/images/cunda.jpg",
-    coordinates: { x: 35, y: 30 },
-    instagramUrl: "https://www.instagram.com/reel/example1",
-    category: "historic",
+      "Osmanlı ve Rum mimarisinin iç içe geçtiği tarihi sokaklar. Her köşede bir keşif sizi bekliyor.",
+    top: "50%",
+    left: "60%",
+    reelsUrl: "#",
   },
   {
-    id: "seytan-sofrasi",
-    name: "Şeytan Sofrası",
+    id: "2",
+    title: "Sarımsaklı Plajı",
+    category: "Plaj",
     description:
-      "Ayvalık'ın en ünlü gün batımı noktası. Efsaneye göre şeytanın ayak izini taşıyan kayadan, adaları ve ege'nin mavisini izlemek paha biçilmez.",
-    image: "/images/seytan-sofrasi.jpg",
-    coordinates: { x: 72, y: 55 },
-    instagramUrl: "https://www.instagram.com/reel/example2",
-    category: "viewpoint",
+      "Ege'nin en güzel plajlarından biri. Altın kumları ve berrak suları ile mükemmel bir tercih.",
+    top: "85%",
+    left: "45%",
+    reelsUrl: "#",
   },
   {
-    id: "sarimsakli-beach",
-    name: "Sarımsaklı Plajı",
+    id: "3",
+    title: "Cunda (Alibey) Adası",
+    category: "Tarihi",
     description:
-      "Ege'nin en güzel plajlarından biri. Altın kumları ve berrak suları ile aileler ve su sporları tutkunları için mükemmel bir tercih.",
-    image: "/images/sarimsakli.jpg",
-    coordinates: { x: 55, y: 75 },
-    instagramUrl: "https://www.instagram.com/reel/example3",
-    category: "beach",
+      "Tarihi dokusu, taş evleri ve meşhur lezzetleriyle Ayvalık'ın göz bebeği.",
+    top: "25%",
+    left: "30%",
+    reelsUrl: "#",
   },
   {
-    id: "ayvalik-old-town",
-    name: "Ayvalık Eski Şehir",
+    id: "4",
+    title: "Şeytan Sofrası",
+    category: "Manzara",
     description:
-      "Osmanlı ve Rum mimarisinin iç içe geçtiği tarihi sokaklar. Her köşede bir keşif, her duvarda bir hikaye sizi bekliyor.",
-    image: "/images/old-town.jpg",
-    coordinates: { x: 48, y: 42 },
-    instagramUrl: "https://www.instagram.com/reel/example4",
-    category: "historic",
-  },
-  {
-    id: "badavut-beach",
-    name: "Badavut Plajı",
-    description:
-      "Doğal güzelliğiyle ünlü, sakin ve huzurlu bir plaj. Gün batımında altın rengine bürünen kumsalı ile fotoğraf tutkunlarının vazgeçilmezi.",
-    image: "/images/badavut.jpg",
-    coordinates: { x: 25, y: 65 },
-    instagramUrl: "https://www.instagram.com/reel/example5",
-    category: "beach",
-  },
-  {
-    id: "patriça-koyu",
-    name: "Patriça Koyu",
-    description:
-      "Tekne turlarının vazgeçilmez durağı. Turkuaz suları ve çam ormanlarıyla çevrili bu koy, doğayla başbaşa kalmak isteyenler için ideal.",
-    image: "/images/patrica.jpg",
-    coordinates: { x: 18, y: 45 },
-    instagramUrl: "https://www.instagram.com/reel/example6",
-    category: "nature",
+      "Tüm Ayvalık adalarını ve Midilli'yi tepeden gören eşsiz gün batımı noktası.",
+    top: "75%",
+    left: "55%",
+    reelsUrl: "#",
   },
 ];

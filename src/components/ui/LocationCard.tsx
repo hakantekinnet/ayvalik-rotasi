@@ -4,10 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { X, Play, ExternalLink } from "lucide-react";
-import { Location } from "@/lib/types";
+import { LocationData } from "@/lib/types";
 
 interface LocationCardProps {
-  location: Location | null;
+  location: LocationData | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -28,20 +28,11 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
     setImageError(false);
   };
 
-  const categoryLabels: Record<string, string> = {
-    beach: "Plaj",
-    historic: "Tarihi",
-    nature: "Doğa",
-    food: "Yeme-İçme",
-    viewpoint: "Manzara",
-  };
-
   const categoryColors: Record<string, string> = {
-    beach: "bg-aegean-100 text-aegean-700",
-    historic: "bg-amber-100 text-amber-700",
-    nature: "bg-olive-100 text-olive-700",
-    food: "bg-orange-100 text-orange-700",
-    viewpoint: "bg-purple-100 text-purple-700",
+    Plaj: "bg-aegean-100 text-aegean-700",
+    Tarihi: "bg-amber-100 text-amber-700",
+    Manzara: "bg-purple-100 text-purple-700",
+    Mekan: "bg-orange-100 text-orange-700",
   };
 
   // Build the Instagram redirect URL — accepts both reel URLs and profile URLs
@@ -111,17 +102,17 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                     <div className="text-center">
                       <span className="text-3xl mb-1 block">📷</span>
                       <span className="text-xs text-aegean-600 font-medium">
-                        {location.name}
+                        {location.title}
                       </span>
                     </div>
                   </div>
                 )}
 
                 {/* Actual Image — Next.js optimized */}
-                {!imageError && (
+                {!imageError && location.imageUrl && (
                   <Image
-                    src={location.image}
-                    alt={location.name}
+                    src={location.imageUrl}
+                    alt={location.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 500px"
                     className={`object-cover transition-opacity duration-500 ${
@@ -142,13 +133,13 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                     "bg-gray-100 text-gray-600"
                   }`}
                 >
-                  {categoryLabels[location.category] || location.category}
+                  {location.category}
                 </span>
               </div>
 
               {/* Title */}
               <h2 className="font-heading text-xl font-bold text-foreground mb-2">
-                {location.name}
+                {location.title}
               </h2>
 
               {/* Description */}
@@ -158,7 +149,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
 
               {/* CTA Button — Dynamic Instagram URL */}
               <motion.a
-                href={getInstagramRedirectUrl(location.instagramUrl)}
+                href={location.reelsUrl ? getInstagramRedirectUrl(location.reelsUrl) : "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileTap={{ scale: 0.97 }}
