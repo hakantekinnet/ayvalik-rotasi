@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export function SplashScreen() {
   const [isVisible, setIsVisible] = useState(false);
@@ -31,9 +32,7 @@ export function SplashScreen() {
           transition={{ duration: 0.5, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] bg-slate-50 flex flex-col items-center justify-center"
         >
-          <motion.img
-            src="/logo.PNG"
-            alt="Ayvalık Rotası Logo"
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{
@@ -42,8 +41,17 @@ export function SplashScreen() {
               damping: 15,
               delay: 0.1,
             }}
-            className="w-32 h-32 object-contain mb-6 drop-shadow-2xl"
-          />
+            className="mb-6"
+          >
+            <Image
+              src="/logo.PNG"
+              alt="Ayvalık Rotası Logo"
+              width={128}
+              height={128}
+              priority
+              className="object-contain drop-shadow-2xl"
+            />
+          </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

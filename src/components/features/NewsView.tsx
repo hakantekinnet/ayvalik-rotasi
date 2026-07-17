@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
+import Image from "next/image";
 import { Sun, Waves, Sunset, Clock, ChevronRight } from "lucide-react";
 
 const fadeUp: Variants = {
@@ -84,10 +85,13 @@ export function NewsView() {
         custom={1}
         className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
       >
-        <img
+        <Image
           src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
           alt="Ayvalık Amfitiyatro Konseri"
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          fill
+          sizes="(max-width: 768px) 100vw, 600px"
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
@@ -135,9 +139,11 @@ export function NewsView() {
             >
               {/* Thumbnail */}
               <div className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden">
-                <img
+                <Image
                   src={item.image}
                   alt={item.title}
+                  width={80}
+                  height={80}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>

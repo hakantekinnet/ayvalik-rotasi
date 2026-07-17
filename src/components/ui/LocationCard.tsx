@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import { X, Play, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import { LocationData } from "@/lib/types";
 
 interface LocationCardProps {
@@ -132,13 +133,19 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                     className="flex w-full overflow-x-auto snap-x snap-mandatory gap-3 hide-scrollbar"
                   >
                     {location.images!.map((src, idx) => (
-                      <img
+                      <div
                         key={idx}
-                        src={src}
-                        alt={`${location.title} - ${idx + 1}`}
-                        className="w-[85%] flex-shrink-0 aspect-[4/3] object-cover rounded-2xl snap-center shadow-sm border border-gray-100"
-                        loading={idx === 0 ? "eager" : "lazy"}
-                      />
+                        className="relative w-[85%] flex-shrink-0 aspect-[4/3] rounded-2xl snap-center overflow-hidden shadow-sm border border-gray-100"
+                      >
+                        <Image
+                          src={src}
+                          alt={`${location.title} - ${idx + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 85vw, 400px"
+                          className="object-cover"
+                          loading={idx === 0 ? "eager" : "lazy"}
+                        />
+                      </div>
                     ))}
                   </div>
 
