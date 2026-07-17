@@ -1,5 +1,5 @@
-import { VotePageClient } from "./VotePageClient";
+import { VotingView } from "@/components/features/VotingView";
 
 export default function VotePage() {
-  return <VotePageClient />;
+  return <VotingView />;
 }
