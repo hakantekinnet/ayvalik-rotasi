@@ -100,13 +100,17 @@ export function MapView({ activeCategory = null }: MapViewProps) {
   return (
     <div className="relative w-full">
       {/* Floating Category Filter Bar */}
-      <div className="absolute top-4 left-0 w-full z-[60] px-4 overflow-x-auto hide-scrollbar pointer-events-none">
-        <div className="flex gap-2 w-max pointer-events-auto">
+      <div
+        className="absolute top-6 left-0 w-full z-[60] overflow-x-auto touch-pan-x pointer-events-auto"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
+      >
+        {/* Added pr-8 to ensure enough space after the last item */}
+        <div className="flex gap-2 w-max px-4 pb-2 pr-8">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveFilter(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap shadow-sm backdrop-blur-md transition-all duration-300 ease-out border ${
+              className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap shadow-sm backdrop-blur-md transition-all duration-300 ease-out border ${
                 activeFilter === cat
                   ? "bg-[#0F766E]/90 text-white border-transparent scale-105"
                   : "bg-white/70 text-gray-700 border-white/60 hover:bg-white/90 active:scale-95"
