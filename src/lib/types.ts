@@ -13,6 +13,7 @@ export interface LocationData {
   left: string;
   images?: string[];
   reelsUrl?: string;
+  reelUrl?: string;
 }
 
 export interface NewsArticle {

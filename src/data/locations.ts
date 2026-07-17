@@ -15,6 +15,7 @@ export const locations: LocationData[] = [
       "https://images.unsplash.com/photo-1504512485720-7d83a16ee930?w=800&q=80",
     ],
     reelsUrl: "#",
+    reelUrl: "https://www.instagram.com/reel/CqP-P7rIMqT/",
   },
   {
     id: "2",
@@ -44,6 +45,7 @@ export const locations: LocationData[] = [
       "https://images.unsplash.com/photo-1602002418816-5c0aeef426aa?w=800&q=80",
     ],
     reelsUrl: "#",
+    reelUrl: "https://www.instagram.com/reel/CqP-P7rIMqT/",
   },
   {
     id: "4",
