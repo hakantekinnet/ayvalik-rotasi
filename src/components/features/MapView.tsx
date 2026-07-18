@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crosshair, Loader2 } from "lucide-react";
 import { locations } from "@/data/locations";
 import { LocationCard } from "@/components/ui/LocationCard";
+import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
 
 interface MapViewProps {
@@ -100,6 +101,9 @@ export function MapView({ activeCategory = null }: MapViewProps) {
   return (
     <div className="relative w-full">
       {/* Floating Category Filter Bar */}
+
+      {/* Wind & Beach Guide Widget */}
+      <WindWidget />
       <div
         className="absolute top-6 left-0 w-full z-[60] overflow-x-auto touch-pan-x pointer-events-auto"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
