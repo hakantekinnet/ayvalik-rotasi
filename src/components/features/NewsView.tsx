@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
-import { Sun, Waves, Sunset, Clock, ChevronRight } from "lucide-react";
+import { Sun, Waves, Sunset, Clock, ChevronRight, Loader2 } from "lucide-react";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -42,6 +43,27 @@ const newsItems = [
 ];
 
 export function NewsView() {
+  const [weather, setWeather] = useState<{
+    temp: number;
+    seaTemp: number;
+    sunset: string;
+  } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/weather")
+      .then((res) => res.json())
+      .then((data) =>
+        setWeather({
+          temp: data.temp ?? 28,
+          seaTemp: data.seaTemp ?? 22,
+          sunset: data.sunset ?? "20:34",
+        })
+      )
+      .catch(() =>
+        setWeather({ temp: 28, seaTemp: 22, sunset: "20:34" })
+      );
+  }, []);
+
   return (
     <div className="w-full h-full overflow-y-auto pb-28 px-4 pt-6 bg-slate-50">
       {/* ── Top Dashboard: Weather & Quick Info ── */}
@@ -56,7 +78,9 @@ export function NewsView() {
           <Sun size={18} className="text-amber-500" />
           <div>
             <p className="text-sm font-medium text-gray-800">Ayvalık</p>
-            <p className="text-xs text-gray-500">28°C Güneşli</p>
+            <p className={`text-xs text-gray-500 ${!weather ? "animate-pulse" : ""}`}>
+              {weather ? `${weather.temp}°C Güneşli` : "—"}
+            </p>
           </div>
         </div>
         <div className="w-px h-8 bg-gray-200" />
@@ -64,7 +88,9 @@ export function NewsView() {
           <Waves size={18} className="text-cyan-500" />
           <div>
             <p className="text-sm font-medium text-gray-800">Deniz</p>
-            <p className="text-xs text-gray-500">22°C</p>
+            <p className={`text-xs text-gray-500 ${!weather ? "animate-pulse" : ""}`}>
+              {weather ? `${weather.seaTemp}°C` : "—"}
+            </p>
           </div>
         </div>
         <div className="w-px h-8 bg-gray-200" />
@@ -72,7 +98,9 @@ export function NewsView() {
           <Sunset size={18} className="text-orange-500" />
           <div>
             <p className="text-sm font-medium text-gray-800">Batım</p>
-            <p className="text-xs text-gray-500">20:34</p>
+            <p className={`text-xs text-gray-500 ${!weather ? "animate-pulse" : ""}`}>
+              {weather ? weather.sunset : "—"}
+            </p>
           </div>
         </div>
       </motion.div>

@@ -1,18 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
+
+interface WindData {
+  windSpeed: number;
+  windDirection: string;
+  windDirectionLocal: string;
+  recommendation: string;
+  goodBeaches: string[];
+  badBeaches: string[];
+}
 
 export function WindWidget() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [wind, setWind] = useState<WindData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Enhanced mock data with specific beach recommendations
-  const [wind] = useState({
-    direction: "Kuzey (Poyraz)",
-    speed: "18 km/s",
-    recommendation: "Badavut veya Sarımsaklı",
-    goodBeaches: ["Badavut Plajı", "Sarımsaklı Merkez", "Küçükköy Sahili"],
-    badBeaches: ["Patriça Koyu", "Ortunç Koyu", "Cunda Arka Deniz"],
-  });
+  useEffect(() => {
+    fetch("/api/weather")
+      .then((res) => res.json())
+      .then((data) => {
+        setWind({
+          windSpeed: data.windSpeed,
+          windDirection: data.windDirection,
+          windDirectionLocal: data.windDirectionLocal,
+          recommendation: data.recommendation,
+          goodBeaches: data.goodBeaches,
+          badBeaches: data.badBeaches,
+        });
+      })
+      .catch(() => {
+        // Fallback if fetch fails
+        setWind({
+          windSpeed: 18,
+          windDirection: "Kuzey",
+          windDirectionLocal: "Poyraz",
+          recommendation: "Badavut veya Sarımsaklı ideal!",
+          goodBeaches: ["Badavut Plajı", "Sarımsaklı Merkez", "Küçükköy Sahili"],
+          badBeaches: ["Patriça Koyu", "Ortunç Koyu", "Cunda Arka Deniz"],
+        });
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  // Loading state — compact skeleton pill
+  if (isLoading || !wind) {
+    return (
+      <div className="absolute top-20 right-4 z-[50] bg-white/90 backdrop-blur-md shadow-md rounded-full pl-2 pr-4 py-1.5 border border-white/60 flex items-center gap-2.5">
+        <div className="w-7 h-7 bg-blue-50/80 rounded-full flex items-center justify-center shadow-inner">
+          <Loader2 size={14} className="text-blue-500 animate-spin" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <div className="w-20 h-2.5 bg-gray-200 rounded-full animate-pulse" />
+          <div className="w-16 h-2 bg-gray-100 rounded-full animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  const directionLabel = `${wind.windDirection} (${wind.windDirectionLocal})`;
 
   // EXPANDED VIEW (Detailed Card)
   if (isExpanded) {
@@ -38,10 +85,11 @@ export function WindWidget() {
         <div className="flex flex-col gap-0.5 mb-3 px-1">
           <p className="text-[11px] text-gray-500 font-medium">
             Yön:{" "}
-            <span className="text-blue-600 font-bold">{wind.direction}</span>
+            <span className="text-blue-600 font-bold">{directionLabel}</span>
           </p>
           <p className="text-[11px] text-gray-500 font-medium">
-            Hız: <span className="text-gray-700">{wind.speed}</span>
+            Hız:{" "}
+            <span className="text-gray-700">{wind.windSpeed} km/s</span>
           </p>
         </div>
 
@@ -79,10 +127,10 @@ export function WindWidget() {
       <div className="flex flex-col justify-center">
         <div className="flex items-baseline gap-1.5">
           <span className="text-[11px] font-extrabold text-gray-800 leading-none">
-            {wind.direction}
+            {directionLabel}
           </span>
           <span className="text-[9px] font-medium text-gray-500 leading-none">
-            ({wind.speed})
+            ({wind.windSpeed} km/s)
           </span>
         </div>
         <span className="text-[10px] font-bold text-[#0F766E] leading-none mt-1 truncate max-w-[120px]">
