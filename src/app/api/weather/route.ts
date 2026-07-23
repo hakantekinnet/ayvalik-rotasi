@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-export async function GET() {
+// Adding (req: Request) is the magic key that forces Next.js to run this on every single request, preventing static generation at build time.
+export async function GET(req: Request) {
   const apiKey = process.env.WEATHER_API_KEY;
   
   const fallbackData = {
@@ -15,12 +17,10 @@ export async function GET() {
     badBeaches: ["Patriça Koyu", "Ortunç Koyu", "Cunda Arka Deniz"]
   };
 
-  // DEBUG LOG 1: Vercel ortam değişkenini görebiliyor mu?
-  console.log("============== HAVA DURUMU API TESTİ ==============");
-  console.log("1. API Key Vercel'de okunuyor mu?:", apiKey ? "EVET, OKUNDU" : "HAYIR, EKSİK (undefined)");
+  console.log("============== HAVA DURUMU CANLI TETİKLENDİ ==============");
+  console.log("1. API Key durumu:", apiKey ? "OKUNDU" : "EKSİK");
 
   if (!apiKey) {
-    console.log("HATA: API Key bulunamadığı için yedek veri gönderiliyor.");
     return NextResponse.json(fallbackData);
   }
 
@@ -31,12 +31,9 @@ export async function GET() {
     );
     
     const data = await res.json();
-    
-    // DEBUG LOG 2: OpenWeatherMap tam olarak ne cevap veriyor?
-    console.log("2. OpenWeatherMap Yanıtı (COD):", data.cod);
+    console.log("2. OpenWeather COD Yanıtı:", data.cod);
 
     if (data.cod !== 200 || !data.main || !data.wind) {
-      console.warn("3. HATA: API geçersiz yanıt döndü. Tam yanıt:", JSON.stringify(data));
       return NextResponse.json(fallbackData);
     }
 
@@ -59,7 +56,6 @@ export async function GET() {
         windDirection = "Doğu (Keşişleme)";
     }
 
-    console.log("BAŞARILI: Canlı veri başarıyla arayüze gönderildi.");
     return NextResponse.json({
       temp: Math.round(data.main.temp),
       seaTemp: Math.round(data.main.temp) - 6,
@@ -70,7 +66,7 @@ export async function GET() {
       badBeaches
     });
   } catch (error) {
-    console.error("SUNUCU HATASI:", error);
+    console.error("3. SUNUCU HATASI:", error);
     return NextResponse.json(fallbackData);
   }
 }
