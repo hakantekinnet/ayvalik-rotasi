@@ -6,7 +6,6 @@ import { Loader2 } from "lucide-react";
 interface WindData {
   windSpeed: number;
   windDirection: string;
-  windDirectionLocal: string;
   recommendation: string;
   goodBeaches: string[];
   badBeaches: string[];
@@ -24,7 +23,6 @@ export function WindWidget() {
         setWind({
           windSpeed: data.windSpeed,
           windDirection: data.windDirection,
-          windDirectionLocal: data.windDirectionLocal,
           recommendation: data.recommendation,
           goodBeaches: data.goodBeaches,
           badBeaches: data.badBeaches,
@@ -34,8 +32,7 @@ export function WindWidget() {
         // Fallback if fetch fails
         setWind({
           windSpeed: 18,
-          windDirection: "Kuzey",
-          windDirectionLocal: "Poyraz",
+          windDirection: "Kuzey (Poyraz)",
           recommendation: "Badavut veya Sarımsaklı ideal!",
           goodBeaches: ["Badavut Plajı", "Sarımsaklı Merkez", "Küçükköy Sahili"],
           badBeaches: ["Patriça Koyu", "Ortunç Koyu", "Cunda Arka Deniz"],
@@ -59,7 +56,7 @@ export function WindWidget() {
     );
   }
 
-  const directionLabel = `${wind.windDirection} (${wind.windDirectionLocal})`;
+  const directionLabel = wind.windDirection;
 
   // EXPANDED VIEW (Detailed Card)
   if (isExpanded) {
