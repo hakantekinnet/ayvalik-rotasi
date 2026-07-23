@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 
-// Prevent Next.js from caching this API route. Always fetch fresh!
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const apiKey = process.env.WEATHER_API_KEY;
   
-  // Bullet-proof fallback data so the UI NEVER crashes
   const fallbackData = {
     temp: 28,
     seaTemp: 22,
@@ -17,22 +15,28 @@ export async function GET() {
     badBeaches: ["Patriça Koyu", "Ortunç Koyu", "Cunda Arka Deniz"]
   };
 
+  // DEBUG LOG 1: Vercel ortam değişkenini görebiliyor mu?
+  console.log("============== HAVA DURUMU API TESTİ ==============");
+  console.log("1. API Key Vercel'de okunuyor mu?:", apiKey ? "EVET, OKUNDU" : "HAYIR, EKSİK (undefined)");
+
   if (!apiKey) {
+    console.log("HATA: API Key bulunamadığı için yedek veri gönderiliyor.");
     return NextResponse.json(fallbackData);
   }
 
   try {
-    // Fetch without ANY cache (cache: 'no-store')
     const res = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=39.3193&lon=26.6961&appid=${apiKey}&units=metric&lang=tr`,
       { cache: 'no-store' }
     );
     
     const data = await res.json();
+    
+    // DEBUG LOG 2: OpenWeatherMap tam olarak ne cevap veriyor?
+    console.log("2. OpenWeatherMap Yanıtı (COD):", data.cod);
 
-    // If API returns an error code (like 401) or is missing data, use fallback safely
     if (data.cod !== 200 || !data.main || !data.wind) {
-      console.warn("API responds with error, using fallback.");
+      console.warn("3. HATA: API geçersiz yanıt döndü. Tam yanıt:", JSON.stringify(data));
       return NextResponse.json(fallbackData);
     }
 
@@ -55,6 +59,7 @@ export async function GET() {
         windDirection = "Doğu (Keşişleme)";
     }
 
+    console.log("BAŞARILI: Canlı veri başarıyla arayüze gönderildi.");
     return NextResponse.json({
       temp: Math.round(data.main.temp),
       seaTemp: Math.round(data.main.temp) - 6,
@@ -65,7 +70,7 @@ export async function GET() {
       badBeaches
     });
   } catch (error) {
-    console.error("API Fetch Error:", error);
-    return NextResponse.json(fallbackData); // ALWAYS return structured data, never throw
+    console.error("SUNUCU HATASI:", error);
+    return NextResponse.json(fallbackData);
   }
 }
