@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crosshair, Loader2 } from "lucide-react";
-import { locations } from "@/data/locations";
+import { locations as staticLocations } from "@/data/locations";
+import { supabase } from "@/lib/supabase";
 import { LocationCard } from "@/components/ui/LocationCard";
 import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
@@ -30,7 +31,38 @@ export function MapView({ activeCategory = null }: MapViewProps) {
   const [userLocation, setUserLocation] = useState<{ top: string; left: string } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [activeFilter, setActiveFilter] = useState("Tümü");
+  const [locations, setLocations] = useState<LocationData[]>(staticLocations);
+  const [isLoadingPlaces, setIsLoadingPlaces] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch places from Supabase on mount
+  useEffect(() => {
+    async function fetchPlaces() {
+      try {
+        const { data, error } = await supabase.from("places").select("*");
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const mapped: LocationData[] = data.map((place: Record<string, unknown>) => ({
+            id: String(place.id),
+            title: (place.title as string) || "",
+            category: (place.category as LocationData["category"]) || "Mekan",
+            description: (place.description as string) || "",
+            top: (place.top as string) || "50%",
+            left: (place.left as string) || "50%",
+            images: (place.images as string[]) || [],
+            reelsUrl: (place.reels_url as string) || undefined,
+            reelUrl: (place.reel_url as string) || undefined,
+          }));
+          setLocations(mapped);
+        }
+      } catch (err) {
+        console.warn("Supabase places fetch failed, using static data:", err);
+      } finally {
+        setIsLoadingPlaces(false);
+      }
+    }
+    fetchPlaces();
+  }, []);
 
   // Placeholder: convert real GPS coordinates to map percentages
   // TODO: Calibrate with the actual bounding box of the Ayvalık map image

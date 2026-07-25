@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import { Sun, Waves, Sunset, Clock, ChevronRight, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -14,33 +15,50 @@ const fadeUp: Variants = {
   }),
 };
 
-const newsItems = [
+interface NewsItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  time: string;
+}
+
+const staticNewsItems: NewsItem[] = [
   {
     id: "1",
     title: "Yeni Mekan Keşfi",
     description: "Cunda'da yeni açılan butik otel, ziyaretçilerini bekliyor.",
-    image:
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
     time: "2 saat önce",
   },
   {
     id: "2",
     title: "Zeytinyağı Festivali",
     description: "Ayvalık'ın meşhur zeytinyağı festivali bu hafta sonu başlıyor.",
-    image:
-      "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&q=80",
     time: "5 saat önce",
   },
   {
     id: "3",
     title: "Tekne Turu Rotası",
-    description:
-      "Ayvalık adaları arasında yeni tekne turu rotası hizmete girdi.",
-    image:
-      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
+    description: "Ayvalık adaları arasında yeni tekne turu rotası hizmete girdi.",
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80",
     time: "Dün",
   },
 ];
+
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins} dk önce`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} saat önce`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "Dün";
+  return `${diffDays} gün önce`;
+}
 
 export function NewsView() {
   const [weather, setWeather] = useState<{
@@ -48,6 +66,9 @@ export function NewsView() {
     seaTemp: number;
     sunset: string;
   } | null>(null);
+
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(staticNewsItems);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
 
   useEffect(() => {
     fetch("/api/weather")
@@ -62,6 +83,32 @@ export function NewsView() {
       .catch(() =>
         setWeather({ temp: 28, seaTemp: 22, sunset: "20:34" })
       );
+
+    // Fetch news from Supabase
+    async function fetchNews() {
+      try {
+        const { data, error } = await supabase
+          .from("news")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const mapped: NewsItem[] = data.map((item: Record<string, unknown>) => ({
+            id: String(item.id),
+            title: (item.title as string) || "",
+            description: (item.description as string) || (item.summary as string) || "",
+            image: (item.image as string) || (item.image_url as string) || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+            time: item.created_at ? timeAgo(item.created_at as string) : "",
+          }));
+          setNewsItems(mapped);
+        }
+      } catch (err) {
+        console.warn("Supabase news fetch failed, using static data:", err);
+      } finally {
+        setIsLoadingNews(false);
+      }
+    }
+    fetchNews();
   }, []);
 
   return (
@@ -156,7 +203,24 @@ export function NewsView() {
         </div>
 
         <div className="space-y-3">
-          {newsItems.map((item, index) => (
+          {isLoadingNews ? (
+            // Loading skeleton
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex bg-white rounded-2xl p-3 shadow-sm border border-gray-100 items-center gap-4 animate-pulse">
+                <div className="w-20 h-20 flex-shrink-0 rounded-xl bg-gray-200" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4" />
+                  <div className="h-2.5 bg-gray-100 rounded w-full" />
+                  <div className="h-2 bg-gray-100 rounded w-1/3" />
+                </div>
+              </div>
+            ))
+          ) : newsItems.length === 0 ? (
+            <div className="text-center py-8 text-gray-400 text-sm font-medium">
+              Henüz haber yok
+            </div>
+          ) : (
+          newsItems.map((item, index) => (
             <motion.div
               key={item.id}
               variants={fadeUp}
@@ -198,7 +262,8 @@ export function NewsView() {
                 className="text-gray-300 flex-shrink-0 group-hover:text-aegean-500 transition-colors"
               />
             </motion.div>
-          ))}
+          ))
+          )}
         </div>
       </motion.div>
     </div>
