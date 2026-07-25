@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { Sun, Waves, Sunset, Clock, ChevronRight, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -221,8 +222,8 @@ export function NewsView() {
             </div>
           ) : (
           newsItems.map((item, index) => (
+            <Link key={item.id} href={`/news/${item.id}`}>
             <motion.div
-              key={item.id}
               variants={fadeUp}
               initial="hidden"
               animate="visible"
@@ -262,6 +263,7 @@ export function NewsView() {
                 className="text-gray-300 flex-shrink-0 group-hover:text-aegean-500 transition-colors"
               />
             </motion.div>
+            </Link>
           ))
           )}
         </div>
