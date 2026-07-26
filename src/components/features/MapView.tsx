@@ -212,7 +212,7 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
           {/* Map Legend */}
           <div className="absolute bottom-4 left-4 glass rounded-xl px-3 py-2 shadow-md">
             <p className="text-[10px] text-foreground-muted font-medium">
-              📍 {filteredLocations.length} / {locations.length} nokta
+              📍 {filteredLocations.length} / {places.length} nokta
             </p>
           </div>
         </div>
