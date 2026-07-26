@@ -1,6 +1,35 @@
+import { client } from "@/sanity/lib/client";
 import { NewsView } from "@/components/features/NewsView";
 
-export default function FeedPage() {
+export interface SanityNewsItem {
+  _id: string;
+  title: string;
+  summary?: string;
+  imageUrl?: string;
+  _createdAt: string;
+}
+
+async function getNews(): Promise<SanityNewsItem[]> {
+  try {
+    const data = await client.fetch(
+      `*[_type == "news"] | order(_createdAt desc){
+        _id,
+        title,
+        summary,
+        _createdAt,
+        "imageUrl": mainImage.asset->url
+      }`
+    );
+    return data || [];
+  } catch (err) {
+    console.warn("Sanity news fetch failed:", err);
+    return [];
+  }
+}
+
+export default async function FeedPage() {
+  const sanityNews = await getNews();
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -14,7 +43,7 @@ export default function FeedPage() {
       </header>
 
       {/* News Dashboard View */}
-      <NewsView />
+      <NewsView sanityNews={sanityNews} />
     </div>
   );
 }

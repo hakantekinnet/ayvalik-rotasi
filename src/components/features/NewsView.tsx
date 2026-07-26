@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { Sun, Waves, Sunset, Clock, ChevronRight, Loader2 } from "lucide-react";
+import type { SanityNewsItem } from "@/app/feed/page";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -14,7 +16,7 @@ const fadeUp: Variants = {
   }),
 };
 
-const newsItems = [
+const staticNewsItems = [
   {
     id: "1",
     title: "Yeni Mekan Keşfi",
@@ -38,7 +40,34 @@ const newsItems = [
   },
 ];
 
-export function NewsView() {
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins} dk önce`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} saat önce`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "Dün";
+  return `${diffDays} gün önce`;
+}
+
+interface NewsViewProps {
+  sanityNews?: SanityNewsItem[];
+}
+
+export function NewsView({ sanityNews }: NewsViewProps) {
+  // Use Sanity data if available, otherwise fall back to static
+  const newsItems = sanityNews && sanityNews.length > 0
+    ? sanityNews.map((item) => ({
+        id: item._id,
+        title: item.title,
+        description: item.summary || "",
+        image: item.imageUrl || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+        time: timeAgo(item._createdAt),
+      }))
+    : staticNewsItems;
   const [weather, setWeather] = useState<{
     temp: number;
     seaTemp: number;
@@ -153,14 +182,14 @@ export function NewsView() {
 
         <div className="space-y-3">
           {newsItems.map((item, index) => (
-            <motion.div
-              key={item.id}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={3 + index}
-              className="flex bg-white rounded-2xl p-3 shadow-sm border border-gray-100 items-center gap-4 cursor-pointer hover:shadow-md transition-shadow duration-200 group"
-            >
+            <Link key={item.id} href={`/news/${item.id}`}>
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                custom={3 + index}
+                className="flex bg-white rounded-2xl p-3 shadow-sm border border-gray-100 items-center gap-4 cursor-pointer hover:shadow-md transition-shadow duration-200 group"
+              >
               {/* Thumbnail */}
               <div className="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden">
                 <Image
@@ -193,7 +222,8 @@ export function NewsView() {
                 size={16}
                 className="text-gray-300 flex-shrink-0 group-hover:text-aegean-500 transition-colors"
               />
-            </motion.div>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </motion.div>

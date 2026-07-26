@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+      },
     ],
     // Allow unoptimized local placeholder images during development
     unoptimized: process.env.NODE_ENV === "development",
