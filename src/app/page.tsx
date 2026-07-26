@@ -66,6 +66,7 @@ async function getPlaces(): Promise<LocationData[]> {
 
 export default async function HomePage() {
   const places = await getPlaces();
+  const serializedPlaces = JSON.parse(JSON.stringify(places));
 
-  return <HomeClient places={places} />;
+  return <HomeClient places={serializedPlaces} />;
 }
