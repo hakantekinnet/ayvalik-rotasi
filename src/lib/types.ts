@@ -7,11 +7,12 @@
 export interface LocationData {
   id: string;
   title: string;
-  category: "Plaj" | "Tarihi" | "Manzara" | "Mekan";
+  category: "Plaj" | "Tarihi" | "Manzara" | "Mekan" | "Eğlence";
   description: string;
   top: string;
   left: string;
   images?: string[];
+  imageUrl?: string;
   reelsUrl?: string;
   reelUrl?: string;
 }

@@ -3,13 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crosshair, Loader2 } from "lucide-react";
-import { locations } from "@/data/locations";
 import { LocationCard } from "@/components/ui/LocationCard";
 import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
 
 interface MapViewProps {
   activeCategory?: string | null;
+  places?: LocationData[];
 }
 
 const categories = ["Tümü", "🏖️ Plajlar", "🏛️ Tarih", "🍽️ Lezzet", "📸 Manzara"];
@@ -22,7 +22,7 @@ const categoryMap: Record<string, string | null> = {
   "📸 Manzara": "Manzara",
 };
 
-export function MapView({ activeCategory = null }: MapViewProps) {
+export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
     null
   );
@@ -94,7 +94,7 @@ export function MapView({ activeCategory = null }: MapViewProps) {
 
   // Local filter bar takes precedence; falls back to parent prop
   const effectiveCategory = categoryMap[activeFilter] ?? activeCategory;
-  const filteredLocations = locations.filter(
+  const filteredLocations = places.filter(
     (location) => !effectiveCategory || location.category === effectiveCategory
   );
 
