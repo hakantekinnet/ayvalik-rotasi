@@ -1,4 +1,5 @@
 import { client } from "@/sanity/lib/client";
+import { PortableText } from "@portabletext/react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar } from "lucide-react";
@@ -101,10 +102,10 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
           </p>
         )}
 
-        {/* Rich text content placeholder — install @portabletext/react for full rendering */}
+        {/* Rich text content */}
         {article.content && (
-          <div className="text-sm text-gray-500 italic">
-            Bu haberin detaylı içeriği yakında burada görüntülenecek.
+          <div className="mt-8 text-gray-800 leading-relaxed space-y-4 prose prose-sm prose-gray max-w-none">
+            <PortableText value={article.content} />
           </div>
         )}
 
