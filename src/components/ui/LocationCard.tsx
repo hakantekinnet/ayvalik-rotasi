@@ -56,7 +56,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
     Mekan: "bg-orange-100 text-orange-700",
   };
 
-  const hasImages = location?.images && location.images.length > 0;
+  const hasImages = location?.imageUrls && location.imageUrls.length > 0;
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -149,7 +149,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                     onScroll={handleScroll}
                     className="flex w-full overflow-x-auto snap-x snap-mandatory gap-3 hide-scrollbar"
                   >
-                    {location.images!.map((src, idx) => (
+                    {location.imageUrls!.map((src, idx) => (
                       <div
                         key={idx}
                         className="relative w-[85%] flex-shrink-0 aspect-[4/3] rounded-2xl snap-center overflow-hidden shadow-sm border border-gray-100"
@@ -167,9 +167,9 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                   </div>
 
                   {/* Dot Indicators */}
-                  {location.images!.length > 1 && (
+                  {location.imageUrls!.length > 1 && (
                     <div className="flex items-center justify-center gap-1.5 mt-3">
-                      {location.images!.map((_, idx) => (
+                      {location.imageUrls!.map((_, idx) => (
                         <div
                           key={idx}
                           className={`rounded-full transition-all duration-300 ${

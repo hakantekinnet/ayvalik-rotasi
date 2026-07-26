@@ -1,4 +1,5 @@
 import { client } from "@/sanity/lib/client";
+export const dynamic = 'force-dynamic';
 import { LocationData } from "@/lib/types";
 import { locations as staticLocations } from "@/data/locations";
 import { HomeClient } from "@/components/features/HomeClient";
