@@ -12,7 +12,7 @@ export interface LocationData {
   top: string;
   left: string;
   images?: string[];
-  imageUrl?: string;
+  imageUrls?: string[];
   reelsUrl?: string;
   reelUrl?: string;
 }

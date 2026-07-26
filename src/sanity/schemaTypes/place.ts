@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { LeafletGeopointInput } from '../components/LeafletGeopointInput'
 
 export const place = defineType({
   name: 'place',
@@ -35,16 +36,20 @@ export const place = defineType({
       rows: 4,
     }),
     defineField({
-      name: 'image',
-      title: 'Mekan Görseli',
-      type: 'image',
-      options: { hotspot: true },
+      name: 'images',
+      title: 'Fotoğraflar',
+      type: 'array',
+      of: [{ type: 'image', options: { hotspot: true } }],
+      description: 'Mekan için birden fazla fotoğraf ekleyebilirsiniz.',
     }),
     defineField({
       name: 'location',
       title: 'Konum (Harita)',
       type: 'geopoint',
-      description: 'Mekanın haritadaki koordinatlarını belirleyin.',
+      description: 'Haritaya tıklayarak mekanın koordinatlarını belirleyin.',
+      components: {
+        input: LeafletGeopointInput,
+      },
     }),
     defineField({
       name: 'reelUrl',
@@ -57,7 +62,7 @@ export const place = defineType({
     select: {
       title: 'title',
       subtitle: 'category',
-      media: 'image',
+      media: 'images.0',
     },
   },
 })

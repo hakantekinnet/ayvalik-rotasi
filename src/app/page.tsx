@@ -8,7 +8,7 @@ export interface SanityPlace {
   title: string;
   category: string;
   description: string;
-  imageUrl?: string;
+  imageUrls?: string[];
   location?: { lat: number; lng: number; alt?: number };
   reelUrl?: string;
 }
@@ -32,7 +32,7 @@ async function getPlaces(): Promise<LocationData[]> {
         title,
         category,
         description,
-        "imageUrl": image.asset->url,
+        "imageUrls": images[].asset->url,
         location,
         reelUrl
       }`
@@ -51,8 +51,8 @@ async function getPlaces(): Promise<LocationData[]> {
           description: place.description || "",
           top: coords.top,
           left: coords.left,
-          imageUrl: place.imageUrl,
-          images: place.imageUrl ? [place.imageUrl] : [],
+          imageUrls: place.imageUrls || [],
+          images: place.imageUrls || [],
           reelUrl: place.reelUrl,
         };
       });
