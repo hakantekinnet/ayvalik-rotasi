@@ -37,6 +37,13 @@ export const news = defineType({
         },
       ],
     }),
+    defineField({
+      name: 'isWeeklyEvent',
+      title: 'Haftanın Etkinliği Olarak İşaretle',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Bu haberi "Haftanın Etkinliği" olarak öne çıkarır.',
+    }),
   ],
   preview: {
     select: {

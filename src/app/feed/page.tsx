@@ -1,12 +1,21 @@
 import { client } from "@/sanity/lib/client";
 import { NewsView } from "@/components/features/NewsView";
 
+export const dynamic = 'force-dynamic';
+
 export interface SanityNewsItem {
   _id: string;
   title: string;
   summary?: string;
   imageUrl?: string;
   _createdAt: string;
+}
+
+export interface SanityWeeklyEvent {
+  _id: string;
+  title: string;
+  summary?: string;
+  imageUrl?: string;
 }
 
 async function getNews(): Promise<SanityNewsItem[]> {
@@ -27,8 +36,33 @@ async function getNews(): Promise<SanityNewsItem[]> {
   }
 }
 
+async function getWeeklyEvent(): Promise<SanityWeeklyEvent | null> {
+  try {
+    const data = await client.fetch(
+      `*[_type == "news" && isWeeklyEvent == true][0]{
+        _id,
+        title,
+        summary,
+        "imageUrl": mainImage.asset->url
+      }`
+    );
+    return data || null;
+  } catch (err) {
+    console.warn("Sanity weekly event fetch failed:", err);
+    return null;
+  }
+}
+
 export default async function FeedPage() {
-  const sanityNews = await getNews();
+  const [sanityNews, weeklyEvent] = await Promise.all([
+    getNews(),
+    getWeeklyEvent(),
+  ]);
+
+  const serializedNews = JSON.parse(JSON.stringify(sanityNews));
+  const serializedEvent = weeklyEvent
+    ? JSON.parse(JSON.stringify(weeklyEvent))
+    : null;
 
   return (
     <div className="min-h-screen">
@@ -43,7 +77,7 @@ export default async function FeedPage() {
       </header>
 
       {/* News Dashboard View */}
-      <NewsView sanityNews={sanityNews} />
+      <NewsView sanityNews={serializedNews} weeklyEvent={serializedEvent} />
     </div>
   );
 }

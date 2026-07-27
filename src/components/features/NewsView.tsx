@@ -5,7 +5,7 @@ import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Sun, Waves, Sunset, Clock, ChevronRight, Loader2 } from "lucide-react";
-import type { SanityNewsItem } from "@/app/feed/page";
+import type { SanityNewsItem, SanityWeeklyEvent } from "@/app/feed/page";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -55,9 +55,10 @@ function timeAgo(dateStr: string): string {
 
 interface NewsViewProps {
   sanityNews?: SanityNewsItem[];
+  weeklyEvent?: SanityWeeklyEvent | null;
 }
 
-export function NewsView({ sanityNews }: NewsViewProps) {
+export function NewsView({ sanityNews, weeklyEvent }: NewsViewProps) {
   // Use Sanity data if available, otherwise fall back to static
   const newsItems = sanityNews && sanityNews.length > 0
     ? sanityNews.map((item) => ({
@@ -130,41 +131,82 @@ export function NewsView({ sanityNews }: NewsViewProps) {
         </div>
       </motion.div>
 
-      {/* ── Featured News Card ── */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        custom={1}
-        className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
-      >
-        <Image
-          src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
-          alt="Ayvalık Amfitiyatro Konseri"
-          fill
-          sizes="(max-width: 768px) 100vw, 600px"
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      {/* ── Featured News Card (Haftanın Etkinliği) ── */}
+      {weeklyEvent ? (
+        <Link href={`/news/${weeklyEvent._id}`}>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={1}
+            className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
+          >
+            <Image
+              src={weeklyEvent.imageUrl || "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"}
+              alt={weeklyEvent.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 600px"
+              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        {/* Featured Badge */}
-        <div className="absolute top-4 left-4">
-          <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
-            ✨ Haftanın Etkinliği
-          </span>
-        </div>
+            {/* Featured Badge */}
+            <div className="absolute top-4 left-4">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
+                ✨ Haftanın Etkinliği
+              </span>
+            </div>
 
-        {/* Text */}
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <h2 className="text-white text-xl font-bold leading-tight mb-1">
-            Amfitiyatro&apos;da Yaz Konseri
-          </h2>
-          <p className="text-white/70 text-xs">
-            Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
-          </p>
-        </div>
-      </motion.div>
+            {/* Text */}
+            <div className="absolute bottom-0 left-0 right-0 p-5">
+              <h2 className="text-white text-xl font-bold leading-tight mb-1">
+                {weeklyEvent.title}
+              </h2>
+              {weeklyEvent.summary && (
+                <p className="text-white/70 text-xs">
+                  {weeklyEvent.summary}
+                </p>
+              )}
+            </div>
+          </motion.div>
+        </Link>
+      ) : (
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+          className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
+            alt="Ayvalık Amfitiyatro Konseri"
+            fill
+            sizes="(max-width: 768px) 100vw, 600px"
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+          {/* Featured Badge */}
+          <div className="absolute top-4 left-4">
+            <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
+              ✨ Haftanın Etkinliği
+            </span>
+          </div>
+
+          {/* Text */}
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <h2 className="text-white text-xl font-bold leading-tight mb-1">
+              Amfitiyatro&apos;da Yaz Konseri
+            </h2>
+            <p className="text-white/70 text-xs">
+              Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* ── News Feed List ── */}
       <motion.div
