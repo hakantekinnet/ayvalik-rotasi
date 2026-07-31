@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
     searchParams.get("imageUrl") ||
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80";
 
-  // Build absolute logo URL from the request origin
   const origin = req.nextUrl.origin;
   const logoUrl = `${origin}/logo.PNG`;
 
@@ -21,14 +20,13 @@ export async function GET(req: NextRequest) {
           width: "1080px",
           height: "1920px",
           display: "flex",
-          flexDirection: "column",
           position: "relative",
           fontFamily: "sans-serif",
           overflow: "hidden",
-          backgroundColor: "#0a0a0a",
+          backgroundColor: "#022B3A",
         }}
       >
-        {/* Background Image */}
+        {/* Background image — fills entire frame */}
         <img
           src={imageUrl}
           alt=""
@@ -42,7 +40,7 @@ export async function GET(req: NextRequest) {
           }}
         />
 
-        {/* Heavy gradient overlay */}
+        {/* Gradient overlay — deep blue-to-teal, bottom-heavy */}
         <div
           style={{
             position: "absolute",
@@ -52,20 +50,18 @@ export async function GET(req: NextRequest) {
             height: "1920px",
             display: "flex",
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.85) 75%, rgba(0,0,0,0.95) 100%)",
+              "linear-gradient(to top, #022B3A 0%, rgba(2,43,58,0.95) 20%, rgba(31,122,140,0.75) 50%, rgba(31,122,140,0.3) 75%, transparent 100%)",
           }}
         />
 
-        {/* Top: Site logo */}
+        {/* Top: Logo */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
             position: "absolute",
-            top: "90px",
-            left: "0",
-            width: "1080px",
+            top: "80px",
+            left: "72px",
             zIndex: 10,
           }}
         >
@@ -73,112 +69,79 @@ export async function GET(req: NextRequest) {
             src={logoUrl}
             alt="Ayvalık Rotası"
             style={{
-              width: "140px",
-              height: "140px",
+              width: "120px",
+              height: "120px",
               objectFit: "contain",
             }}
           />
         </div>
 
-        {/* Center: Main title — massive, bold, centered */}
+        {/* Content container — bottom-aligned */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "absolute",
-            top: "0",
-            left: "0",
+            justifyContent: "flex-end",
             width: "1080px",
-            height: "1400px",
+            height: "1920px",
+            position: "relative",
             zIndex: 10,
-            padding: "0 72px",
+            padding: "48px 72px 80px 72px",
           }}
         >
-          {/* Accent bar */}
-          <div
-            style={{
-              display: "flex",
-              width: "80px",
-              height: "6px",
-              borderRadius: "3px",
-              background: "linear-gradient(90deg, #22D3EE 0%, #0891B2 100%)",
-              marginBottom: "32px",
-            }}
-          />
-
-          {/* Label */}
+          {/* Title — massive, ultra-bold */}
           <span
             style={{
-              display: "flex",
-              fontSize: "26px",
-              fontWeight: 700,
-              color: "#22D3EE",
-              textTransform: "uppercase",
-              letterSpacing: "8px",
-              marginBottom: "28px",
-            }}
-          >
-            SON DAKİKA
-          </span>
-
-          {/* Title */}
-          <span
-            style={{
-              fontSize: "90px",
+              fontSize: "85px",
               fontWeight: 900,
               color: "#FFFFFF",
-              textAlign: "center",
-              lineHeight: 1.08,
-              textShadow:
-                "0 2px 20px rgba(0,0,0,0.8), 0 8px 40px rgba(0,0,0,0.5)",
-              maxWidth: "940px",
+              lineHeight: 1.1,
               letterSpacing: "-2px",
+              marginBottom: "48px",
+              textShadow:
+                "0 4px 24px rgba(2,43,58,0.6), 0 2px 8px rgba(0,0,0,0.4)",
+              maxWidth: "940px",
             }}
           >
             {title}
           </span>
-        </div>
 
-        {/* Bottom: Link sticker zone */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            position: "absolute",
-            bottom: "180px",
-            left: "0",
-            width: "1080px",
-            zIndex: 10,
-            gap: "20px",
-          }}
-        >
-          {/* Hint text above the frame */}
+          {/* Link sticker guide text */}
           <span
             style={{
               fontSize: "30px",
-              fontWeight: 700,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.9)",
+              marginBottom: "16px",
+            }}
+          >
+            Haberin detayları için dokun 👇
+          </span>
+
+          {/* Link sticker empty frame */}
+          <div
+            style={{
+              display: "flex",
+              width: "450px",
+              height: "130px",
+              borderRadius: "32px",
+              background: "rgba(255,255,255,0.1)",
+              border: "4px solid rgba(255,255,255,0.4)",
+              marginBottom: "48px",
+            }}
+          />
+
+          {/* Footer domain */}
+          <span
+            style={{
+              fontSize: "28px",
+              fontWeight: 500,
               color: "rgba(255,255,255,0.7)",
               letterSpacing: "1px",
             }}
           >
-            Haberin devamı için dokun 👇
+            www.ayvalikrotasi.com
           </span>
-
-          {/* Empty sticker placeholder frame */}
-          <div
-            style={{
-              display: "flex",
-              width: "350px",
-              height: "100px",
-              borderRadius: "24px",
-              background: "rgba(255,255,255,0.08)",
-              border: "2px solid rgba(255,255,255,0.3)",
-              boxShadow: "0 0 40px rgba(34,211,238,0.08)",
-            }}
-          />
         </div>
       </div>
     ),
