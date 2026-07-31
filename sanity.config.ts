@@ -16,22 +16,15 @@ import {structure} from './src/sanity/structure'
 
 // Custom document action: "📱 Hikaye Üret"
 const GenerateStoryAction: DocumentActionComponent = (props) => {
-  const {published, draft} = props
-  const doc = published || draft
-
-  if (!doc) {
-    return null
-  }
-
   return {
     label: '📱 Hikaye Üret',
-    icon: () => '📱',
     tone: 'primary' as const,
     onHandle: () => {
-      const title = (doc.title as string) || 'Ayvalık Rotası'
+      const doc = props.published || props.draft
+      const title = (doc?.title as string) || 'Ayvalık Rotası'
 
       // Resolve the image URL from the Sanity image reference
-      const mainImage = doc.mainImage as {asset?: {_ref?: string}} | undefined
+      const mainImage = doc?.mainImage as {asset?: {_ref?: string}} | undefined
       let imageUrl = ''
       if (mainImage?.asset?._ref) {
         // Convert Sanity image ref to CDN URL
@@ -61,10 +54,8 @@ export default defineConfig({
   ],
   document: {
     actions: (prev: DocumentActionComponent[], context: DocumentActionsContext) => {
-      if (context.schemaType === 'news') {
-        return [...prev, GenerateStoryAction]
-      }
-      return prev
+      console.log('Action overriding for:', context.schemaType)
+      return context.schemaType === 'news' ? [GenerateStoryAction, ...prev] : prev
     },
   },
 })
