@@ -10,6 +10,10 @@ export async function GET(req: NextRequest) {
     searchParams.get("imageUrl") ||
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80";
 
+  // Build absolute logo URL from the request origin
+  const origin = req.nextUrl.origin;
+  const logoUrl = `${origin}/logo.PNG`;
+
   return new ImageResponse(
     (
       <div
@@ -38,7 +42,7 @@ export async function GET(req: NextRequest) {
           }}
         />
 
-        {/* Heavy gradient overlay — dark from bottom, medium everywhere else */}
+        {/* Heavy gradient overlay */}
         <div
           style={{
             position: "absolute",
@@ -48,53 +52,48 @@ export async function GET(req: NextRequest) {
             height: "1920px",
             display: "flex",
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.88) 75%, rgba(0,0,0,0.95) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.85) 75%, rgba(0,0,0,0.95) 100%)",
           }}
         />
 
-        {/* Top: Brand badge — frosted glass pill */}
+        {/* Top: Site logo */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "14px",
+            justifyContent: "center",
             position: "absolute",
-            top: "100px",
-            left: "72px",
+            top: "90px",
+            left: "0",
+            width: "1080px",
             zIndex: 10,
-            padding: "18px 40px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.12)",
-            border: "1px solid rgba(255,255,255,0.2)",
           }}
         >
-          <span style={{ fontSize: "32px" }}>📍</span>
-          <span
+          <img
+            src={logoUrl}
+            alt="Ayvalık Rotası"
             style={{
-              fontSize: "30px",
-              fontWeight: 700,
-              color: "rgba(255,255,255,0.9)",
-              letterSpacing: "-0.3px",
+              width: "140px",
+              height: "140px",
+              objectFit: "contain",
             }}
-          >
-            AYVALIK ROTASI
-          </span>
+          />
         </div>
 
-        {/* Center-left: Main title block */}
+        {/* Center: Main title — massive, bold, centered */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",
-            justifyContent: "flex-end",
+            alignItems: "center",
+            justifyContent: "center",
             position: "absolute",
-            top: 0,
-            left: 0,
+            top: "0",
+            left: "0",
             width: "1080px",
-            height: "1320px",
+            height: "1400px",
             zIndex: 10,
-            padding: "0 72px 40px 72px",
+            padding: "0 72px",
           }}
         >
           {/* Accent bar */}
@@ -104,8 +103,7 @@ export async function GET(req: NextRequest) {
               width: "80px",
               height: "6px",
               borderRadius: "3px",
-              background:
-                "linear-gradient(90deg, #22D3EE 0%, #0891B2 100%)",
+              background: "linear-gradient(90deg, #22D3EE 0%, #0891B2 100%)",
               marginBottom: "32px",
             }}
           />
@@ -119,19 +117,19 @@ export async function GET(req: NextRequest) {
               color: "#22D3EE",
               textTransform: "uppercase",
               letterSpacing: "8px",
-              marginBottom: "24px",
+              marginBottom: "28px",
             }}
           >
             SON DAKİKA
           </span>
 
-          {/* Title — massive, left-aligned */}
+          {/* Title */}
           <span
             style={{
               fontSize: "90px",
               fontWeight: 900,
               color: "#FFFFFF",
-              textAlign: "left",
+              textAlign: "center",
               lineHeight: 1.08,
               textShadow:
                 "0 2px 20px rgba(0,0,0,0.8), 0 8px 40px rgba(0,0,0,0.5)",
@@ -143,7 +141,7 @@ export async function GET(req: NextRequest) {
           </span>
         </div>
 
-        {/* Bottom: Premium link sticker zone */}
+        {/* Bottom: Link sticker zone */}
         <div
           style={{
             display: "flex",
@@ -154,58 +152,33 @@ export async function GET(req: NextRequest) {
             left: "0",
             width: "1080px",
             zIndex: 10,
-            gap: "24px",
+            gap: "20px",
           }}
         >
-          {/* Frosted glass link box */}
+          {/* Hint text above the frame */}
+          <span
+            style={{
+              fontSize: "30px",
+              fontWeight: 700,
+              color: "rgba(255,255,255,0.7)",
+              letterSpacing: "1px",
+            }}
+          >
+            Haberin devamı için dokun 👇
+          </span>
+
+          {/* Empty sticker placeholder frame */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "32px 72px",
-              borderRadius: "28px",
-              background: "rgba(255,255,255,0.1)",
-              border: "1.5px solid rgba(255,255,255,0.2)",
-              boxShadow:
-                "0 0 60px rgba(34,211,238,0.15), 0 8px 32px rgba(0,0,0,0.3)",
-              gap: "12px",
+              width: "350px",
+              height: "100px",
+              borderRadius: "24px",
+              background: "rgba(255,255,255,0.08)",
+              border: "2px solid rgba(255,255,255,0.3)",
+              boxShadow: "0 0 40px rgba(34,211,238,0.08)",
             }}
-          >
-            <span
-              style={{
-                fontSize: "34px",
-                fontWeight: 800,
-                color: "#FFFFFF",
-                letterSpacing: "3px",
-              }}
-            >
-              HABERİ OKUMAK İÇİN TIKLA
-            </span>
-            <span
-              style={{
-                fontSize: "24px",
-                color: "rgba(255,255,255,0.5)",
-                fontWeight: 600,
-                letterSpacing: "1px",
-              }}
-            >
-              ayvalikrotasi.com
-            </span>
-          </div>
-
-          {/* Subtle placement hint */}
-          <span
-            style={{
-              fontSize: "24px",
-              color: "rgba(255,255,255,0.35)",
-              fontWeight: 600,
-              letterSpacing: "4px",
-            }}
-          >
-            👆 LINK STİCKER ALANI 👆
-          </span>
+          />
         </div>
       </div>
     ),
