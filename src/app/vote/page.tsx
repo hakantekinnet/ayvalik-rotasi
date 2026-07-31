@@ -1,7 +1,7 @@
 import { client } from "@/sanity/lib/client";
 import { VotingView } from "@/components/features/VotingView";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export interface SanityPoll {
   _id: string;

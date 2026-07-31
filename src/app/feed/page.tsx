@@ -1,7 +1,7 @@
 import { client } from "@/sanity/lib/client";
 import { NewsView } from "@/components/features/NewsView";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export interface SanityNewsItem {
   _id: string;

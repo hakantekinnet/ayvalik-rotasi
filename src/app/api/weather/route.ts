@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 300;
 
 // Adding (req: Request) is the magic key that forces Next.js to run this on every single request, preventing static generation at build time.
 export async function GET(req: Request) {
@@ -27,7 +26,7 @@ export async function GET(req: Request) {
   try {
     const res = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=39.3193&lon=26.6961&appid=${apiKey}&units=metric&lang=tr`,
-      { cache: 'no-store' }
+      { next: { revalidate: 300 } }
     );
     
     const data = await res.json();
