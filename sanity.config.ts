@@ -16,21 +16,22 @@ import {structure} from './src/sanity/structure'
 
 // Custom document action: "📱 Hikaye Üret"
 const GenerateStoryAction: DocumentActionComponent = (props) => {
-  const {published} = props
+  const {published, draft} = props
+  const doc = published || draft
+
+  if (!doc) {
+    return null
+  }
 
   return {
     label: '📱 Hikaye Üret',
-    tone: 'primary',
+    icon: () => '📱',
+    tone: 'primary' as const,
     onHandle: () => {
-      if (!published) {
-        alert('Lütfen önce haberi yayınlayın.')
-        return
-      }
-
-      const title = (published.title as string) || 'Ayvalık Rotası'
+      const title = (doc.title as string) || 'Ayvalık Rotası'
 
       // Resolve the image URL from the Sanity image reference
-      const mainImage = published.mainImage as {asset?: {_ref?: string}} | undefined
+      const mainImage = doc.mainImage as {asset?: {_ref?: string}} | undefined
       let imageUrl = ''
       if (mainImage?.asset?._ref) {
         // Convert Sanity image ref to CDN URL
