@@ -18,11 +18,10 @@ export async function GET(req: NextRequest) {
           height: "1920px",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "space-between",
           position: "relative",
           fontFamily: "sans-serif",
           overflow: "hidden",
+          backgroundColor: "#0a0a0a",
         }}
       >
         {/* Background Image */}
@@ -39,7 +38,7 @@ export async function GET(req: NextRequest) {
           }}
         />
 
-        {/* Dark gradient overlay — heavier at top and bottom for text readability */}
+        {/* Heavy gradient overlay — dark from bottom, medium everywhere else */}
         <div
           style={{
             position: "absolute",
@@ -49,134 +48,163 @@ export async function GET(req: NextRequest) {
             height: "1920px",
             display: "flex",
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0.8) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.88) 75%, rgba(0,0,0,0.95) 100%)",
           }}
         />
 
-        {/* Top: Brand badge */}
+        {/* Top: Brand badge — frosted glass pill */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
-            marginTop: "120px",
+            gap: "14px",
+            position: "absolute",
+            top: "100px",
+            left: "72px",
             zIndex: 10,
-            padding: "16px 36px",
+            padding: "18px 40px",
             borderRadius: "999px",
-            background: "rgba(255,255,255,0.15)",
-            border: "1px solid rgba(255,255,255,0.25)",
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.2)",
           }}
         >
-          <span style={{ fontSize: "36px" }}>📍</span>
+          <span style={{ fontSize: "32px" }}>📍</span>
           <span
             style={{
-              fontSize: "32px",
+              fontSize: "30px",
               fontWeight: 700,
-              color: "#FFFFFF",
-              letterSpacing: "-0.5px",
+              color: "rgba(255,255,255,0.9)",
+              letterSpacing: "-0.3px",
             }}
           >
-            Ayvalık Rotası
+            AYVALIK ROTASI
           </span>
         </div>
 
-        {/* Center: Title */}
+        {/* Center-left: Main title block */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: "flex-start",
+            justifyContent: "flex-end",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "1080px",
+            height: "1320px",
             zIndex: 10,
-            padding: "0 72px",
-            marginTop: "-100px",
+            padding: "0 72px 40px 72px",
           }}
         >
+          {/* Accent bar */}
+          <div
+            style={{
+              display: "flex",
+              width: "80px",
+              height: "6px",
+              borderRadius: "3px",
+              background:
+                "linear-gradient(90deg, #22D3EE 0%, #0891B2 100%)",
+              marginBottom: "32px",
+            }}
+          />
+
+          {/* Label */}
           <span
             style={{
-              fontSize: "28px",
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.6)",
+              display: "flex",
+              fontSize: "26px",
+              fontWeight: 700,
+              color: "#22D3EE",
               textTransform: "uppercase",
-              letterSpacing: "6px",
-              marginBottom: "28px",
+              letterSpacing: "8px",
+              marginBottom: "24px",
             }}
           >
             SON DAKİKA
           </span>
+
+          {/* Title — massive, left-aligned */}
           <span
             style={{
-              fontSize: "64px",
-              fontWeight: 800,
+              fontSize: "90px",
+              fontWeight: 900,
               color: "#FFFFFF",
-              textAlign: "center",
-              lineHeight: 1.2,
-              textShadow: "0 4px 30px rgba(0,0,0,0.6)",
-              maxWidth: "900px",
+              textAlign: "left",
+              lineHeight: 1.08,
+              textShadow:
+                "0 2px 20px rgba(0,0,0,0.8), 0 8px 40px rgba(0,0,0,0.5)",
+              maxWidth: "940px",
+              letterSpacing: "-2px",
             }}
           >
             {title}
           </span>
         </div>
 
-        {/* Bottom: Link Sticker Zone */}
+        {/* Bottom: Premium link sticker zone */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            position: "absolute",
+            bottom: "180px",
+            left: "0",
+            width: "1080px",
             zIndex: 10,
-            marginBottom: "200px",
-            gap: "20px",
+            gap: "24px",
           }}
         >
-          {/* Link sticker bounding box */}
+          {/* Frosted glass link box */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              padding: "28px 64px",
-              borderRadius: "24px",
-              background:
-                "linear-gradient(135deg, rgba(14,116,144,0.85) 0%, rgba(8,145,178,0.85) 100%)",
-              border: "2px solid rgba(255,255,255,0.3)",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.4)",
-              gap: "8px",
+              padding: "32px 72px",
+              borderRadius: "28px",
+              background: "rgba(255,255,255,0.1)",
+              border: "1.5px solid rgba(255,255,255,0.2)",
+              boxShadow:
+                "0 0 60px rgba(34,211,238,0.15), 0 8px 32px rgba(0,0,0,0.3)",
+              gap: "12px",
             }}
           >
             <span
               style={{
-                fontSize: "36px",
+                fontSize: "34px",
                 fontWeight: 800,
                 color: "#FFFFFF",
-                letterSpacing: "1px",
+                letterSpacing: "3px",
               }}
             >
-              HABERİ OKU
+              HABERİ OKUMAK İÇİN TIKLA
             </span>
             <span
               style={{
                 fontSize: "24px",
-                color: "rgba(255,255,255,0.7)",
+                color: "rgba(255,255,255,0.5)",
                 fontWeight: 600,
+                letterSpacing: "1px",
               }}
             >
               ayvalikrotasi.com
             </span>
           </div>
 
-          {/* Arrow hint */}
+          {/* Subtle placement hint */}
           <span
             style={{
-              fontSize: "32px",
-              color: "rgba(255,255,255,0.5)",
+              fontSize: "24px",
+              color: "rgba(255,255,255,0.35)",
               fontWeight: 600,
-              letterSpacing: "2px",
+              letterSpacing: "4px",
             }}
           >
-            👆 LINK STİCKER BURAYA 👆
+            👆 LINK STİCKER ALANI 👆
           </span>
         </div>
       </div>

@@ -109,25 +109,15 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
           </div>
         )}
 
-        {/* Back CTA + Story Download */}
-        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col gap-4">
+        {/* Back CTA */}
+        <div className="mt-10 pt-6 border-t border-gray-200">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F766E] text-white rounded-full font-semibold text-sm shadow-lg hover:bg-[#0d6b63] transition-colors active:scale-95 w-fit"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F766E] text-white rounded-full font-semibold text-sm shadow-lg hover:bg-[#0d6b63] transition-colors active:scale-95"
           >
             <ArrowLeft size={16} />
             Ana Sayfaya Dön
           </Link>
-
-          <a
-            href={`/api/story?title=${encodeURIComponent(article.title)}&imageUrl=${encodeURIComponent(imageUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            download="ayvalik-rotasi-story.png"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] text-white rounded-full font-semibold text-sm shadow-lg hover:opacity-90 transition-opacity active:scale-95 w-fit"
-          >
-            📱 Hikaye Görselini İndir
-          </a>
         </div>
       </div>
     </div>
