@@ -6,6 +6,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const title = searchParams.get("title") || "Ayvalık Rotası";
+  const summary = searchParams.get("summary") || "";
   const imageUrl =
     searchParams.get("imageUrl") ||
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80";
@@ -54,23 +55,25 @@ export async function GET(req: NextRequest) {
           }}
         />
 
-        {/* Top: Logo */}
+        {/* Top: Centered logo — large */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
+            width: "1080px",
+            justifyContent: "center",
             position: "absolute",
-            top: "80px",
-            left: "72px",
+            top: "64px",
+            left: "0",
             zIndex: 10,
+            padding: "0 48px",
           }}
         >
           <img
             src={logoUrl}
             alt="Ayvalık Rotası"
             style={{
-              width: "120px",
-              height: "120px",
+              width: "400px",
+              height: "400px",
               objectFit: "contain",
             }}
           />
@@ -92,12 +95,11 @@ export async function GET(req: NextRequest) {
           {/* Title — massive, ultra-bold */}
           <span
             style={{
-              fontSize: "85px",
+              fontSize: "80px",
               fontWeight: 900,
               color: "#FFFFFF",
               lineHeight: 1.1,
               letterSpacing: "-2px",
-              marginBottom: "48px",
               textShadow:
                 "0 4px 24px rgba(2,43,58,0.6), 0 2px 8px rgba(0,0,0,0.4)",
               maxWidth: "940px",
@@ -105,6 +107,26 @@ export async function GET(req: NextRequest) {
           >
             {title}
           </span>
+
+          {/* Summary — below title */}
+          {summary && (
+            <span
+              style={{
+                display: "flex",
+                fontSize: "36px",
+                fontWeight: 400,
+                color: "rgba(255,255,255,0.9)",
+                lineHeight: 1.4,
+                marginTop: "24px",
+                maxWidth: "900px",
+              }}
+            >
+              {summary}
+            </span>
+          )}
+
+          {/* Spacer before sticker zone */}
+          <div style={{ display: "flex", marginTop: "48px" }} />
 
           {/* Link sticker guide text */}
           <span

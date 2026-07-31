@@ -23,6 +23,23 @@ const GenerateStoryAction: DocumentActionComponent = (props) => {
       const doc = props.published || props.draft
       const title = (doc?.title as string) || 'Ayvalık Rotası'
 
+      // Extract summary: try summary field, then first text block from content
+      let summary = ''
+      if (doc?.summary) {
+        summary = doc.summary as string
+      } else if (doc?.content && Array.isArray(doc.content)) {
+        // Extract first plain text span from Portable Text blocks
+        for (const block of doc.content as Array<{_type?: string; children?: Array<{text?: string}>}>) {
+          if (block._type === 'block' && block.children) {
+            const text = block.children.map((c) => c.text || '').join('')
+            if (text.trim()) {
+              summary = text.trim().length > 120 ? text.trim().slice(0, 120) + '...' : text.trim()
+              break
+            }
+          }
+        }
+      }
+
       // Resolve the image URL from the Sanity image reference
       const mainImage = doc?.mainImage as {asset?: {_ref?: string}} | undefined
       let imageUrl = ''
@@ -34,7 +51,10 @@ const GenerateStoryAction: DocumentActionComponent = (props) => {
         imageUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${dimensions}.${format}`
       }
 
-      const storyUrl = `/api/story?title=${encodeURIComponent(title)}&imageUrl=${encodeURIComponent(imageUrl)}`
+      let storyUrl = `/api/story?title=${encodeURIComponent(title)}&imageUrl=${encodeURIComponent(imageUrl)}`
+      if (summary) {
+        storyUrl += `&summary=${encodeURIComponent(summary)}`
+      }
       window.open(storyUrl, '_blank')
     },
   }
