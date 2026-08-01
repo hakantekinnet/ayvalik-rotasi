@@ -1,0 +1,168 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouteStore } from "@/store/useRouteStore";
+import { motion, AnimatePresence } from "framer-motion";
+import { Trash2, MapPin, Navigation, ChevronLeft, Route } from "lucide-react";
+
+export default function RotamPage() {
+  const [mounted, setMounted] = useState(false);
+  const { routeList, removeFromRoute, clearRoute } = useRouteStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  // Build multi-stop Google Maps Directions URL
+  const mapsUrl =
+    "https://www.google.com/maps/dir/" +
+    routeList
+      .map((loc) => `${loc.geopoint?.lat},${loc.geopoint?.lng}`)
+      .filter((val) => !val.includes("undefined"))
+      .join("/");
+
+  // ── Empty State ──────────────────────────────────────────────────────────
+  if (routeList.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-b from-slate-50 to-white">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-sm"
+        >
+          {/* Empty illustration */}
+          <div className="w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#0F766E]/10 to-[#0F766E]/5 flex items-center justify-center">
+            <Route size={48} className="text-[#0F766E]/40" />
+          </div>
+
+          <h1 className="text-2xl font-extrabold text-slate-800 mb-3">
+            Rotanız Henüz Boş
+          </h1>
+          <p className="text-slate-500 text-sm leading-relaxed mb-8">
+            Haritadan mekanları keşfedin ve &quot;Rotaya Ekle&quot; butonuyla
+            kendi rotanızı oluşturun.
+          </p>
+
+          <Link href="/">
+            <div className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#0F766E] text-white font-bold text-sm tracking-wide shadow-lg shadow-[#0F766E]/25 hover:shadow-xl hover:shadow-[#0F766E]/30 transition-all duration-300 hover:scale-105 active:scale-95">
+              <MapPin size={18} />
+              Haritaya Git
+            </div>
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ── List State ───────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pb-48">
+      {/* Header */}
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+        <div className="max-w-lg mx-auto px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors active:scale-95">
+                <ChevronLeft size={20} className="text-slate-600" />
+              </div>
+            </Link>
+            <div>
+              <h1 className="text-lg font-extrabold text-slate-800 leading-tight">
+                Rotam
+              </h1>
+              <p className="text-xs text-slate-400 font-medium">
+                {routeList.length} mekan seçildi
+              </p>
+            </div>
+          </div>
+
+          {/* Clear all */}
+          <button
+            onClick={clearRoute}
+            className="text-xs font-semibold text-red-400 hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all duration-200"
+          >
+            Tümünü Sil
+          </button>
+        </div>
+      </div>
+
+      {/* Location List */}
+      <div className="max-w-lg mx-auto px-5 pt-4">
+        <ul className="space-y-3">
+          <AnimatePresence initial={false}>
+            {routeList.map((loc, index) => (
+              <motion.li
+                key={loc._id}
+                layout
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 60, transition: { duration: 0.2 } }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+              >
+                <div className="flex items-center gap-4 px-5 py-4">
+                  {/* Order number */}
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0F766E] to-[#0D9488] flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <span className="text-white text-sm font-extrabold">
+                      {index + 1}
+                    </span>
+                  </div>
+
+                  {/* Location info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-slate-800 truncate">
+                      {loc.title}
+                    </h3>
+                    {loc.geopoint?.lat && loc.geopoint?.lng && (
+                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+                        {loc.geopoint.lat.toFixed(4)}°N,{" "}
+                        {loc.geopoint.lng.toFixed(4)}°E
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Remove button */}
+                  <button
+                    onClick={() => removeFromRoute(loc._id)}
+                    className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400 hover:bg-red-100 hover:text-red-500 transition-all duration-200 active:scale-90 flex-shrink-0"
+                    aria-label={`${loc.title} mekanını rotadan çıkar`}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </motion.li>
+            ))}
+          </AnimatePresence>
+        </ul>
+
+        {/* Route path connector (visual decoration) */}
+        <div className="flex flex-col items-center mt-6 mb-2">
+          <div className="w-px h-8 bg-gradient-to-b from-slate-200 to-transparent" />
+        </div>
+      </div>
+
+      {/* Sticky CTA */}
+      <div className="fixed bottom-[88px] left-0 right-0 z-30 px-5 pb-4 pt-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
+        <div className="max-w-lg mx-auto pointer-events-auto">
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              className="w-full flex items-center justify-center gap-3 py-4.5 px-8 rounded-2xl bg-gradient-to-r from-[#0F766E] via-[#0D9488] to-[#14B8A6] text-white font-extrabold text-base tracking-wide shadow-xl shadow-[#0F766E]/30 cursor-pointer"
+            >
+              <Navigation size={20} strokeWidth={2.5} />
+              Rotamı Haritalarda Aç
+            </motion.div>
+          </a>
+          <p className="text-center text-[11px] text-slate-400 mt-2.5 font-medium">
+            Google Haritalar ile {routeList.length} duraklı rota
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
