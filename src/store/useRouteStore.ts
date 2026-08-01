@@ -12,6 +12,9 @@ export interface RouteLocation {
     lng: number;
     _type?: string;
   };
+  isOpportunity?: boolean;
+  opportunityText?: string;
+  opportunityCode?: string;
 }
 
 export interface RouteState {

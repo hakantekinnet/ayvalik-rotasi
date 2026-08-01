@@ -123,6 +123,16 @@ export default function RotamPage() {
                         {loc.geopoint.lng.toFixed(4)}°E
                       </p>
                     )}
+                    {loc.isOpportunity && loc.opportunityText && (
+                      <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md w-fit border border-amber-200">
+                        <span>🎁 {loc.opportunityText}</span>
+                        {loc.opportunityCode && (
+                          <span className="font-bold text-amber-700">
+                            (Kod: {loc.opportunityCode})
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Remove button */}

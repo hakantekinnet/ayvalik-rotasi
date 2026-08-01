@@ -33,6 +33,9 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
         _id: location.id,
         title: location.title,
         slug: location.id,
+        isOpportunity: location.isOpportunity,
+        opportunityText: location.opportunityText,
+        opportunityCode: location.opportunityCode,
       });
     }
   };
