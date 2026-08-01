@@ -2,9 +2,10 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { X, Upload, Loader2 } from "lucide-react";
+import { X, Upload, Loader2, MapPin, Check } from "lucide-react";
 import Image from "next/image";
 import { LocationData } from "@/lib/types";
+import { useRouteStore } from "@/store/useRouteStore";
 
 interface LocationCardProps {
   location: LocationData | null;
@@ -16,6 +17,25 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Route planner state
+  const { routeList, addToRoute, removeFromRoute } = useRouteStore();
+  const isAdded = location
+    ? routeList.some((item) => item._id === location.id)
+    : false;
+
+  const handleRouteToggle = () => {
+    if (!location) return;
+    if (isAdded) {
+      removeFromRoute(location.id);
+    } else {
+      addToRoute({
+        _id: location.id,
+        title: location.title,
+        slug: location.id,
+      });
+    }
+  };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y > 100 || info.velocity.y > 500) {
@@ -199,9 +219,31 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
               )}
 
               {/* Description */}
-              <p className="text-foreground-muted text-sm leading-relaxed mb-6">
+              <p className="text-foreground-muted text-sm leading-relaxed mb-4">
                 {location.description}
               </p>
+
+              {/* Route Planner Toggle Button */}
+              <button
+                onClick={handleRouteToggle}
+                className={`w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 active:scale-[0.97] mb-6 ${
+                  isAdded
+                    ? "bg-[#0F766E] text-white shadow-lg shadow-[#0F766E]/25"
+                    : "bg-white text-[#0F766E] border-2 border-[#0F766E]/30 hover:border-[#0F766E] hover:bg-[#0F766E]/5"
+                }`}
+              >
+                {isAdded ? (
+                  <>
+                    <Check size={18} strokeWidth={3} />
+                    Rotaya Eklendi
+                  </>
+                ) : (
+                  <>
+                    <MapPin size={18} strokeWidth={2.5} />
+                    Rotaya Ekle
+                  </>
+                )}
+              </button>
 
               {/* Community Photo Upload — Benim Kadrajım */}
               <div className="mt-2 border-t border-gray-100 pt-6 mb-6">
