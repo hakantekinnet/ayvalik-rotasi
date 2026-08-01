@@ -57,6 +57,27 @@ export const place = defineType({
       type: 'url',
       description: 'Opsiyonel: Bu mekana ait Instagram Reel linki.',
     }),
+    defineField({
+      name: 'isOpportunity',
+      title: 'Fırsat / Anlaşma Var mı?',
+      type: 'boolean',
+      description: 'Bu mekanla özel bir indirim veya fırsat anlaşması varsa açın.',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'opportunityText',
+      title: 'Fırsat Metni',
+      type: 'string',
+      description: 'Örn: %10 İndirim, Ücretsiz Kahve vs.',
+      hidden: ({ document }) => !document?.isOpportunity,
+    }),
+    defineField({
+      name: 'opportunityCode',
+      title: 'İndirim Kodu (Opsiyonel)',
+      type: 'string',
+      description: 'Örn: ROTA10 (Kullanıcı bu kodu esnafa gösterecek)',
+      hidden: ({ document }) => !document?.isOpportunity,
+    }),
   ],
   preview: {
     select: {
