@@ -20,6 +20,7 @@ export interface RouteLocation {
 export interface RouteState {
   routeList: RouteLocation[];
   addToRoute: (location: RouteLocation) => void;
+  addMultipleToRoute: (locations: RouteLocation[]) => void;
   removeFromRoute: (id: string) => void;
   clearRoute: () => void;
 }
@@ -35,6 +36,19 @@ export const useRouteStore = create<RouteState>()(
         const exists = get().routeList.some((l) => l._id === location._id);
         if (exists) return; // prevent duplicates
         set((state) => ({ routeList: [...state.routeList, location] }));
+      },
+
+      addMultipleToRoute: (locations) => {
+        set((state) => {
+          const newLocations = locations.filter(
+            (newLoc) =>
+              !state.routeList.some(
+                (existingLoc) => existingLoc._id === newLoc._id
+              )
+          );
+          if (newLocations.length === 0) return state;
+          return { routeList: [...state.routeList, ...newLocations] };
+        });
       },
 
       removeFromRoute: (id) => {
