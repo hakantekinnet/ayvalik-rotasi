@@ -193,9 +193,10 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                           src={src}
                           alt={`${location.title} - ${idx + 1}`}
                           fill
-                          sizes="(max-width: 768px) 85vw, 400px"
-                          className="object-cover"
+                          sizes="(max-width: 768px) 85vw, (max-width: 1200px) 50vw, 400px"
+                          className="object-cover object-center"
                           loading={idx === 0 ? "eager" : "lazy"}
+                          priority={idx === 0}
                         />
                       </div>
                     ))}
