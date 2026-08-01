@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRouteStore } from "@/store/useRouteStore";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function RouteFAB() {
   const { routeList } = useRouteStore();
+  const pathname = usePathname();
 
   return (
     <AnimatePresence>
-      {routeList.length > 0 && (
+      {routeList.length > 0 && pathname !== "/rotam" && (
         <motion.div
           initial={{ y: 80, opacity: 0, scale: 0.8 }}
           animate={{ y: 0, opacity: 1, scale: 1 }}
