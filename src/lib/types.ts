@@ -15,6 +15,9 @@ export interface LocationData {
   imageUrls?: string[];
   reelsUrl?: string;
   reelUrl?: string;
+  isOpportunity?: boolean;
+  opportunityText?: string;
+  opportunityCode?: string;
 }
 
 export interface NewsArticle {

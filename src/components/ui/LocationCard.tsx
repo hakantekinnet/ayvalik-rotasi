@@ -145,7 +145,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
               onPointerDownCapture={(e) => e.stopPropagation()}
             >
               {/* Category Badge */}
-              <div className="mb-3">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span
                   className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                     categoryColors[location.category] ||
@@ -154,6 +154,18 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                 >
                   {location.category}
                 </span>
+
+                {/* Esnaf Fırsatları Badge */}
+                {location.isOpportunity && location.opportunityText && (
+                  <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 text-xs font-bold rounded-full shadow-md animate-pulse">
+                    🎁 {location.opportunityText}
+                    {location.opportunityCode && (
+                      <span className="ml-0.5 opacity-90">
+                        · Kod: {location.opportunityCode}
+                      </span>
+                    )}
+                  </span>
+                )}
               </div>
 
               {/* Title */}

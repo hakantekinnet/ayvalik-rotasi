@@ -12,6 +12,9 @@ export interface SanityPlace {
   imageUrls?: string[];
   location?: { lat: number; lng: number; alt?: number };
   reelUrl?: string;
+  isOpportunity?: boolean;
+  opportunityText?: string;
+  opportunityCode?: string;
 }
 
 // Bounding box for Ayvalık region — converts GPS to map percentages
@@ -35,7 +38,10 @@ async function getPlaces(): Promise<LocationData[]> {
         description,
         "imageUrls": images[].asset->url,
         location,
-        reelUrl
+        reelUrl,
+        isOpportunity,
+        opportunityText,
+        opportunityCode
       }`
     );
 
@@ -55,6 +61,9 @@ async function getPlaces(): Promise<LocationData[]> {
           imageUrls: place.imageUrls || [],
           images: place.imageUrls || [],
           reelUrl: place.reelUrl,
+          isOpportunity: place.isOpportunity,
+          opportunityText: place.opportunityText,
+          opportunityCode: place.opportunityCode,
         };
       });
     }
