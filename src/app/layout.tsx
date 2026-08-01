@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { RouteFAB } from "@/components/RouteFAB";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <main className="flex-1 pb-safe-nav">{children}</main>
+        <RouteFAB />
         <BottomNav />
       </body>
     </html>
