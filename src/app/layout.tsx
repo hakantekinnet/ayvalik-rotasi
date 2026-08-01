@@ -1,23 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { RouteFAB } from "@/components/RouteFAB";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-manrope",
 });
 
 export const metadata: Metadata = {
-  title: "Ayvalık Rotası",
+  title: {
+    default: "Ayvalık Rotası | Dijital Rehber ve Fırsatlar",
+    template: "%s | Ayvalık Rotası",
+  },
   description:
-    "Ege'nin incisi Ayvalık'ı keşfet. Plajlar, tarihi mekanlar ve en iyi rotalar.",
+    "Ayvalık, Cunda ve çevresindeki en iyi mekanları keşfedin, kendi rotanızı oluşturun ve yerel esnaf fırsatlarından yararlanın.",
   keywords: [
     "Ayvalık",
     "Cunda",
@@ -26,17 +25,32 @@ export const metadata: Metadata = {
     "turizm",
     "seyahat",
     "gün batımı",
+    "rota planlama",
+    "esnaf fırsatları",
   ],
   authors: [{ name: "Ayvalık Rotası" }],
   openGraph: {
-    title: "Ayvalık Rotası - Ege'nin İncisini Keşfet",
+    title: "Ayvalık Rotası | Kendi Tatilini Planla",
     description:
-      "Ayvalık'ın gizli kalmış plajlarını, tarihi sokaklarını ve en iyi lezzet duraklarını interaktif harita ile keşfet.",
-    type: "website",
-    locale: "tr_TR",
+      "Ayvalık ve Cunda sokaklarında kaybolmadan önce kendi dijital rotanı oluştur, özel indirimleri yakala.",
+    url: "https://ayvalik-rotasi.vercel.app",
+    siteName: "Ayvalık Rotası",
     images: [
-      "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200&auto=format&fit=crop",
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Ayvalık Rotası Önizleme",
+      },
     ],
+    locale: "tr_TR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ayvalık Rotası | Dijital Rehber",
+    description:
+      "Ayvalık, Cunda ve çevresindeki en iyi mekanları keşfedin, rotanızı planlayın.",
   },
 };
 
@@ -54,11 +68,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="tr" className={`${manrope.variable} h-full`}>
+      <body
+        className={`${manrope.className} antialiased text-slate-800 min-h-full flex flex-col`}
+      >
         <main className="flex-1 pb-safe-nav">{children}</main>
         <RouteFAB />
         <BottomNav />
