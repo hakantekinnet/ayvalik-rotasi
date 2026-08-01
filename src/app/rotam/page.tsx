@@ -157,12 +157,12 @@ export default function RotamPage() {
 
       {/* Sticky CTA */}
       <div className="fixed bottom-[88px] left-0 right-0 z-30 px-5 pb-4 pt-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
-        <div className="max-w-lg mx-auto pointer-events-auto space-y-3">
-          <a href={mapsUrl} target="_blank" rel="noopener noreferrer">
+        <div className="max-w-lg mx-auto pointer-events-auto flex flex-col gap-3">
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="block">
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="w-full flex items-center justify-center gap-3 py-4.5 px-8 rounded-2xl bg-gradient-to-r from-[#0F766E] via-[#0D9488] to-[#14B8A6] text-white font-extrabold text-base tracking-wide shadow-xl shadow-[#0F766E]/30 cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 py-4 px-8 rounded-2xl bg-gradient-to-r from-[#0F766E] via-[#0D9488] to-[#14B8A6] text-white font-extrabold text-base tracking-wide shadow-xl shadow-[#0F766E]/30 cursor-pointer"
             >
               <Navigation size={20} strokeWidth={2.5} />
               Rotamı Haritalarda Aç
@@ -178,6 +178,7 @@ export default function RotamPage() {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
+            className="block"
           >
             <motion.div
               whileHover={{ scale: 1.02 }}
