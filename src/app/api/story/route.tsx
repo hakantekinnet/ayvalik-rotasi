@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
           />
         </div>
 
-        {/* Content container — bottom-aligned */}
+        {/* Content container — bottom-aligned, extra bottom padding to avoid IG UI */}
         <div
           style={{
             display: "flex",
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
             height: "1920px",
             position: "relative",
             zIndex: 10,
-            padding: "48px 72px 80px 72px",
+            padding: "48px 72px 180px 72px",
           }}
         >
           {/* Title — massive, ultra-bold */}
@@ -125,45 +125,53 @@ export async function GET(req: NextRequest) {
             </span>
           )}
 
-          {/* Spacer before sticker zone */}
-          <div style={{ display: "flex", marginTop: "48px" }} />
-
-          {/* Link sticker guide text */}
-          <span
-            style={{
-              fontSize: "30px",
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.9)",
-              marginBottom: "16px",
-            }}
-          >
-            Haberin detayları için dokun 👇
-          </span>
-
-          {/* Link sticker empty frame */}
+          {/* Centered link sticker zone + footer */}
           <div
             style={{
               display: "flex",
-              width: "450px",
-              height: "130px",
-              borderRadius: "32px",
-              background: "rgba(255,255,255,0.1)",
-              border: "4px solid rgba(255,255,255,0.4)",
-              marginBottom: "48px",
-            }}
-          />
-
-          {/* Footer domain */}
-          <span
-            style={{
-              fontSize: "28px",
-              fontWeight: 500,
-              color: "rgba(255,255,255,0.7)",
-              letterSpacing: "1px",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "100%",
+              marginTop: "48px",
             }}
           >
-            www.ayvalikrotasi.com
-          </span>
+            {/* Link sticker guide text */}
+            <span
+              style={{
+                fontSize: "30px",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.9)",
+                marginBottom: "16px",
+              }}
+            >
+              Haberin detayları için dokun 👇
+            </span>
+
+            {/* Link sticker empty frame */}
+            <div
+              style={{
+                display: "flex",
+                width: "450px",
+                height: "130px",
+                borderRadius: "32px",
+                background: "rgba(255,255,255,0.1)",
+                border: "4px solid rgba(255,255,255,0.4)",
+              }}
+            />
+
+            {/* Footer domain */}
+            <span
+              style={{
+                fontSize: "28px",
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.7)",
+                letterSpacing: "1px",
+                marginTop: "24px",
+              }}
+            >
+              www.ayvalikrotasi.com
+            </span>
+          </div>
         </div>
       </div>
     ),
