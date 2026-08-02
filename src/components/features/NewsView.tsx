@@ -5,7 +5,8 @@ import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Sun, Waves, Sunset, Clock, ChevronRight, Loader2 } from "lucide-react";
-import type { SanityNewsItem, SanityWeeklyEvent } from "@/app/feed/page";
+import type { SanityNewsItem, SanityWeeklyEvent, SanityEvent } from "@/app/feed/page";
+import { useRouteStore } from "@/store/useRouteStore";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -56,9 +57,11 @@ function timeAgo(dateStr: string): string {
 interface NewsViewProps {
   sanityNews?: SanityNewsItem[];
   weeklyEvent?: SanityWeeklyEvent | null;
+  events?: SanityEvent[];
 }
 
-export function NewsView({ sanityNews, weeklyEvent }: NewsViewProps) {
+export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps) {
+  const { addToRoute, routeList } = useRouteStore();
   // Use Sanity data if available, otherwise fall back to static
   const newsItems = sanityNews && sanityNews.length > 0
     ? sanityNews.map((item) => ({
@@ -228,10 +231,76 @@ export function NewsView({ sanityNews, weeklyEvent }: NewsViewProps) {
           )}
         </>
       ) : (
-        <div className="h-56 w-full bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-slate-400 font-medium mb-8">
-          <span className="text-4xl mb-3">📅</span>
-          <p className="text-sm">Canlı Takvim Modülü Gelecek</p>
-          <p className="text-[11px] text-slate-300 mt-1">Etkinlikler, konserler ve festivaller</p>
+        <div className="w-full mb-8">
+          {events.length > 0 ? (
+            <div className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4">
+              {events.map((evt) => {
+                const dateObj = new Date(evt.eventDate);
+                const day = dateObj.toLocaleDateString("tr-TR", { day: "numeric" });
+                const month = dateObj.toLocaleDateString("tr-TR", { month: "short" });
+                const time = dateObj.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+                const isInRoute = evt.location
+                  ? routeList.some((r) => r._id === evt.location!._id)
+                  : false;
+
+                return (
+                  <div
+                    key={evt._id}
+                    className="min-w-[240px] bg-white rounded-2xl shadow-sm border border-slate-100 p-3 snap-center shrink-0 flex flex-col"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="bg-slate-800 text-white flex flex-col items-center justify-center rounded-xl w-14 h-14 shrink-0">
+                        <span className="text-lg font-bold leading-none">{day}</span>
+                        <span className="text-[10px] uppercase tracking-wider">{month}</span>
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-slate-800 text-sm leading-tight line-clamp-2">
+                          {evt.title}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{time}</p>
+                      </div>
+                    </div>
+
+                    {evt.description && (
+                      <p className="text-[11px] text-slate-500 line-clamp-2 mb-3">
+                        {evt.description}
+                      </p>
+                    )}
+
+                    {evt.location && (
+                      <button
+                        onClick={() =>
+                          addToRoute({
+                            _id: evt.location!._id,
+                            title: evt.location!.title,
+                            slug: evt.location!.slug,
+                            geopoint: evt.location!.geopoint,
+                            isOpportunity: evt.location!.isOpportunity,
+                            opportunityText: evt.location!.opportunityText,
+                            opportunityCode: evt.location!.opportunityCode,
+                          })
+                        }
+                        disabled={isInRoute}
+                        className={`mt-auto w-full text-xs font-bold py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-1 ${
+                          isInRoute
+                            ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            : "bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 active:scale-[0.97] cursor-pointer"
+                        }`}
+                      >
+                        {isInRoute ? "✅ Rotada" : "📍 Konumu Rotaya Ekle"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="h-56 w-full bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-slate-400 font-medium">
+              <span className="text-4xl mb-3">📅</span>
+              <p className="text-sm">Henüz etkinlik eklenmedi</p>
+              <p className="text-[11px] text-slate-300 mt-1">Etkinlikler, konserler ve festivaller</p>
+            </div>
+          )}
         </div>
       )}
 

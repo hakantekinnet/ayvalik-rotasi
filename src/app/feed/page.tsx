@@ -18,6 +18,23 @@ export interface SanityWeeklyEvent {
   imageUrl?: string;
 }
 
+export interface SanityEvent {
+  _id: string;
+  title: string;
+  eventDate: string;
+  description?: string;
+  coverImage?: any;
+  location?: {
+    _id: string;
+    title: string;
+    slug: string;
+    geopoint?: { lat: number; lng: number };
+    isOpportunity?: boolean;
+    opportunityText?: string;
+    opportunityCode?: string;
+  };
+}
+
 async function getNews(): Promise<SanityNewsItem[]> {
   try {
     const data = await client.fetch(
@@ -53,16 +70,45 @@ async function getWeeklyEvent(): Promise<SanityWeeklyEvent | null> {
   }
 }
 
+async function getEvents(): Promise<SanityEvent[]> {
+  try {
+    const data = await client.fetch(
+      `*[_type == "event"] | order(eventDate asc){
+        _id,
+        title,
+        eventDate,
+        description,
+        coverImage,
+        "location": location->{
+          _id,
+          title,
+          "slug": _id,
+          "geopoint": location,
+          isOpportunity,
+          opportunityText,
+          opportunityCode
+        }
+      }`
+    );
+    return data || [];
+  } catch (err) {
+    console.warn("Sanity events fetch failed:", err);
+    return [];
+  }
+}
+
 export default async function FeedPage() {
-  const [sanityNews, weeklyEvent] = await Promise.all([
+  const [sanityNews, weeklyEvent, events] = await Promise.all([
     getNews(),
     getWeeklyEvent(),
+    getEvents(),
   ]);
 
   const serializedNews = JSON.parse(JSON.stringify(sanityNews));
   const serializedEvent = weeklyEvent
     ? JSON.parse(JSON.stringify(weeklyEvent))
     : null;
+  const serializedEvents = JSON.parse(JSON.stringify(events));
 
   return (
     <div className="min-h-screen">
@@ -77,7 +123,11 @@ export default async function FeedPage() {
       </header>
 
       {/* News Dashboard View */}
-      <NewsView sanityNews={serializedNews} weeklyEvent={serializedEvent} />
+      <NewsView
+        sanityNews={serializedNews}
+        weeklyEvent={serializedEvent}
+        events={serializedEvents}
+      />
     </div>
   );
 }
