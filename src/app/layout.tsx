@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { RouteFAB } from "@/components/RouteFAB";
+import { Toaster } from "sonner";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -73,6 +74,7 @@ export default function RootLayout({
         className={`${manrope.className} antialiased text-slate-800 min-h-full flex flex-col`}
       >
         <main className="flex-1 pb-safe-nav">{children}</main>
+        <Toaster position="top-center" richColors theme="light" />
         <RouteFAB />
         <BottomNav />
       </body>

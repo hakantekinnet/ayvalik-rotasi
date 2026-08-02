@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { toast } from "sonner";
 
 // ── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -34,8 +35,12 @@ export const useRouteStore = create<RouteState>()(
 
       addToRoute: (location) => {
         const exists = get().routeList.some((l) => l._id === location._id);
-        if (exists) return; // prevent duplicates
+        if (exists) {
+          toast.info(`${location.title} zaten rotanızda!`);
+          return;
+        }
         set((state) => ({ routeList: [...state.routeList, location] }));
+        toast.success(`${location.title} rotanıza eklendi!`);
       },
 
       addMultipleToRoute: (locations) => {
@@ -46,7 +51,11 @@ export const useRouteStore = create<RouteState>()(
                 (existingLoc) => existingLoc._id === newLoc._id
               )
           );
-          if (newLocations.length === 0) return state;
+          if (newLocations.length === 0) {
+            toast.info("Bu paketteki mekanlar zaten rotanızda!");
+            return state;
+          }
+          toast.success(`${newLocations.length} yeni mekan rotanıza eklendi!`);
           return { routeList: [...state.routeList, ...newLocations] };
         });
       },
