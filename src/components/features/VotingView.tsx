@@ -6,6 +6,7 @@ import { Check, Swords, UtensilsCrossed } from "lucide-react";
 import Image from "next/image";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
+import { toast } from "sonner";
 import type { SanityPoll } from "@/app/vote/page";
 
 // Static fallback polls
@@ -76,6 +77,39 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
           : p
       )
     );
+  };
+
+  // ── Upload Modal State ──
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [username, setUsername] = useState("");
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadFile) return toast.error("Lütfen bir fotoğraf seçin!");
+
+    setIsSubmitting(true);
+    const formData = new FormData();
+    formData.append("file", uploadFile);
+    formData.append("username", username);
+
+    try {
+      const res = await fetch("/api/upload-photo", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Yükleme hatası");
+
+      toast.success("Fotoğrafın incelemeye gönderildi! 📸");
+      setIsModalOpen(false);
+      setUploadFile(null);
+      setUsername("");
+    } catch {
+      toast.error("Bir hata oluştu. Tekrar dene.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -169,15 +203,13 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
               </div>
             )}
 
-            {/* CTA Button for WhatsApp submission */}
-            <a
-              href="https://wa.me/?text=Merhaba,%20Ayvalık%20Rotası%20için%20fotoğraf%20göndermek%20istiyorum!%20📷"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3.5 bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-md hover:bg-slate-700 transition-colors"
+            {/* CTA Button to open upload modal */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="w-full py-3.5 bg-slate-800 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-md hover:bg-slate-700 transition-colors cursor-pointer"
             >
-              Kendi Fotoğrafını Gönder
-            </a>
+              Kendi Fotoğrafını Gönder 📸
+            </button>
           </div>
         ) : (
           /* ── En İyiler (Polls) Tab ── */
@@ -505,6 +537,64 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
           </div>
         )}
       </div>
+
+      {/* Upload Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-slate-800 mb-2">
+              Fotoğraf Gönder
+            </h3>
+            <p className="text-sm text-slate-500 mb-6">
+              Ayvalık kadrajını bizimle paylaş, onaylandıktan sonra oylamaya
+              eklensin.
+            </p>
+
+            <form onSubmit={handleUpload} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Fotoğraf
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Instagram Adın (İsteğe Bağlı)
+                </label>
+                <input
+                  type="text"
+                  placeholder="@kullaniciadi"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="flex gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 py-3 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors text-sm cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-3 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 transition-colors text-sm disabled:opacity-50"
+                >
+                  {isSubmitting ? "Gönderiliyor..." : "Gönder"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
