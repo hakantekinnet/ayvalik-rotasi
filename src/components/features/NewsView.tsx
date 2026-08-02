@@ -153,20 +153,59 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
       </div>
 
       {/* ── Featured News Card (Haftanın Etkinliği) / Takvim ── */}
-      {activeHero === "vitrin" ? (
-        <>
-          {weeklyEvent ? (
-            <Link href={`/news/${weeklyEvent._id}`}>
+      <div className="min-h-[280px] mb-6">
+        {activeHero === "vitrin" ? (
+          <>
+            {weeklyEvent ? (
+              <Link href={`/news/${weeklyEvent._id}`}>
+                <motion.div
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  custom={1}
+                  className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md group cursor-pointer"
+                >
+                  <Image
+                    src={weeklyEvent.imageUrl || "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"}
+                    alt={weeklyEvent.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 600px"
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                  {/* Featured Badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
+                      ✨ Haftanın Etkinliği
+                    </span>
+                  </div>
+
+                  {/* Text */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <h2 className="text-white text-xl font-bold leading-tight mb-1">
+                      {weeklyEvent.title}
+                    </h2>
+                    {weeklyEvent.summary && (
+                      <p className="text-white/70 text-xs">
+                        {weeklyEvent.summary}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              </Link>
+            ) : (
               <motion.div
                 variants={fadeUp}
                 initial="hidden"
                 animate="visible"
                 custom={1}
-                className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
+                className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md group cursor-pointer"
               >
                 <Image
-                  src={weeklyEvent.imageUrl || "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"}
-                  alt={weeklyEvent.title}
+                  src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
+                  alt="Ayvalık Amfitiyatro Konseri"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -184,135 +223,118 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
                 {/* Text */}
                 <div className="absolute bottom-0 left-0 right-0 p-5">
                   <h2 className="text-white text-xl font-bold leading-tight mb-1">
-                    {weeklyEvent.title}
+                    Amfitiyatro&apos;da Yaz Konseri
                   </h2>
-                  {weeklyEvent.summary && (
-                    <p className="text-white/70 text-xs">
-                      {weeklyEvent.summary}
-                    </p>
-                  )}
+                  <p className="text-white/70 text-xs">
+                    Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
+                  </p>
                 </div>
               </motion.div>
-            </Link>
-          ) : (
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={1}
-              className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
-            >
-              <Image
-                src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
-                alt="Ayvalık Amfitiyatro Konseri"
-                fill
-                sizes="(max-width: 768px) 100vw, 600px"
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            )}
+          </>
+        ) : (
+          <div className="w-full">
+            {events.length > 0 ? (
+              <div className="flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar items-stretch h-[280px] -mx-4 px-4">
+                {events.map((evt) => {
+                  const dateObj = new Date(evt.eventDate);
+                  const day = dateObj.toLocaleDateString("tr-TR", { day: "numeric" });
+                  const month = dateObj.toLocaleDateString("tr-TR", { month: "short" });
+                  const time = dateObj.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+                  const isInRoute = evt.location
+                    ? routeList.some((r) => r._id === evt.location!._id)
+                    : false;
 
-              {/* Featured Badge */}
-              <div className="absolute top-4 left-4">
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
-                  ✨ Haftanın Etkinliği
-                </span>
-              </div>
-
-              {/* Text */}
-              <div className="absolute bottom-0 left-0 right-0 p-5">
-                <h2 className="text-white text-xl font-bold leading-tight mb-1">
-                  Amfitiyatro&apos;da Yaz Konseri
-                </h2>
-                <p className="text-white/70 text-xs">
-                  Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </>
-      ) : (
-        <div className="w-full mb-8">
-          {events.length > 0 ? (
-            <div className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar -mx-4 px-4">
-              {events.map((evt) => {
-                const dateObj = new Date(evt.eventDate);
-                const day = dateObj.toLocaleDateString("tr-TR", { day: "numeric" });
-                const month = dateObj.toLocaleDateString("tr-TR", { month: "short" });
-                const isInRoute = evt.location
-                  ? routeList.some((r) => r._id === evt.location!._id)
-                  : false;
-
-                return (
-                  <div
-                    key={evt._id}
-                    className="min-w-[220px] bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden snap-center shrink-0 flex flex-col"
-                  >
-                    {/* Event Image */}
-                    <div className="relative h-28 w-full bg-slate-100">
-                      {evt.coverImage ? (
-                        <Image
-                          src={urlFor(evt.coverImage).url()}
-                          alt={evt.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 220px"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl bg-gradient-to-br from-slate-50 to-slate-100">
-                          🎉
+                  return (
+                    <div
+                      key={evt._id}
+                      className="w-[calc(50%-6px)] min-w-[160px] bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden shrink-0 snap-center"
+                    >
+                      {/* Image Section */}
+                      <div className="relative h-28 w-full shrink-0 bg-slate-100">
+                        {evt.coverImage ? (
+                          <Image
+                            src={urlFor(evt.coverImage).url()}
+                            alt={evt.title}
+                            fill
+                            sizes="(max-width: 768px) 50vw, 200px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xl bg-gradient-to-br from-slate-50 to-slate-100">
+                            🎉
+                          </div>
+                        )}
+                        {/* Date Badge Overlay */}
+                        <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white px-2 py-1 rounded flex flex-col items-center justify-center min-w-[34px]">
+                          <span className="text-sm font-bold leading-none">{day}</span>
+                          <span className="text-[9px] uppercase tracking-wider mt-0.5">{month}</span>
                         </div>
-                      )}
-                      {/* Date Badge Overlay */}
-                      <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white px-2.5 py-1.5 rounded-lg flex flex-col items-center justify-center min-w-[40px]">
-                        <span className="text-sm font-bold leading-none">{day}</span>
-                        <span className="text-[9px] uppercase tracking-wider mt-0.5">{month}</span>
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="p-2.5 flex flex-col flex-1">
+                        <h4 className="font-bold text-slate-800 text-sm leading-tight line-clamp-2 mb-1.5">
+                          {evt.title}
+                        </h4>
+
+                        {/* Metadata */}
+                        <div className="flex items-center text-[10px] text-slate-500 font-medium mb-1.5 truncate">
+                          <span className="mr-1">🕒</span> {time}
+                          {evt.location && (
+                            <>
+                              <span className="mx-1">•</span>
+                              <span className="truncate">{evt.location.title}</span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Description */}
+                        {evt.description && (
+                          <p className="text-[11px] text-slate-500 line-clamp-2 mb-2 leading-relaxed">
+                            {evt.description}
+                          </p>
+                        )}
+
+                        {/* Route Button */}
+                        {evt.location && (
+                          <button
+                            onClick={() =>
+                              addToRoute({
+                                _id: evt.location!._id,
+                                title: evt.location!.title,
+                                slug: evt.location!.slug,
+                                geopoint: evt.location!.geopoint,
+                                isOpportunity: evt.location!.isOpportunity,
+                                opportunityText: evt.location!.opportunityText,
+                                opportunityCode: evt.location!.opportunityCode,
+                              })
+                            }
+                            disabled={isInRoute}
+                            className={`mt-auto w-full text-[11px] font-bold py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center gap-1 ${
+                              isInRoute
+                                ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                                : "bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 active:scale-[0.97] cursor-pointer"
+                            }`}
+                          >
+                            {isInRoute ? "✅ Rotada" : "📍 Rotaya Ekle"}
+                          </button>
+                        )}
                       </div>
                     </div>
-
-                    {/* Card Body */}
-                    <div className="p-3 flex flex-col flex-1">
-                      <h4 className="font-bold text-slate-800 text-sm leading-tight line-clamp-2 mb-3">
-                        {evt.title}
-                      </h4>
-
-                      {evt.location && (
-                        <button
-                          onClick={() =>
-                            addToRoute({
-                              _id: evt.location!._id,
-                              title: evt.location!.title,
-                              slug: evt.location!.slug,
-                              geopoint: evt.location!.geopoint,
-                              isOpportunity: evt.location!.isOpportunity,
-                              opportunityText: evt.location!.opportunityText,
-                              opportunityCode: evt.location!.opportunityCode,
-                            })
-                          }
-                          disabled={isInRoute}
-                          className={`mt-auto w-full text-xs font-bold py-2 rounded-xl transition-all duration-200 flex items-center justify-center gap-1 ${
-                            isInRoute
-                              ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
-                              : "bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 active:scale-[0.97] cursor-pointer"
-                          }`}
-                        >
-                          {isInRoute ? "✅ Rotada" : "📍 Rotaya Ekle"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="h-56 w-full bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-slate-400 font-medium">
-              <span className="text-4xl mb-3">📅</span>
-              <p className="text-sm">Henüz etkinlik eklenmedi</p>
-              <p className="text-[11px] text-slate-300 mt-1">Etkinlikler, konserler ve festivaller</p>
-            </div>
-          )}
-        </div>
-      )}
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="h-64 w-full bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-slate-400 font-medium">
+                <span className="text-4xl mb-3">📅</span>
+                <p className="text-sm">Henüz etkinlik eklenmedi</p>
+                <p className="text-[11px] text-slate-300 mt-1">Etkinlikler, konserler ve festivaller</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* ── News Feed List ── */}
       <motion.div
