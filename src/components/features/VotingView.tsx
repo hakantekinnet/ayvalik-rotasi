@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Swords, UtensilsCrossed } from "lucide-react";
+import Image from "next/image";
+import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/sanity/lib/image";
 import type { SanityPoll } from "@/app/vote/page";
 
 // Static fallback polls
@@ -39,12 +42,40 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
 
   const [activeTab, setActiveTab] = useState<"kadraj" | "mekan">("kadraj");
   const [votes, setVotes] = useState<Record<string, "a" | "b">>({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [photos, setPhotos] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const data = await client.fetch(
+          `*[_type == "userPhoto"] | order(_createdAt desc){
+            _id, photo, photographer, votes
+          }`
+        );
+        setPhotos(data || []);
+      } catch (err) {
+        console.warn("User photos fetch failed:", err);
+      }
+    };
+    fetchPhotos();
+  }, []);
 
   const getResults = () => ({ a: 65, b: 35 });
 
-  const handleVote = (pollId: string, option: "a" | "b") => {
+  const handlePollVote = (pollId: string, option: "a" | "b") => {
     if (votes[pollId]) return;
     setVotes((prev) => ({ ...prev, [pollId]: option }));
+  };
+
+  const handlePhotoVote = (photoId: string) => {
+    setPhotos((prev) =>
+      prev.map((p) =>
+        p._id === photoId
+          ? { ...p, votes: (p.votes || 0) + 1, hasVoted: true }
+          : p
+      )
+    );
   };
 
   return (
@@ -86,12 +117,57 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
         {activeTab === "kadraj" ? (
           /* ── Benim Kadrajımdan Tab ── */
           <div className="flex flex-col items-center">
-            <div className="w-full h-40 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 mb-6">
-              <span className="text-2xl mb-2">📷</span>
-              <span className="text-sm font-medium">
-                Fotoğraf Galerisi Yükleniyor...
-              </span>
-            </div>
+            {/* Masonry Photo Grid */}
+            {photos.length > 0 ? (
+              <div className="w-full columns-2 gap-3 mb-6 space-y-3">
+                {photos.map((photo) => (
+                  <div
+                    key={photo._id}
+                    className="relative bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 break-inside-avoid inline-block w-full"
+                  >
+                    {photo.photo && (
+                      <div
+                        className="relative w-full"
+                        style={{ paddingBottom: "120%" }}
+                      >
+                        <Image
+                          src={urlFor(photo.photo).url()}
+                          alt={photo.photographer || "Kullanıcı Fotoğrafı"}
+                          className="object-cover"
+                          fill
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                        />
+                      </div>
+                    )}
+                    <div className="p-2.5 flex items-center justify-between bg-white">
+                      <span className="text-[10px] font-bold text-slate-700 truncate mr-2">
+                        {photo.photographer || "@anonim"}
+                      </span>
+                      <button
+                        onClick={() =>
+                          !photo.hasVoted && handlePhotoVote(photo._id)
+                        }
+                        className={`flex items-center gap-1 text-xs font-bold px-2 py-1.5 rounded-lg transition-colors ${
+                          photo.hasVoted
+                            ? "bg-red-50 text-red-500"
+                            : "bg-slate-50 text-slate-500 hover:bg-red-50 hover:text-red-500 cursor-pointer"
+                        }`}
+                      >
+                        <span>{photo.hasVoted ? "❤️" : "🤍"}</span>
+                        <span>{photo.votes || 0}</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="w-full h-40 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 mb-6">
+                <span className="text-2xl mb-2">📷</span>
+                <span className="text-sm font-medium">
+                  Henüz fotoğraf eklenmedi
+                </span>
+              </div>
+            )}
 
             {/* CTA Button for WhatsApp submission */}
             <a
@@ -131,7 +207,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                     <div className="flex gap-3">
                       {/* Option A */}
                       <button
-                        onClick={() => handleVote(poll._id, "a")}
+                        onClick={() => handlePollVote(poll._id, "a")}
                         disabled={!!voted}
                         className={`relative flex-1 overflow-hidden rounded-2xl border-2 p-4 text-center transition-all duration-300 ${
                           voted === "a"
@@ -207,7 +283,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
 
                       {/* Option B */}
                       <button
-                        onClick={() => handleVote(poll._id, "b")}
+                        onClick={() => handlePollVote(poll._id, "b")}
                         disabled={!!voted}
                         className={`relative flex-1 overflow-hidden rounded-2xl border-2 p-4 text-center transition-all duration-300 ${
                           voted === "b"
@@ -277,7 +353,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                     <div className="flex flex-col gap-3">
                       {/* Option A */}
                       <button
-                        onClick={() => handleVote(poll._id, "a")}
+                        onClick={() => handlePollVote(poll._id, "a")}
                         disabled={!!voted}
                         className={`relative overflow-hidden rounded-2xl border-2 p-4 text-left transition-all duration-300 ${
                           voted === "a"
@@ -340,7 +416,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
 
                       {/* Option B */}
                       <button
-                        onClick={() => handleVote(poll._id, "b")}
+                        onClick={() => handlePollVote(poll._id, "b")}
                         disabled={!!voted}
                         className={`relative overflow-hidden rounded-2xl border-2 p-4 text-left transition-all duration-300 ${
                           voted === "b"
