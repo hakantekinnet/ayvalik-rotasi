@@ -49,12 +49,19 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
+        const votedPhotos: string[] = JSON.parse(
+          localStorage.getItem("votedPhotos") || "[]"
+        );
         const data = await client.fetch(
           `*[_type == "userPhoto" && isApproved == true] | order(_createdAt desc){
             _id, photo, photographer, votes
           }`
         );
-        setPhotos(data || []);
+        const photosWithVotes = (data || []).map((p: Record<string, unknown>) => ({
+          ...p,
+          hasVoted: votedPhotos.includes(p._id as string),
+        }));
+        setPhotos(photosWithVotes);
       } catch (err) {
         console.warn("User photos fetch failed:", err);
       }
@@ -69,7 +76,8 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
     setVotes((prev) => ({ ...prev, [pollId]: option }));
   };
 
-  const handlePhotoVote = (photoId: string) => {
+  const handlePhotoVote = async (photoId: string) => {
+    // 1. Optimistic UI update
     setPhotos((prev) =>
       prev.map((p) =>
         p._id === photoId
@@ -77,6 +85,26 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
           : p
       )
     );
+
+    // 2. Save to localStorage
+    const votedPhotos: string[] = JSON.parse(
+      localStorage.getItem("votedPhotos") || "[]"
+    );
+    if (!votedPhotos.includes(photoId)) {
+      votedPhotos.push(photoId);
+      localStorage.setItem("votedPhotos", JSON.stringify(votedPhotos));
+    }
+
+    // 3. Persist to Sanity
+    try {
+      await fetch("/api/vote-photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photoId }),
+      });
+    } catch (error) {
+      console.error("Oy gönderilemedi:", error);
+    }
   };
 
   // ── Upload Modal State ──
