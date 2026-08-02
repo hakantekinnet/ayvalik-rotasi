@@ -74,6 +74,7 @@ export function NewsView({ sanityNews, weeklyEvent }: NewsViewProps) {
     seaTemp: number;
     sunset: string;
   } | null>(null);
+  const [activeHero, setActiveHero] = useState<"vitrin" | "takvim">("vitrin");
 
   useEffect(() => {
     fetch("/api/weather")
@@ -131,81 +132,107 @@ export function NewsView({ sanityNews, weeklyEvent }: NewsViewProps) {
         </div>
       </motion.div>
 
-      {/* ── Featured News Card (Haftanın Etkinliği) ── */}
-      {weeklyEvent ? (
-        <Link href={`/news/${weeklyEvent._id}`}>
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={1}
-            className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
-          >
-            <Image
-              src={weeklyEvent.imageUrl || "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"}
-              alt={weeklyEvent.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 600px"
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-            {/* Featured Badge */}
-            <div className="absolute top-4 left-4">
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
-                ✨ Haftanın Etkinliği
-              </span>
-            </div>
-
-            {/* Text */}
-            <div className="absolute bottom-0 left-0 right-0 p-5">
-              <h2 className="text-white text-xl font-bold leading-tight mb-1">
-                {weeklyEvent.title}
-              </h2>
-              {weeklyEvent.summary && (
-                <p className="text-white/70 text-xs">
-                  {weeklyEvent.summary}
-                </p>
-              )}
-            </div>
-          </motion.div>
-        </Link>
-      ) : (
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={1}
-          className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
+      {/* ── Hero Toggle ── */}
+      <div className="flex bg-slate-100/80 p-1 rounded-xl w-full max-w-[280px] mx-auto mb-5 mt-2">
+        <button
+          onClick={() => setActiveHero("vitrin")}
+          className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeHero === "vitrin" ? "bg-white shadow-sm text-slate-800" : "text-slate-500 hover:text-slate-700"}`}
         >
-          <Image
-            src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
-            alt="Ayvalık Amfitiyatro Konseri"
-            fill
-            sizes="(max-width: 768px) 100vw, 600px"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          Vitrin
+        </button>
+        <button
+          onClick={() => setActiveHero("takvim")}
+          className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${activeHero === "takvim" ? "bg-white shadow-sm text-slate-800" : "text-slate-500 hover:text-slate-700"}`}
+        >
+          Takvim
+        </button>
+      </div>
 
-          {/* Featured Badge */}
-          <div className="absolute top-4 left-4">
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
-              ✨ Haftanın Etkinliği
-            </span>
-          </div>
+      {/* ── Featured News Card (Haftanın Etkinliği) / Takvim ── */}
+      {activeHero === "vitrin" ? (
+        <>
+          {weeklyEvent ? (
+            <Link href={`/news/${weeklyEvent._id}`}>
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                custom={1}
+                className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
+              >
+                <Image
+                  src={weeklyEvent.imageUrl || "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"}
+                  alt={weeklyEvent.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-          {/* Text */}
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <h2 className="text-white text-xl font-bold leading-tight mb-1">
-              Amfitiyatro&apos;da Yaz Konseri
-            </h2>
-            <p className="text-white/70 text-xs">
-              Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
-            </p>
-          </div>
-        </motion.div>
+                {/* Featured Badge */}
+                <div className="absolute top-4 left-4">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
+                    ✨ Haftanın Etkinliği
+                  </span>
+                </div>
+
+                {/* Text */}
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <h2 className="text-white text-xl font-bold leading-tight mb-1">
+                    {weeklyEvent.title}
+                  </h2>
+                  {weeklyEvent.summary && (
+                    <p className="text-white/70 text-xs">
+                      {weeklyEvent.summary}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            </Link>
+          ) : (
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md mb-8 group cursor-pointer"
+            >
+              <Image
+                src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
+                alt="Ayvalık Amfitiyatro Konseri"
+                fill
+                sizes="(max-width: 768px) 100vw, 600px"
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+              {/* Featured Badge */}
+              <div className="absolute top-4 left-4">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
+                  ✨ Haftanın Etkinliği
+                </span>
+              </div>
+
+              {/* Text */}
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <h2 className="text-white text-xl font-bold leading-tight mb-1">
+                  Amfitiyatro&apos;da Yaz Konseri
+                </h2>
+                <p className="text-white/70 text-xs">
+                  Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </>
+      ) : (
+        <div className="h-56 w-full bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-slate-400 font-medium mb-8">
+          <span className="text-4xl mb-3">📅</span>
+          <p className="text-sm">Canlı Takvim Modülü Gelecek</p>
+          <p className="text-[11px] text-slate-300 mt-1">Etkinlikler, konserler ve festivaller</p>
+        </div>
       )}
 
       {/* ── News Feed List ── */}
