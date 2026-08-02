@@ -3,12 +3,17 @@
 import { useState } from "react";
 import { MapView } from "@/components/features/MapView";
 import { LocationData } from "@/lib/types";
+import {
+  CuratedRoutesList,
+  CuratedRoute,
+} from "@/components/CuratedRoutesList";
 
 interface HomeClientProps {
   places: LocationData[];
+  curatedRoutes?: CuratedRoute[];
 }
 
-export function HomeClient({ places }: HomeClientProps) {
+export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const handleCategoryClick = (category: string) => {
@@ -76,52 +81,8 @@ export function HomeClient({ places }: HomeClientProps) {
           ))}
         </div>
 
-        {/* Önerilen Paket Rotalar */}
-        <div className="mt-8">
-          <h3 className="text-sm font-bold text-foreground-muted uppercase tracking-wider mb-4">
-            Önerilen Paket Rotalar
-          </h3>
-          <div
-            className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar -mx-5 px-5"
-          >
-            {[
-              {
-                emoji: "🌅",
-                title: "1 Günde Cunda Turu",
-                desc: "Tarihi taş sokaklar, en iyi kahve durakları ve meşhur sakızlı dondurma rotası.",
-                count: 4,
-              },
-              {
-                emoji: "🏖️",
-                title: "Plaj Rotası",
-                desc: "Ayvalık ve çevresinin en temiz ve sakin plajlarını keşfet.",
-                count: 5,
-              },
-              {
-                emoji: "🏛️",
-                title: "Tarih & Kültür",
-                desc: "Antik kiliseler, zeytinyağı müzesi ve Osmanlı mimarisi turu.",
-                count: 3,
-              },
-            ].map((route) => (
-              <div
-                key={route.title}
-                className="min-w-[260px] bg-white rounded-2xl shadow-sm border border-slate-100 p-4 snap-center shrink-0"
-              >
-                <div className="h-32 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl mb-3 flex items-center justify-center text-4xl">
-                  {route.emoji}
-                </div>
-                <h4 className="font-bold text-slate-800">{route.title}</h4>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                  {route.desc}
-                </p>
-                <button className="w-full mt-4 bg-slate-800 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-slate-700 active:scale-[0.97] transition-all duration-200 cursor-pointer">
-                  + Paketi Ekle ({route.count} Mekan)
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Curated Routes from Sanity */}
+        <CuratedRoutesList routes={curatedRoutes} />
       </section>
     </div>
   );

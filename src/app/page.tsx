@@ -3,6 +3,7 @@ export const revalidate = 60;
 import { LocationData } from "@/lib/types";
 import { locations as staticLocations } from "@/data/locations";
 import { HomeClient } from "@/components/features/HomeClient";
+import type { CuratedRoute } from "@/components/CuratedRoutesList";
 
 export interface SanityPlace {
   _id: string;
@@ -74,9 +75,40 @@ async function getPlaces(): Promise<LocationData[]> {
   return staticLocations;
 }
 
-export default async function HomePage() {
-  const places = await getPlaces();
-  const serializedPlaces = JSON.parse(JSON.stringify(places));
+async function getCuratedRoutes(): Promise<CuratedRoute[]> {
+  try {
+    const data = await client.fetch<CuratedRoute[]>(
+      `*[_type == "curatedRoute"]{
+        _id,
+        title,
+        description,
+        "locations": locations[]->{
+          _id,
+          title,
+          "slug": _id,
+          "geopoint": location,
+          isOpportunity,
+          opportunityText,
+          opportunityCode
+        }
+      }`
+    );
+    return data || [];
+  } catch (err) {
+    console.warn("Sanity curated routes fetch failed:", err);
+    return [];
+  }
+}
 
-  return <HomeClient places={serializedPlaces} />;
+export default async function HomePage() {
+  const [places, curatedRoutes] = await Promise.all([
+    getPlaces(),
+    getCuratedRoutes(),
+  ]);
+  const serializedPlaces = JSON.parse(JSON.stringify(places));
+  const serializedRoutes = JSON.parse(JSON.stringify(curatedRoutes));
+
+  return (
+    <HomeClient places={serializedPlaces} curatedRoutes={serializedRoutes} />
+  );
 }
