@@ -25,6 +25,13 @@ export const userPhoto = defineType({
       type: 'number',
       initialValue: 0,
     }),
+    defineField({
+      name: 'isApproved',
+      title: 'Onaylandı (Sitede Göster)',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Bu seçeneği açtığınızda fotoğraf sitede herkes tarafından görünür olur.',
+    }),
   ],
   preview: {
     select: {

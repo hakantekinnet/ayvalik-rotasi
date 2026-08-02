@@ -49,7 +49,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
     const fetchPhotos = async () => {
       try {
         const data = await client.fetch(
-          `*[_type == "userPhoto"] | order(_createdAt desc){
+          `*[_type == "userPhoto" && isApproved == true] | order(_createdAt desc){
             _id, photo, photographer, votes
           }`
         );
