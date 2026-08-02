@@ -3,7 +3,8 @@ import { news } from './news'
 import { place } from './place'
 import { poll } from './poll'
 import { curatedRoute } from './curatedRoute'
+import { event } from './event'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [news, place, poll, curatedRoute],
+  types: [news, place, poll, curatedRoute, event],
 }
