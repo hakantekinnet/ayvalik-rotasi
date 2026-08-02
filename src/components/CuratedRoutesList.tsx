@@ -1,11 +1,15 @@
 "use client";
 
 import { useRouteStore, RouteLocation } from "@/store/useRouteStore";
+import Image from "next/image";
+import { urlFor } from "@/sanity/lib/image";
 
 export interface CuratedRoute {
   _id: string;
   title: string;
   description?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  coverImage?: any;
   locations: RouteLocation[];
 }
 
@@ -38,8 +42,20 @@ export function CuratedRoutesList({ routes }: CuratedRoutesListProps) {
               key={route._id}
               className="min-w-[260px] bg-white rounded-2xl shadow-sm border border-slate-100 p-4 snap-center shrink-0"
             >
-              <div className="h-32 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl mb-3 flex items-center justify-center text-4xl">
-                🗺️
+              <div className="relative h-32 w-full mb-3 rounded-xl overflow-hidden bg-slate-100">
+                {route.coverImage ? (
+                  <Image
+                    src={urlFor(route.coverImage).url()}
+                    alt={route.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 260px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-3xl bg-gradient-to-br from-slate-50 to-slate-100">
+                    🗺️
+                  </div>
+                )}
               </div>
               <h4 className="font-bold text-slate-800">{route.title}</h4>
               {route.description && (

@@ -82,6 +82,7 @@ async function getCuratedRoutes(): Promise<CuratedRoute[]> {
         _id,
         title,
         description,
+        coverImage,
         "locations": locations[]->{
           _id,
           title,
