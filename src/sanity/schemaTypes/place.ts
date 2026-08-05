@@ -78,6 +78,71 @@ export const place = defineType({
       description: 'Örn: ROTA10 (Kullanıcı bu kodu esnafa gösterecek)',
       hidden: ({ document }) => !document?.isOpportunity,
     }),
+
+    // --- DEĞERLENDİRME SİSTEMİ SAYAÇLARI ---
+
+    defineField({
+      name: 'voteCount',
+      title: 'Toplam Oy Sayısı',
+      type: 'number',
+      initialValue: 0,
+      description: 'Bu mekana oy veren toplam kişi sayısı.',
+    }),
+
+    // Lezzet Kategorisi Özel Puanları
+    defineField({
+      name: 'ratingLezzet',
+      title: 'Toplam Lezzet Puanı',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => document?.category !== 'Mekan',
+    }),
+    defineField({
+      name: 'ratingFiyat',
+      title: 'Toplam Fiyat/Performans Puanı',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => document?.category !== 'Mekan',
+    }),
+    defineField({
+      name: 'ratingAtmosfer',
+      title: 'Toplam Atmosfer Puanı',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => document?.category !== 'Mekan',
+    }),
+
+    // Plaj Kategorisi Özel Puanları
+    defineField({
+      name: 'ratingDeniz',
+      title: 'Toplam Deniz Kalitesi Puanı',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => document?.category !== 'Plaj',
+    }),
+    defineField({
+      name: 'ratingTemizlik',
+      title: 'Toplam Temizlik Puanı',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => document?.category !== 'Plaj',
+    }),
+    defineField({
+      name: 'ratingTesis',
+      title: 'Toplam Tesis Puanı',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => document?.category !== 'Plaj',
+    }),
+
+    // Manzara ve Tarih (Genel) İçin Puanlar
+    defineField({
+      name: 'ratingGenel',
+      title: 'Toplam Genel Puan (Manzara/Tarih)',
+      type: 'number',
+      initialValue: 0,
+      hidden: ({ document }) => !['Manzara', 'Tarihi'].includes(document?.category as string),
+    }),
   ],
   preview: {
     select: {
