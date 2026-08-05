@@ -152,6 +152,8 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
   // ── Upload Modal State ──
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [selectedPhoto, setSelectedPhoto] = useState<any | null>(null);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [username, setUsername] = useState("");
 
@@ -231,16 +233,19 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                   >
                     {photo.photo && (
                       <div
-                        className="relative w-full"
+                        className="relative w-full cursor-pointer group"
                         style={{ paddingBottom: "120%" }}
+                        onClick={() => setSelectedPhoto(photo)}
                       >
                         <Image
                           src={urlFor(photo.photo).url()}
                           alt={photo.photographer || "Kullanıcı Fotoğrafı"}
-                          className="object-cover"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
                           fill
                           sizes="(max-width: 768px) 50vw, 33vw"
                         />
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-10" />
                       </div>
                     )}
                     <div className="p-2.5 flex items-center justify-between bg-white">
@@ -751,6 +756,64 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Photo Lightbox Modal */}
+      {selectedPhoto && (
+        <div
+          className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          {/* Close Button */}
+          <button
+            className="absolute top-4 right-4 md:top-6 md:right-6 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full w-10 h-10 flex items-center justify-center transition-all z-50 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedPhoto(null);
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+
+          {/* Full Size Photo */}
+          <div
+            className="relative w-full max-w-4xl max-h-[85vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={urlFor(selectedPhoto.photo).url()}
+              alt={selectedPhoto.photographer || "Ayvalık"}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+            />
+          </div>
+
+          {/* Photo Info */}
+          <div
+            className="mt-4 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-white font-bold text-lg">
+              {selectedPhoto.photographer || "@anonim"}
+            </p>
+            <p className="text-white/60 text-sm mt-1">
+              {selectedPhoto.votes || 0} beğeni
+            </p>
           </div>
         </div>
       )}
