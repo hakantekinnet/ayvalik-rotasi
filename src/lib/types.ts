@@ -18,6 +18,15 @@ export interface LocationData {
   isOpportunity?: boolean;
   opportunityText?: string;
   opportunityCode?: string;
+  // Rating system
+  voteCount?: number;
+  ratingLezzet?: number;
+  ratingFiyat?: number;
+  ratingAtmosfer?: number;
+  ratingDeniz?: number;
+  ratingTemizlik?: number;
+  ratingTesis?: number;
+  ratingGenel?: number;
 }
 
 export interface NewsArticle {

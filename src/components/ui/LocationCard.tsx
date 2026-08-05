@@ -6,6 +6,7 @@ import { X, Upload, Loader2, MapPin, Check } from "lucide-react";
 import Image from "next/image";
 import { LocationData } from "@/lib/types";
 import { useRouteStore } from "@/store/useRouteStore";
+import LocationRating from "@/components/LocationRating";
 
 interface LocationCardProps {
   location: LocationData | null;
@@ -260,6 +261,15 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                   </>
                 )}
               </button>
+
+              {/* Puanlama Modülü */}
+              {location.id && location.category && (
+                <LocationRating
+                  locationId={location.id}
+                  category={location.category}
+                  currentVoteCount={location.voteCount || 0}
+                />
+              )}
 
               {/* Community Photo Upload — Benim Kadrajım */}
               <div className="mt-2 border-t border-gray-100 pt-6 mb-6">

@@ -16,6 +16,14 @@ export interface SanityPlace {
   isOpportunity?: boolean;
   opportunityText?: string;
   opportunityCode?: string;
+  voteCount?: number;
+  ratingLezzet?: number;
+  ratingFiyat?: number;
+  ratingAtmosfer?: number;
+  ratingDeniz?: number;
+  ratingTemizlik?: number;
+  ratingTesis?: number;
+  ratingGenel?: number;
 }
 
 // Bounding box for Ayvalık region — converts GPS to map percentages
@@ -32,7 +40,7 @@ function gpsToMapPercent(lat: number, lng: number): { top: string; left: string 
 async function getPlaces(): Promise<LocationData[]> {
   try {
     const data: SanityPlace[] = await client.fetch(
-      `*[_type == "place"]{
+       `*[_type == "place"]{
         _id,
         title,
         category,
@@ -42,7 +50,15 @@ async function getPlaces(): Promise<LocationData[]> {
         reelUrl,
         isOpportunity,
         opportunityText,
-        opportunityCode
+        opportunityCode,
+        voteCount,
+        ratingLezzet,
+        ratingFiyat,
+        ratingAtmosfer,
+        ratingDeniz,
+        ratingTemizlik,
+        ratingTesis,
+        ratingGenel
       }`
     );
 
@@ -52,7 +68,7 @@ async function getPlaces(): Promise<LocationData[]> {
           ? gpsToMapPercent(place.location.lat, place.location.lng)
           : { top: "50%", left: "50%" };
 
-        return {
+          return {
           id: place._id,
           title: place.title || "",
           category: (place.category as LocationData["category"]) || "Mekan",
@@ -65,6 +81,14 @@ async function getPlaces(): Promise<LocationData[]> {
           isOpportunity: place.isOpportunity,
           opportunityText: place.opportunityText,
           opportunityCode: place.opportunityCode,
+          voteCount: place.voteCount || 0,
+          ratingLezzet: place.ratingLezzet || 0,
+          ratingFiyat: place.ratingFiyat || 0,
+          ratingAtmosfer: place.ratingAtmosfer || 0,
+          ratingDeniz: place.ratingDeniz || 0,
+          ratingTemizlik: place.ratingTemizlik || 0,
+          ratingTesis: place.ratingTesis || 0,
+          ratingGenel: place.ratingGenel || 0,
         };
       });
     }

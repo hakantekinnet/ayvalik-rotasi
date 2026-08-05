@@ -7,6 +7,21 @@ import { LocationCard } from "@/components/ui/LocationCard";
 import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
 
+// Gold pin helper — calculates average score across category criteria
+const calculateAverageScore = (loc: LocationData) => {
+  if (!loc.voteCount || loc.voteCount === 0) return 0;
+
+  if (loc.category === "Mekan") {
+    const total = (loc.ratingLezzet || 0) + (loc.ratingFiyat || 0) + (loc.ratingAtmosfer || 0);
+    return total / (loc.voteCount * 3);
+  }
+  if (loc.category === "Plaj") {
+    const total = (loc.ratingDeniz || 0) + (loc.ratingTemizlik || 0) + (loc.ratingTesis || 0);
+    return total / (loc.voteCount * 3);
+  }
+  return (loc.ratingGenel || 0) / loc.voteCount;
+};
+
 interface MapViewProps {
   activeCategory?: string | null;
   places?: LocationData[];
@@ -139,7 +154,11 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
 
           {/* Dynamic Map Pins — percentage-based, pan with canvas */}
           <AnimatePresence>
-            {filteredLocations.map((location, index) => (
+            {filteredLocations.map((location, index) => {
+              const avgScore = calculateAverageScore(location);
+              const isGold = avgScore >= 4.5 && (location.voteCount || 0) >= 5;
+
+              return (
               <motion.button
                 key={location.id}
                 initial={{ scale: 0, opacity: 0, y: -20 }}
@@ -167,8 +186,8 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
                 <div className="relative">
                   <MapPin
                     size={28}
-                    className="text-aegean-600 drop-shadow-lg"
-                    fill="#0891B2"
+                    className={isGold ? "text-amber-500 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" : "text-aegean-600 drop-shadow-lg"}
+                    fill={isGold ? "#F59E0B" : "#0891B2"}
                     strokeWidth={1.5}
                     stroke="white"
                   />
@@ -183,15 +202,22 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
                       repeat: Infinity,
                       delay: index * 0.4,
                     }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-aegean-400"
+                    className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full ${isGold ? "bg-amber-400" : "bg-aegean-400"}`}
                   />
+                  {/* Gold Badge */}
+                  {isGold && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center shadow-sm border border-white">
+                      <span className="text-[8px]">⭐</span>
+                    </div>
+                  )}
                 </div>
                 {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-white/95 rounded-lg shadow-lg text-[10px] font-semibold text-foreground whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  {location.title}
+                <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg shadow-lg text-[10px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${isGold ? "bg-amber-50 text-amber-800 border border-amber-200" : "bg-white/95 text-foreground"}`}>
+                  {isGold && <span className="mr-0.5">⭐</span>}{location.title}
                 </div>
               </motion.button>
-            ))}
+              );
+            })}
           </AnimatePresence>
 
           {/* User Location Dot */}
