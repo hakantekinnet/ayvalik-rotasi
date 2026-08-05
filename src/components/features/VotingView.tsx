@@ -45,6 +45,8 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
   const [votes, setVotes] = useState<Record<string, "a" | "b">>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [photos, setPhotos] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [topLocations, setTopLocations] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -66,7 +68,47 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
         console.warn("User photos fetch failed:", err);
       }
     };
+
+    const fetchTopLocations = async () => {
+      try {
+        const locationsData = await client.fetch(
+          `*[_type == "place" && voteCount > 0]{
+            _id, title, category, voteCount,
+            ratingLezzet, ratingFiyat, ratingAtmosfer,
+            ratingDeniz, ratingTemizlik, ratingTesis,
+            ratingGenel
+          }`
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const calculated = (locationsData || []).map((loc: any) => {
+          let avg = 0;
+          if (loc.category === "Mekan") {
+            avg =
+              ((loc.ratingLezzet || 0) +
+                (loc.ratingFiyat || 0) +
+                (loc.ratingAtmosfer || 0)) /
+              (loc.voteCount * 3);
+          } else if (loc.category === "Plaj") {
+            avg =
+              ((loc.ratingDeniz || 0) +
+                (loc.ratingTemizlik || 0) +
+                (loc.ratingTesis || 0)) /
+              (loc.voteCount * 3);
+          } else {
+            avg = (loc.ratingGenel || 0) / loc.voteCount;
+          }
+          return { ...loc, avgScore: Number(avg.toFixed(1)) };
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        calculated.sort((a: any, b: any) => b.avgScore - a.avgScore);
+        setTopLocations(calculated);
+      } catch (err) {
+        console.warn("Top locations fetch failed:", err);
+      }
+    };
+
     fetchPhotos();
+    fetchTopLocations();
   }, []);
 
   const getResults = () => ({ a: 65, b: 35 });
@@ -240,8 +282,97 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
             </button>
           </div>
         ) : (
-          /* ── En İyiler (Polls) Tab ── */
+          /* ── En İyiler Tab ── */
           <div className="space-y-6">
+            {/* Leaderboard Header */}
+            <div className="bg-slate-800 text-white rounded-2xl p-6 text-center shadow-lg">
+              <h2 className="text-xl font-bold mb-2">
+                Ayvalık&apos;ın Zirvesi 🏆
+              </h2>
+              <p className="text-xs text-slate-300">
+                Topluluğun oylarıyla belirlenen en iyi mekanlar ve gizli
+                hazineler.
+              </p>
+            </div>
+
+            {/* Leaderboard List */}
+            {topLocations.length === 0 ? (
+              <div className="text-center p-8 text-sm text-slate-500 bg-slate-50 rounded-2xl border border-slate-100">
+                Henüz hiç mekan oylanmadı. Haritadan ilk oyu sen ver!
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {topLocations.map((loc, index) => {
+                  let badge = "bg-slate-100 text-slate-500";
+                  let border = "border-slate-100";
+                  if (index === 0) {
+                    badge = "bg-amber-400 text-white shadow-md";
+                    border = "border-amber-300 ring-2 ring-amber-100";
+                  }
+                  if (index === 1) {
+                    badge = "bg-slate-300 text-slate-700 shadow";
+                    border = "border-slate-300";
+                  }
+                  if (index === 2) {
+                    badge = "bg-orange-300 text-white shadow";
+                    border = "border-orange-200";
+                  }
+
+                  return (
+                    <div
+                      key={loc._id}
+                      className={`flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border ${border} transition-all`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${badge}`}
+                        >
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-slate-800 text-sm capitalize">
+                            {loc.title}
+                          </h3>
+                          <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                            {loc.category} • {loc.voteCount} Oy
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-lg font-black text-slate-800">
+                          {loc.avgScore}
+                        </span>
+                        <div className="flex text-xs">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={
+                                i < Math.round(loc.avgScore)
+                                  ? "text-amber-400"
+                                  : "text-slate-200"
+                              }
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-2">
+              <div className="flex-1 h-px bg-slate-200" />
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Haftalık Anketler
+              </span>
+              <div className="flex-1 h-px bg-slate-200" />
+            </div>
+
+            {/* Existing Poll Cards */}
             {polls.map((poll) => {
               const voted = votes[poll._id];
               const results = getResults();
