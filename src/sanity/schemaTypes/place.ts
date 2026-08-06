@@ -1,5 +1,6 @@
 import { defineType, defineField } from 'sanity'
 import { LeafletGeopointInput } from '../components/LeafletGeopointInput'
+import MapPicker from '../components/MapPicker'
 
 export const place = defineType({
   name: 'place',
@@ -49,6 +50,19 @@ export const place = defineType({
       description: 'Haritaya tıklayarak mekanın koordinatlarını belirleyin.',
       components: {
         input: LeafletGeopointInput,
+      },
+    }),
+    defineField({
+      name: 'mapCoordinates',
+      title: 'Harita Konumu (Görsel Seçici)',
+      type: 'object',
+      description: 'Harita görseli üzerinde tıklayarak pin konumunu belirleyin. Bu alan doldurulursa GPS koordinatı yerine kullanılır.',
+      fields: [
+        defineField({ name: 'x', type: 'number', title: 'X (%)' }),
+        defineField({ name: 'y', type: 'number', title: 'Y (%)' }),
+      ],
+      components: {
+        input: MapPicker,
       },
     }),
     defineField({

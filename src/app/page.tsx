@@ -12,6 +12,7 @@ export interface SanityPlace {
   description: string;
   imageUrls?: string[];
   location?: { lat: number; lng: number; alt?: number };
+  mapCoordinates?: { x: number; y: number };
   reelUrl?: string;
   isOpportunity?: boolean;
   opportunityText?: string;
@@ -47,6 +48,7 @@ async function getPlaces(): Promise<LocationData[]> {
         description,
         "imageUrls": images[].asset->url,
         location,
+        mapCoordinates,
         reelUrl,
         isOpportunity,
         opportunityText,
@@ -64,9 +66,18 @@ async function getPlaces(): Promise<LocationData[]> {
 
     if (data && data.length > 0) {
       return data.map((place) => {
-        const coords = place.location
-          ? gpsToMapPercent(place.location.lat, place.location.lng)
-          : { top: "50%", left: "50%" };
+        // mapCoordinates (visual picker) takes priority over GPS conversion
+        let coords: { top: string; left: string };
+        if (place.mapCoordinates?.x != null && place.mapCoordinates?.y != null) {
+          coords = {
+            top: `${place.mapCoordinates.y}%`,
+            left: `${place.mapCoordinates.x}%`,
+          };
+        } else if (place.location) {
+          coords = gpsToMapPercent(place.location.lat, place.location.lng);
+        } else {
+          coords = { top: "50%", left: "50%" };
+        }
 
           return {
           id: place._id,
