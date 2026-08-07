@@ -64,6 +64,23 @@ export const place = defineType({
       components: {
         input: MapPicker,
       },
+      validation: (rule) =>
+        rule.custom((value, context) => {
+          const doc = context.document as Record<string, unknown> | undefined;
+          // If the document has no GPS location, mapCoordinates becomes required
+          const hasGps = doc?.location &&
+            typeof doc.location === 'object' &&
+            (doc.location as Record<string, unknown>)._type === 'geopoint';
+          const hasMap = value &&
+            typeof value === 'object' &&
+            (value as Record<string, unknown>).x != null &&
+            (value as Record<string, unknown>).y != null;
+
+          if (!hasGps && !hasMap) {
+            return 'En az bir konum bilgisi gereklidir: GPS koordinatı veya Harita Konumu (X/Y) doldurulmalıdır.';
+          }
+          return true;
+        }),
     }),
     defineField({
       name: 'reelUrl',

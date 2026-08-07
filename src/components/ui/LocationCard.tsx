@@ -112,6 +112,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/40 z-[var(--z-overlay)]"
             onClick={onClose}
+            aria-hidden="true"
           />
 
           {/* Bottom Sheet */}
@@ -128,6 +129,9 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="location-card-title"
             className="fixed bottom-0 left-0 right-0 z-[var(--z-modal)] w-full max-w-md mx-auto bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-hidden pointer-events-auto"
           >
             {/* Drag Handle — only this area triggers drag-to-dismiss */}
@@ -138,6 +142,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             {/* Close Button */}
             <button
               onClick={onClose}
+              aria-label="Kapat"
               className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
             >
               <X size={18} className="text-foreground-muted" />
@@ -173,7 +178,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
               </div>
 
               {/* Title */}
-              <h2 className="font-heading text-xl font-bold text-foreground mb-2">
+              <h2 id="location-card-title" className="font-heading text-xl font-bold text-foreground mb-2">
                 {location.title}
               </h2>
 

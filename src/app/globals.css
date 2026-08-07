@@ -21,6 +21,10 @@
   --z-modal: 70;
   --z-toast: 80;
 
+  /* Mobile Layout Heights */
+  --mobile-nav-height: 72px;
+  --route-cta-height: 58px;
+
   --aegean-50: #ECFEFF;
   --aegean-100: #CFFAFE;
   --aegean-200: #A5F3FC;
@@ -126,7 +130,20 @@ body {
 
 /* Bottom nav safe area padding */
 .pb-safe-nav {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Mobile page padding — accounts for nav + route CTA + safe area */
+.mobile-page-padding {
+  padding-bottom: calc(
+    var(--mobile-nav-height) + var(--route-cta-height) + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+@media (min-width: 1024px) {
+  .mobile-page-padding {
+    padding-bottom: 0;
+  }
 }
 
 /* Glassmorphism utility */

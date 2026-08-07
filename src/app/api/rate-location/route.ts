@@ -1,8 +1,55 @@
 import { client } from '@/sanity/lib/client';
 import { NextResponse } from 'next/server';
 
+// --- In-memory rate limiter ---
+// Maps IP -> array of timestamps (ms) of recent requests
+const ipRequestLog = new Map<string, number[]>();
+const RATE_WINDOW_MS = 60_000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 5; // max 5 votes per minute per IP
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = ipRequestLog.get(ip) || [];
+
+  // Remove entries older than the window
+  const recent = timestamps.filter((t) => now - t < RATE_WINDOW_MS);
+
+  if (recent.length >= MAX_REQUESTS_PER_WINDOW) {
+    ipRequestLog.set(ip, recent);
+    return true;
+  }
+
+  recent.push(now);
+  ipRequestLog.set(ip, recent);
+  return false;
+}
+
+// Periodically clean up stale entries to prevent memory leaks (every 5 min)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamps] of ipRequestLog.entries()) {
+    const recent = timestamps.filter((t) => now - t < RATE_WINDOW_MS);
+    if (recent.length === 0) {
+      ipRequestLog.delete(ip);
+    } else {
+      ipRequestLog.set(ip, recent);
+    }
+  }
+}, 5 * 60_000);
+
 export async function POST(req: Request) {
   try {
+    // --- Rate limiting check ---
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded?.split(',')[0]?.trim() || 'unknown';
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Çok fazla istek gönderildi. Lütfen bir dakika bekleyin.' },
+        { status: 429 }
+      );
+    }
+
     const { locationId, scores } = await req.json();
 
     if (!locationId || !scores || Object.keys(scores).length === 0) {

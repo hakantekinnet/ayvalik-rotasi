@@ -56,6 +56,25 @@ export const poll = defineType({
       type: 'string',
       description: 'Örn: 🌊',
     }),
+
+    // --- Oy Sayaçları ---
+    defineField({
+      name: 'votesA',
+      title: 'Seçenek A — Toplam Oy',
+      type: 'number',
+      initialValue: 0,
+      description: 'Seçenek A için toplam oy sayısı (API tarafından artırılır).',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'votesB',
+      title: 'Seçenek B — Toplam Oy',
+      type: 'number',
+      initialValue: 0,
+      description: 'Seçenek B için toplam oy sayısı (API tarafından artırılır).',
+      readOnly: true,
+    }),
+
     defineField({
       name: 'isActive',
       title: 'Aktif mi?',
