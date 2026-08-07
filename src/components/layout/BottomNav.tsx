@@ -16,7 +16,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-card-border"
+      className="fixed bottom-0 left-0 right-0 z-[var(--z-bottom-nav)] glass border-t border-card-border"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-4">

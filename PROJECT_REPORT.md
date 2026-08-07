@@ -1,242 +1,165 @@
-# Ayvalık Rotası — Proje Raporu
+# Ayvalık Rotası — Proje Raporu V2
 
-> **Son güncelleme:** 28 Temmuz 2026  
-> **Framework:** Next.js 16.2 (App Router, Turbopack)  
-> **CMS:** Sanity v5 (Embedded Studio @ `/admin`)  
-> **Deploy:** Vercel  
-> **Dil:** TypeScript  
+> **Son Güncelleme:** 07 Ağustos 2026
+> **Mimar:** Next.js 16 (App Router), Tailwind CSS v4, Sanity CMS v5
+> **Dil:** TypeScript
 
 ---
 
-## 1. Proje Yapısı & Routing
+## 1. Proje Yapısı & Routing (Project Structure & Routing)
 
-```
+Aşağıda projenin mevcut durumunu yansıtan temel dosya ve klasör ağacı bulunmaktadır:
+
+```text
 ayvalik-rotasi/
-├── sanity.config.ts          # Sanity Studio ana yapılandırması
-├── sanity.cli.ts             # Sanity CLI yapılandırması
-├── next.config.ts            # Next.js config (image domains: unsplash, cdn.sanity.io)
-├── .env.local                # WEATHER_API_KEY, SANITY_PROJECT_ID, SANITY_DATASET
-│
+├── next.config.ts            # Next.js konfigürasyonu (image domains vb.)
+├── .env.local                # Çevresel değişkenler (API key'ler, Sanity token'lar)
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx        # Root layout — Geist font, BottomNav, SEO metadata
-│   │   ├── template.tsx      # Sayfa geçiş animasyonları (Framer Motion) + SplashScreen
-│   │   ├── globals.css       # Tailwind v4 + özel CSS değişkenleri (aegean renk paleti)
-│   │   ├── manifest.ts       # PWA manifest
-│   │   ├── page.tsx          # 🏠 Ana Sayfa (Server) → Sanity'den places çeker → HomeClient'a geçer
-│   │   ├── feed/
-│   │   │   └── page.tsx      # 📰 Haberler (Server) → Sanity'den news + weeklyEvent çeker
+│   │   ├── layout.tsx        # Kök (Root) layout — global fontlar, SEO, meta, Viewport
+│   │   ├── template.tsx      # Global Framer Motion geçiş animasyonları
+│   │   ├── globals.css       # Tailwind v4 direktifleri ve global stiller
+│   │   ├── page.tsx          # 🏠 Ana Sayfa (Server) — Sanity fetch ve HomeClient çağrısı
+│   │   ├── feed/page.tsx     # 📰 Haber Akışı (Server)
+│   │   ├── rotam/page.tsx    # 🗺️ Özel Rota (Client)
+│   │   ├── vote/page.tsx     # 🗳️ Oylama Sayfası (Server)
 │   │   ├── news/
-│   │   │   └── [id]/
-│   │   │       └── page.tsx  # 📄 Haber Detay (Server) → Tekil haber + PortableText render
-│   │   ├── vote/
-│   │   │   └── page.tsx      # 🗳️ Oylama (Server) → Sanity'den aktif polls çeker
-│   │   ├── admin/
-│   │   │   └── [[...tool]]/
-│   │   │       └── page.tsx  # 🔧 Sanity Studio (force-dynamic)
-│   │   └── api/
-│   │       ├── weather/
-│   │       │   └── route.ts  # 🌤️ OpenWeatherMap API proxy (force-dynamic)
-│   │       └── upload/       # 📤 Vercel Blob upload endpoint
+│   │   │   └── [id]/page.tsx # 📄 Dinamik Rota: Haber Detay (Server)
+│   │   ├── api/
+│   │   │   ├── rate-location/route.ts # ⭐️ YENİ: Mekan puanlama API'si (force-dynamic)
+│   │   │   ├── weather/route.ts       # 🌤️ Hava durumu proxy API'si
+│   │   │   └── upload/route.ts        # 📤 Fotoğraf yükleme endpoint'i (Vercel Blob)
+│   │   └── admin/[[...tool]]/page.tsx # 🔧 Sanity Studio Catch-all Rotası
 │   │
 │   ├── components/
-│   │   ├── features/         # İş mantığı bileşenleri
-│   │   ├── ui/               # Yeniden kullanılabilir UI bileşenleri
-│   │   └── layout/           # Navigasyon bileşenleri
+│   │   ├── features/         # İş mantığı barındıran kompleks bileşenler (MapView, vs.)
+│   │   ├── ui/               # Yeniden kullanılabilir arayüz elemanları (LocationCard, vs.)
+│   │   └── layout/           # Navigasyon ve iskelet bileşenleri (BottomNav, vs.)
 │   │
 │   ├── sanity/
-│   │   ├── schemaTypes/      # Sanity doküman şemaları
-│   │   ├── components/       # Özel Sanity input bileşenleri (Leaflet harita)
-│   │   ├── lib/              # Sanity client, image helper, live preview
-│   │   ├── env.ts            # Ortam değişkenleri yardımcısı
-│   │   └── structure.ts      # Studio navigasyon yapısı
+│   │   ├── schemaTypes/      # Sanity şemaları (place.ts, news.ts, poll.ts vb.)
+│   │   └── components/       # YENİ: Özel Sanity Studio bileşenleri (MapPicker.tsx, vb.)
 │   │
-│   ├── data/                 # Statik fallback verileri (locations, news, contests)
-│   └── lib/
-│       └── types.ts          # TypeScript arayüzleri (LocationData, NewsArticle, vb.)
+│   └── store/useRouteStore.ts # Zustand global state yönetimi
 ```
 
-### Navigasyon
+### Rotalama Mimarisi ve Sekmeler
+Uygulama, alt navigasyon (BottomNav) üzerinden ulaşılan 3 ana sekmeye sahiptir:
+1. **Harita (`/`)**: İnteraktif harita ve mekan keşfi. 
+2. **Haberler (`/feed`)**: Haber ve etkinlik akışı.
+3. **Oylama (`/vote`)**: Topluluk anketleri.
 
-Uygulama 3 ana sekmeye sahiptir (alt navigasyon çubuğu ile):
-
-| Sekme | Rota | Açıklama |
-|-------|------|----------|
-| 📍 Harita | `/` | İnteraktif Ayvalık haritası + mekan pinleri |
-| 📰 Haberler | `/feed` | Haber akışı + Haftanın Etkinliği |
-| 🗳️ Oylama | `/vote` | Topluluk anketleri ve kapışmalar |
-
-Ek rotalar: `/news/[id]` (haber detay), `/admin` (Sanity Studio)
+*Kritik Not: Kullanıcı deneyimi kesintisiz olsun diye mekanlar için (örneğin `src/app/mekan/[slug]/page.tsx` gibi) ayrı bir dinamik rota KULLANILMAMIŞTIR. Haritada seçilen mekanlar, doğrudan ana sayfada (`/`) bir Modal (Bottom Sheet - `LocationCard`) içerisinde SPA (Tek Sayfa Uygulaması) mantığıyla açılır. Dinamik rotalama sadece Haberler (`/news/[id]`) ve CMS (`/admin`) sayfaları için devrededir.*
 
 ---
 
-## 2. Sanity Şemaları
+## 2. Sanity Şemaları (Sanity Schemas)
 
-### 📰 `news` — Haberler
+Projeyi besleyen 3 temel Sanity doküman şeması ve içerdikleri güncel alanlar:
+
+### 📍 `place` (Mekanlar - YENİ ÖZELLİKLERLE GÜNCELLENDİ)
+| Alan (Field) | Tip (Type) | Açıklama |
+|--------------|------------|----------|
+| `title` | string | Mekan adı (Zorunlu) |
+| `category` | string (radio) | Kategoriler: Tarihi, Manzara, Plaj, Mekan, Eğlence |
+| `description` | text | Mekan hakkında açıklama yazısı |
+| `images` | array [image] | Hotspot destekli çoklu fotoğraf galerisi |
+| `location` | geopoint | GPS koordinatları (LeafletGeopointInput) |
+| **`mapCoordinates`** | **object (x,y)** | **YENİ:** Harita görseli üzerindeki X ve Y yüzdelik konumunu belirleyen özel `MapPicker` bileşeni alanı. |
+| `reelUrl` | url | Opsiyonel Instagram Reel linki |
+| `isOpportunity` / `opportunityText` | boolean / string | Esnaf indirim fırsatı kontrolü ve metni |
+| **`voteCount`** | **number** | **YENİ:** Mekana oy veren toplam kişi sayısı (Varsayılan: 0) |
+| **`ratingLezzet` vb.** | **number** | **YENİ:** Kategoriye özel dinamik puan sayaçları (Lezzet, Fiyat, Deniz, Temizlik, Atmosfer, Genel Puan). Sadece mekanın ait olduğu kategoride Sanity Studio üzerinde görünür olurlar. |
+
+### 📰 `news` (Haberler)
 | Alan | Tip | Açıklama |
 |------|-----|----------|
-| `title` | string | Haber başlığı (5–120 karakter) |
-| `mainImage` | image (hotspot) | Kapak görseli |
-| `summary` | text | Kartlarda görünecek kısa özet |
-| `content` | array [block, image] | Zengin metin editörü (Portable Text) |
-| `isWeeklyEvent` | boolean | `true` ise "Haftanın Etkinliği" olarak öne çıkar |
+| `title` | string | Haber başlığı |
+| `mainImage` | image | Kapak görseli (hotspot) |
+| `summary` | text | Kartlarda listelenen kısa özet |
+| `content` | array [block] | Zengin metin (Portable Text) detay içeriği |
+| `isWeeklyEvent` | boolean | İşaretlendiğinde "Haftanın Etkinliği" olarak üstte gösterilir |
 
-### 📍 `place` — Mekanlar
+### 🗳️ `poll` (Oylamalar)
 | Alan | Tip | Açıklama |
 |------|-----|----------|
-| `title` | string | Mekan adı |
-| `category` | string (radio) | Tarihi / Manzara / Plaj / Mekan / Eğlence |
-| `description` | text | Mekan açıklaması |
-| `images` | array [image] | Çoklu fotoğraf galerisi (hotspot destekli) |
-| `location` | geopoint | GPS koordinatları (özel Leaflet input bileşeni) |
-| `reelUrl` | url | İsteğe bağlı Instagram Reel linki |
-
-### 🗳️ `poll` — Oylamalar
-| Alan | Tip | Açıklama |
-|------|-----|----------|
-| `title` | string | Oylama başlığı |
-| `category` | string (radio) | `versus` (ikili kapışma) veya `classic` (klasik anket) |
-| `emoji` | string | Kategori emojisi |
-| `optionA_title` / `optionA_emoji` | string | Seçenek A başlığı ve emojisi |
-| `optionB_title` / `optionB_emoji` | string | Seçenek B başlığı ve emojisi |
-| `isActive` | boolean | Sadece aktif oylamalar ön yüzde gösterilir |
+| `title` / `category` | string | Anket başlığı ve türü (`versus` veya `classic`) |
+| `optionA_title` / `optionB_title` | string | Seçeneklerin başlık ve emojileri |
+| `isActive` | boolean | Yalnızca aktif olanlar İstemci tarafında gösterilir |
 
 ---
 
-## 3. Core UI Bileşenleri
+## 3. Core UI Bileşenleri (Core UI Components)
 
-### Feature Bileşenleri (`src/components/features/`)
+### Feature Bileşenleri (İş Mantığı & Orkestrasyon)
+- **`HomeClient` (Client):** Ana sayfanın orkestratörüdür. Kategori filtreleme state'ini tutar ve bunu `MapView`'a geçirir.
+- **`MapView` (Client):** Gelişmiş, interaktif harita tuvalidir. Pan, zoom, kullanıcı konumu izleme işlevlerine sahiptir. Yeni `mapCoordinates` (X/Y) verilerini kullanarak pin'leri harita üzerine kusursuz bir şekilde yerleştirir. Pin tıklandığında `LocationCard`'ı tetikler.
+- **`VotingView` (Client):** Sanity'den gelen `sanityPolls` verisini alarak kapışma ve anketleri yönetir.
+- **`LocationRating` (Client) [YENİ]:** `LocationCard` içerisine entegre edilen dinamik puanlama bileşeni. Mekanın kategorisine göre (örn. Plaj ise Deniz/Temizlik/Tesis, Mekan ise Lezzet/Fiyat/Atmosfer) özel yıldızlı değerlendirme formları sunar ve API'ye istek atar. LocalStorage üzerinden çift oylamayı engeller.
 
-| Bileşen | Tip | Açıklama |
-|---------|-----|----------|
-| **HomeClient** | Client | Ana sayfa wrapper — kategori filtresi state yönetimi, MapView'a `places` prop geçirir |
-| **MapView** | Client | İnteraktif stilize harita — GPS→yüzde dönüşümü, animasyonlu pin'ler, kategori filtresi, "Konumumu Bul" özelliği |
-| **WindWidget** | Client | Rüzgar durumu ve plaj önerisi widget'ı — `/api/weather`'dan veri çeker |
-| **NewsView** | Client | Haber akışı dashboard — hava durumu özeti, Haftanın Etkinliği kartı, haber listesi. `sanityNews` ve `weeklyEvent` propları alır |
-| **VotingView** | Client | Oylama sayfası — `sanityPolls` prop'u ile dinamik versus/classic anket kartları render eder |
-| **NewsFeed** | Client | Basit haber feed sarmalayıcısı |
-| **VoteContest** | Client | Tek bir yarışma kartı bileşeni |
+### UI ve Layout Bileşenleri
+- **`LocationCard` (UI):** Bottom Sheet (Açılır Modal). Framer Motion `drag="y"` ile kaydırarak kapatılabilir. Yeni desktop layout optimizasyonları kapsamında `max-w-md` sınıfı kullanılarak geniş ekranlarda merkeze hizalı ve estetik görünmesi sağlanmıştır. Mekan bilgileri, görsel carousel ve yeni `LocationRating` bileşenini barındırır.
+- **`BottomNav` (Layout):** Sabit alt navigasyon çubuğu. `usePathname` üzerinden aktif sekmeyi belirler ve geçiş animasyonları sunar.
 
-### UI Bileşenleri (`src/components/ui/`)
-
-| Bileşen | Açıklama |
-|---------|----------|
-| **LocationCard** | Bottom sheet mekan detay kartı — drag-to-dismiss, `imageUrls[]` galeri carousel, dot göstergeleri, fotoğraf yükleme |
-| **NewsCard** | Tekil haber kartı bileşeni |
-| **NewsSkeleton** | Haber yüklenirken iskelet (loading skeleton) animasyonu |
-| **SplashScreen** | Uygulama açılış animasyonu |
-| **VoteCard** | Tekil oylama kartı bileşeni |
-
-### Layout Bileşenleri (`src/components/layout/`)
-
-| Bileşen | Açıklama |
-|---------|----------|
-| **BottomNav** | Sabit alt navigasyon çubuğu — 3 sekme (Harita, Haberler, Oylama), aktif sayfa vurgusu, Framer Motion animasyonları |
-
-### Sanity Bileşenleri (`src/sanity/components/`)
-
-| Bileşen | Açıklama |
-|---------|----------|
-| **LeafletGeopointInput** | Özel Sanity v3 input bileşeni — OpenStreetMap + Leaflet ile interaktif harita. Tıkla → pin bırak, sürükle → güncelle. API key gerektirmez. Varsayılan konum: Ayvalık merkezi |
+### Sanity Custom Bileşenleri
+- **`MapPicker` (Sanity) [YENİ]:** Sanity Studio içerisine gömülü, görsel bir harita seçicidir. Editörün statik harita görseli (`ayvalik-harita-final.png`) üzerine tıklayarak tam bir X/Y yüzdelik koordinatı elde etmesini sağlar. Böylelikle manuel GPS sapmalarını sıfırlar ve pinlerin tasarıma tam oturmasını garantiler.
 
 ---
 
-## 4. Veri Akışı & Fetching Mimarisi
+## 4. Data Flow & Fetching Architecture (Veri Akışı ve Mimari)
 
-### Server → Client Veri Akışı
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  Sanity CMS (sanity.io)                                 │
-│  ├── news documents                                     │
-│  ├── place documents                                    │
-│  └── poll documents                                     │
-└────────────────────┬────────────────────────────────────┘
-                     │ GROQ Queries
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│  Server Components (src/app/*/page.tsx)                  │
-│  ├── page.tsx      → getPlaces()     → GROQ fetch       │
-│  ├── feed/page.tsx → getNews()       → GROQ fetch       │
-│  │                 → getWeeklyEvent() → GROQ fetch       │
-│  ├── vote/page.tsx → getPolls()      → GROQ fetch       │
-│  └── news/[id]/    → client.fetch()  → GROQ fetch       │
-│                                                         │
-│  ⚠️ JSON.parse(JSON.stringify(data))                     │
-│     Turbopack serialization hatalarını önlemek için       │
-└────────────────────┬────────────────────────────────────┘
-                     │ Serialized Props
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│  Client Components                                      │
-│  ├── HomeClient    ← places: LocationData[]              │
-│  ├── NewsView      ← sanityNews, weeklyEvent             │
-│  ├── VotingView    ← sanityPolls: SanityPoll[]           │
-│  └── MapView       ← places: LocationData[]              │
-│                                                         │
-│  Hepsi statik fallback verisine sahiptir (src/data/)     │
-└─────────────────────────────────────────────────────────┘
+```text
+[ Sanity CMS Veritabanı ]
+           │
+           │ (GROQ Queries)
+           ▼
+[ Server Components (page.tsx) ]
+           │ (SSR Fetching - force-dynamic)
+           │ 
+           │ ⚠️ Serialization Strategy: 
+           │ JSON.parse(JSON.stringify(data))
+           ▼
+[ Client Components (HomeClient, MapView vb.) ]
+           │ (Props olarak iletilir)
+           ▼
+[ Kullanıcı Arayüzü (Harita UI / Listeler) ]
 ```
 
-### Kritik Uygulama Detayları
-
-1. **Serileştirme:** Sanity client'ın döndürdüğü nesneler serileştirilemez prototype zinciri içerebilir. Tüm Server → Client prop geçişlerinde `JSON.parse(JSON.stringify(data))` uygulanır.
-
-2. **Dinamik Rendering:** Tüm Sanity-bağlantılı sayfalar `export const dynamic = 'force-dynamic'` kullanır — önbellekleme devre dışı, her istekte taze veri.
-
-3. **Fallback Stratejisi:** Sanity boş dönerse veya hata verirse, `src/data/` dizinindeki statik mock veri kullanılır. UI hiçbir zaman boş/kırık kalmaz.
-
-4. **GPS → Harita Dönüşümü:** Sanity'deki `geopoint` (lat/lng) verileri, `gpsToMapPercent()` fonksiyonu ile stilize harita üzerindeki yüzde konumlarına dönüştürülür (bounding box: 39.28–39.38°N, 26.64–26.78°E).
+- **Fetching ve Caching Stratejisi:** Bütün ana sayfalar (Harita, Feed, Oylama) Server Component'tır ve `export const dynamic = 'force-dynamic'` ile işaretlenerek önbellekleme (caching) tamamen kapatılmış, her sayfa yenilemesinde en güncel verinin gelmesi garanti altına alınmıştır.
+- **Serialization (Serileştirme):** Sanity üzerinden gelen veriler gizli prototype'lar veya tarih objeleri barındırabileceği için Client bileşenlerine geçerken Next.js Turbopack/hydration hatalarını engellemek amacıyla `JSON.parse(JSON.stringify())` işleminden geçirilmektedir.
 
 ---
 
-## 5. API & Harici Entegrasyonlar
+## 5. API & Harici Entegrasyonlar (API & External Integrations)
 
-### 🌤️ Hava Durumu API'si (`/api/weather`)
-- **Kaynak:** OpenWeatherMap API (`api.openweathermap.org/data/2.5/weather`)
-- **Konum:** Ayvalık, TR (sabit koordinatlar)
-- **Çekilen Veri:** Sıcaklık, deniz sıcaklığı, rüzgar hızı/yönü, gün batımı saati
-- **Kullanım Yerleri:** `WindWidget` (ana sayfa) ve `NewsView` (haber sayfası üst bar)
-- **Önbellek:** `force-dynamic` + `revalidate: 0` — her zaman taze veri
-- **Fallback:** API başarısız olursa sabit varsayılan değerler döner (28°C, 22°C deniz, vb.)
+Uygulamanın `src/app/api` dizininde çalışan kritik API Route'ları şunlardır:
 
-### 🗺️ Leaflet Harita Input (Sanity Studio)
-- **Kütüphane:** `leaflet` v1.9.4
-- **Tile Sağlayıcı:** OpenStreetMap (ücretsiz, API key gerektirmez)
-- **Kullanım:** Sanity Studio'da `place` dokümanının `location` alanı için özel input bileşeni
-- **Özellikler:** Tıkla → pin bırak, sürükle → güncelle, koordinat gösterimi, temizle butonu
-
-### 📤 Dosya Yükleme (`/api/upload`)
-- **Platform:** Vercel Blob Storage
-- **Kullanım:** LocationCard'daki fotoğraf yükleme özelliği
-
-### 📝 Portable Text (`@portabletext/react`)
-- **Kullanım:** `/news/[id]` haber detay sayfasında Sanity'nin zengin metin (block content) içeriğini render eder
+- **`/api/rate-location` (YENİ):** `LocationRating` bileşeni üzerinden gelen yeni nesil puanlama isteklerini karşılar. Kullanıcıdan gelen kategorik puanları (örn. Lezzet: 5, Fiyat: 4) alır ve `client.patch().inc()` metoduyla Sanity CMS üzerindeki ilgili sayacı arttırır. Aynı zamanda `voteCount` (toplam oy) sayısını da 1 arttırır. `SANITY_API_WRITE_TOKEN` ile güvenli yazma (mutation) işlemi yapar.
+- **`/api/weather`:** OpenWeatherMap API'sine proxy görevi yapar. Ayvalık'ın güncel sıcaklık, deniz suyu sıcaklığı ve rüzgar verilerini çekerek `WindWidget` (Harita üstü) ve `NewsView` (Haberler üstü) bileşenlerine veri sağlar.
+- **`/api/upload`:** Vercel Blob servisini kullanarak kullanıcıların mekanlara veya oylamalara doğrudan yüksek çözünürlüklü fotoğraf yüklemesine olanak tanır.
 
 ---
 
-## 6. Ortam Değişkenleri
+## 6. Çevresel Değişkenler (Environment Variables)
 
-| Değişken | Açıklama |
-|----------|----------|
-| `WEATHER_API_KEY` | OpenWeatherMap API anahtarı |
-| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity proje ID'si |
-| `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset adı (`production`) |
+Projenin yerelde (`.env.local`) ve Vercel üzerinde güvenli çalışabilmesi için gereken aktif değişkenler:
+
+| Değişken Adı | Açıklama |
+|--------------|----------|
+| `WEATHER_API_KEY` | OpenWeatherMap entegrasyonu için gizli API anahtarı. |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity projesinin ID'si (Client side erişilebilir). |
+| `NEXT_PUBLIC_SANITY_DATASET` | Kullanılan veritabanı ortamı (örn. `production`). |
+| **`SANITY_API_WRITE_TOKEN`** | **YENİ:** Puanlama ve veri yazma (rate-location) API'sinin Sanity veritabanını güncelleyebilmesi için gerekli olan yönetici (write) iznine sahip güvenli token. |
 
 ---
 
-## 7. Bağımlılıklar (Öne Çıkanlar)
+## 7. Temel Bağımlılıklar (Key Dependencies)
 
-| Paket | Versiyon | Kullanım |
-|-------|----------|----------|
-| `next` | 16.2.10 | Framework |
-| `react` | 19.2.4 | UI kütüphanesi |
-| `sanity` | ^5.31.1 | CMS Studio |
-| `next-sanity` | ^13.2.1 | Sanity + Next.js entegrasyonu |
-| `framer-motion` | ^12.42.2 | Animasyonlar (sayfa geçişleri, pin animasyonları, bottom sheet) |
-| `lucide-react` | ^1.24.0 | İkon kütüphanesi |
-| `leaflet` | ^1.9.4 | Sanity Studio harita input bileşeni |
-| `@portabletext/react` | ^7.0.1 | Zengin metin (rich text) render |
-| `@vercel/blob` | ^2.6.1 | Dosya yükleme |
-| `tailwindcss` | ^4 | CSS framework |
-| `styled-components` | ^6.4.4 | Sanity Studio iç stili |
+Projenin performansını ve estetiğini sağlayan temel kütüphaneler:
+
+- **Next.js (`16.2.x`):** Server ve Client bileşenlerini harmanlayan App Router mimarisi.
+- **Tailwind CSS (`v4`):** Yeni nesil hızlı CSS motoru. Hem mobil öncelikli arayüz hem de Desktop optimizasyonları için kullanılmıştır.
+- **Sanity (`^5.31.x`) & next-sanity:** İçerik yönetimi (Headless CMS) ve entegrasyon.
+- **Framer Motion (`^12.x`):** Sayfa geçişleri, MapView pin'lerinin dinamik ortaya çıkışı ve Modal (LocationCard) kaydırma/sürükleme animasyonları.
+- **Zustand (`^5`):** Kullanıcının kendine özel oluşturduğu rotayı (`routeList`) tutan hafif global state yöneticisi.
+- **Lucide React:** Uygulama içi SVG tabanlı ikonografi.

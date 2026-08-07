@@ -16,13 +16,23 @@ export default function RotamPage() {
 
   if (!mounted) return null;
 
-  // Build multi-stop Google Maps Directions URL
-  const mapsUrl =
-    "https://www.google.com/maps/dir/" +
-    routeList
-      .map((loc) => `${loc.geopoint?.lat},${loc.geopoint?.lng}`)
-      .filter((val) => !val.includes("undefined"))
-      .join("/");
+  // Build Google Maps Directions URL with origin/waypoints/destination
+  const validStops = routeList
+    .filter((loc) => loc.geopoint?.lat != null && loc.geopoint?.lng != null)
+    .map((loc) => `${loc.geopoint!.lat},${loc.geopoint!.lng}`);
+
+  let mapsUrl = "https://www.google.com/maps/dir/?api=1&travelmode=walking";
+  if (validStops.length === 1) {
+    mapsUrl += `&destination=${encodeURIComponent(validStops[0])}`;
+  } else if (validStops.length >= 2) {
+    const origin = validStops[0];
+    const destination = validStops[validStops.length - 1];
+    const waypoints = validStops.slice(1, -1).join("|");
+    mapsUrl += `&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
+    if (waypoints) {
+      mapsUrl += `&waypoints=${encodeURIComponent(waypoints)}`;
+    }
+  }
 
   // ── Empty State ──────────────────────────────────────────────────────────
   if (routeList.length === 0) {

@@ -58,8 +58,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: "#FAFAFA",
 };
 
@@ -76,7 +74,9 @@ export default function RootLayout({
         <main className="flex-1 pb-safe-nav">{children}</main>
         <Toaster position="top-center" richColors theme="light" />
         <RouteFAB />
-        <BottomNav />
+        <div className="lg:hidden">
+          <BottomNav />
+        </div>
       </body>
     </html>
   );

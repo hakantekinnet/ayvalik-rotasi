@@ -66,7 +66,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
           src={imageUrl}
           alt={article.title}
           fill
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 70vw, 900px"
           className="object-cover"
           priority
         />
@@ -105,7 +105,43 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
         {/* Rich text content */}
         {article.content && (
           <div className="mt-8 text-gray-800 leading-relaxed space-y-4 prose prose-sm prose-gray max-w-none">
-            <PortableText value={article.content} />
+            <PortableText
+              value={article.content}
+              components={{
+                block: {
+                  h2: ({ children }) => (
+                    <h2 className="text-xl font-extrabold text-gray-900 mt-8 mb-3">
+                      {children}
+                    </h2>
+                  ),
+                  normal: ({ children }) => (
+                    <p className="text-base text-gray-700 leading-relaxed mb-4">
+                      {children}
+                    </p>
+                  ),
+                },
+                list: {
+                  bullet: ({ children }) => (
+                    <ul className="list-disc list-inside space-y-1.5 text-gray-700 pl-2 mb-4">
+                      {children}
+                    </ul>
+                  ),
+                  number: ({ children }) => (
+                    <ol className="list-decimal list-inside space-y-1.5 text-gray-700 pl-2 mb-4">
+                      {children}
+                    </ol>
+                  ),
+                },
+                listItem: {
+                  bullet: ({ children }) => (
+                    <li className="text-base leading-relaxed">{children}</li>
+                  ),
+                  number: ({ children }) => (
+                    <li className="text-base leading-relaxed">{children}</li>
+                  ),
+                },
+              }}
+            />
           </div>
         )}
 

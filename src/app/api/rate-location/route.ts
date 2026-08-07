@@ -9,6 +9,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Eksik veri' }, { status: 400 });
     }
 
+    // Validate: only allow known rating fields with integer values 1–5
+    const ALLOWED_KEYS = new Set([
+      'ratingLezzet', 'ratingFiyat', 'ratingAtmosfer',
+      'ratingDeniz', 'ratingTemizlik', 'ratingTesis',
+      'ratingGenel',
+    ]);
+
+    for (const [key, value] of Object.entries(scores)) {
+      if (!ALLOWED_KEYS.has(key)) {
+        return NextResponse.json({ error: `Geçersiz puan alanı: ${key}` }, { status: 400 });
+      }
+      const num = Number(value);
+      if (!Number.isInteger(num) || num < 1 || num > 5) {
+        return NextResponse.json(
+          { error: `Puan 1–5 arası tam sayı olmalıdır (${key}: ${value})` },
+          { status: 400 }
+        );
+      }
+    }
+
     const writeClient = client.withConfig({
       token: process.env.SANITY_API_WRITE_TOKEN,
       useCdn: false,
@@ -16,8 +36,6 @@ export async function POST(req: Request) {
 
     // Prepare the increment object. Always increment voteCount by 1.
     const incrementData: Record<string, number> = { voteCount: 1 };
-
-    // Add the specific category scores to the increment object
     for (const [key, value] of Object.entries(scores)) {
       incrementData[key] = Number(value);
     }

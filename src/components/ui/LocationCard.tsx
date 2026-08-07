@@ -110,7 +110,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/40 z-[60]"
+            className="fixed inset-0 bg-black/40 z-[var(--z-overlay)]"
             onClick={onClose}
           />
 
@@ -128,7 +128,7 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
             onDragEnd={handleDragEnd}
-            className="fixed bottom-0 left-0 right-0 z-[70] w-full max-w-md mx-auto bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-hidden pointer-events-auto"
+            className="fixed bottom-0 left-0 right-0 z-[var(--z-modal)] w-full max-w-md mx-auto bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[85vh] overflow-hidden pointer-events-auto"
           >
             {/* Drag Handle — only this area triggers drag-to-dismiss */}
             <div className="w-full flex justify-center pt-4 pb-3 cursor-grab active:cursor-grabbing">

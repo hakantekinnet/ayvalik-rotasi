@@ -17,7 +17,7 @@ export function RouteFAB() {
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 80, opacity: 0, scale: 0.8 }}
           transition={{ type: "spring", damping: 20, stiffness: 300 }}
-          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 z-50"
+          className="fixed bottom-[88px] left-1/2 -translate-x-1/2 z-[var(--z-floating-action)]"
         >
           <Link href="/rotam" prefetch={false}>
             <div className="px-6 py-3.5 rounded-full flex items-center gap-2.5 bg-white/80 backdrop-blur-md shadow-2xl border border-white/40 transition-all duration-300 hover:scale-105 hover:bg-white/90 active:scale-95 cursor-pointer">

@@ -12,6 +12,15 @@
   --foreground-muted: #6B7280;
   --card-bg: #FFFFFF;
   --card-border: #F0F0F0;
+
+  /* Centralized Z-Index Scale */
+  --z-header: 30;
+  --z-bottom-nav: 40;
+  --z-floating-action: 50;
+  --z-overlay: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+
   --aegean-50: #ECFEFF;
   --aegean-100: #CFFAFE;
   --aegean-200: #A5F3FC;
