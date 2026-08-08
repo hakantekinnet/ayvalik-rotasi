@@ -251,7 +251,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
       {/* Content Area */}
       <div className="px-4">
         {activeTab === "kadraj" ? (
-          /* ── Benim Kadrajımdan Tab ── */}
+          /* ── Benim Kadrajımdan Tab ── */
           <div
             role="tabpanel"
             id="panel-kadraj"
