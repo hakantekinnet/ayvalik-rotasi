@@ -6,6 +6,7 @@
 
 export interface LocationData {
   id: string;
+  slug?: string;
   title: string;
   category: "Plaj" | "Tarihi" | "Manzara" | "Mekan" | "Eğlence";
   description: string;

@@ -7,6 +7,7 @@ import type { CuratedRoute } from "@/components/CuratedRoutesList";
 
 export interface SanityPlace {
   _id: string;
+  slug?: string;
   title: string;
   category: string;
   description: string;
@@ -43,6 +44,7 @@ async function getPlaces(): Promise<LocationData[]> {
     const data: SanityPlace[] = await client.fetch(
        `*[_type == "place"]{
         _id,
+        "slug": coalesce(slug.current, _id),
         title,
         category,
         description,
@@ -81,6 +83,7 @@ async function getPlaces(): Promise<LocationData[]> {
 
           return {
           id: place._id,
+          slug: place.slug || place._id,
           title: place.title || "",
           category: (place.category as LocationData["category"]) || "Mekan",
           description: place.description || "",

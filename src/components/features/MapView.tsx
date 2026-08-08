@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crosshair, Loader2 } from "lucide-react";
-import { LocationCard } from "@/components/ui/LocationCard";
 import { LocationData } from "@/lib/types";
 
 // Gold pin helper — calculates average score across category criteria
@@ -37,10 +37,7 @@ const categoryMap: Record<string, string | null> = {
 };
 
 export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
-  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(
-    null
-  );
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const router = useRouter();
   const [userLocation, setUserLocation] = useState<{ top: string; left: string } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [activeFilter, setActiveFilter] = useState("Tümü");
@@ -102,8 +99,8 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
   }, []);
 
   const handlePinClick = (location: LocationData) => {
-    setSelectedLocation(location);
-    setIsSheetOpen(true);
+    const slug = location.slug || location.id;
+    router.push(`/mekan/${slug}`, { scroll: false });
   };
 
   // Local filter bar takes precedence; falls back to parent prop
@@ -254,12 +251,6 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
         {isLocating ? "Aranıyor…" : "📍 Konum"}
       </button>
 
-      {/* Location Bottom Sheet */}
-      <LocationCard
-        location={selectedLocation}
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-      />
     </div>
   );
 }

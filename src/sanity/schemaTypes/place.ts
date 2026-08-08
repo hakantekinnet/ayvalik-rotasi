@@ -15,6 +15,15 @@ export const place = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'slug',
+      title: 'URL Uzantısı (Slug)',
+      type: 'slug',
+      options: {
+        source: 'title',
+        maxLength: 96,
+      },
+    }),
+    defineField({
       name: 'category',
       title: 'Kategori',
       type: 'string',

@@ -71,8 +71,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
   children: React.ReactNode;
+  modal: React.ReactNode;
 }>) {
   return (
     <html lang="tr" className={`${manrope.variable} ${playfair.variable} h-full`}>
@@ -85,6 +87,7 @@ export default function RootLayout({
             {children}
           </div>
         </main>
+        {modal}
         <Toaster position="top-center" richColors theme="light" />
         <RouteFAB />
         <div className="lg:hidden">
