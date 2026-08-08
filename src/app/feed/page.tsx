@@ -1,4 +1,5 @@
 import { client } from "@/sanity/lib/client";
+import { Suspense } from "react";
 import { NewsView } from "@/components/features/NewsView";
 
 export const revalidate = 60;
@@ -23,6 +24,7 @@ export interface SanityEvent {
   title: string;
   eventDate: string;
   description?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   coverImage?: any;
   location?: {
     _id: string;
@@ -112,8 +114,8 @@ export default async function FeedPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="px-5 pt-12 pb-2">
+      {/* Header — mobile only (DesktopHeader handles lg+) */}
+      <header className="px-5 pt-12 pb-2 lg:hidden">
         <h1 className="font-heading text-2xl font-extrabold text-foreground tracking-tight">
           Haberler
         </h1>
@@ -122,12 +124,14 @@ export default async function FeedPage() {
         </p>
       </header>
 
-      {/* News Dashboard View */}
-      <NewsView
-        sanityNews={serializedNews}
-        weeklyEvent={serializedEvent}
-        events={serializedEvents}
-      />
+      {/* News Dashboard View — Suspense needed for useSearchParams */}
+      <Suspense>
+        <NewsView
+          sanityNews={serializedNews}
+          weeklyEvent={serializedEvent}
+          events={serializedEvents}
+        />
+      </Suspense>
     </div>
   );
 }
