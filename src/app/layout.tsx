@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Manrope, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { DesktopHeader } from "@/components/layout/DesktopHeader";
 import { RouteFAB } from "@/components/RouteFAB";
 import { Toaster } from "sonner";
 
@@ -9,6 +10,13 @@ const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-manrope",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -67,11 +75,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className={`${manrope.variable} h-full`}>
+    <html lang="tr" className={`${manrope.variable} ${playfair.variable} h-full`}>
       <body
         className={`${manrope.className} antialiased text-slate-800 min-h-full flex flex-col`}
       >
-        <main className="flex-1 pb-safe-nav">{children}</main>
+        <DesktopHeader />
+        <main className="flex-1 pb-safe-nav lg:pb-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {children}
+          </div>
+        </main>
         <Toaster position="top-center" richColors theme="light" />
         <RouteFAB />
         <div className="lg:hidden">

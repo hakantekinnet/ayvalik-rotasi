@@ -79,6 +79,7 @@
   --font-sans: var(--font-manrope), 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-heading: var(--font-manrope), 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-serif: var(--font-playfair), 'Playfair Display', Georgia, serif;
 
   --animate-skeleton: skeleton 1.5s ease-in-out infinite;
   --animate-fade-in: fadeIn 0.3s ease-out;
@@ -161,6 +162,13 @@ body {
 /* Heading font utility */
 .font-heading {
   font-family: var(--font-heading);
+}
+
+/* Editorial serif — hero headings, route titles, story headings */
+.font-editorial {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* Hide scrollbars — keeps scroll/pan functional */

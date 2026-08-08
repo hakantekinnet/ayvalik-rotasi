@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crosshair, Loader2 } from "lucide-react";
 import { LocationCard } from "@/components/ui/LocationCard";
-import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
 
 // Gold pin helper — calculates average score across category criteria
@@ -116,9 +115,6 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
   return (
     <div className="relative w-full">
       {/* Floating Category Filter Bar */}
-
-      {/* Wind & Beach Guide Widget */}
-      <WindWidget />
       <div
         className="absolute top-6 left-0 w-full z-[60] overflow-x-auto touch-pan-x pointer-events-auto"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
@@ -142,7 +138,7 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
       </div>
 
       {/* Outer Window — scrollable viewport */}
-      <div ref={scrollContainerRef} className="relative w-full max-w-4xl mx-auto h-[50vh] max-h-[500px] rounded-3xl overflow-auto shadow-xl border border-white/20 touch-pan-x touch-pan-y hide-scrollbar">
+      <div ref={scrollContainerRef} className="relative w-full max-w-4xl mx-auto h-[50vh] max-h-[500px] lg:h-[calc(100vh-5rem)] lg:max-h-none lg:sticky lg:top-20 rounded-3xl overflow-auto shadow-xl border border-white/20 touch-pan-x touch-pan-y hide-scrollbar">
         {/* Inner Canvas — larger than viewport to enable panning */}
         <div className="relative w-[200%] md:w-[150%] lg:w-full aspect-[3/4] min-h-full">
           {/* Map Image */}
