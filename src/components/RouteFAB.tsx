@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRouteStore } from "@/store/useRouteStore";
+import { useRouteStore, useStoreHydration } from "@/store/useRouteStore";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function RouteFAB() {
   const { routeList } = useRouteStore();
   const pathname = usePathname();
+  const hasHydrated = useStoreHydration();
+
+  // Don't render until localStorage has been read — prevents hydration mismatch
+  if (!hasHydrated) return null;
 
   return (
     <AnimatePresence>

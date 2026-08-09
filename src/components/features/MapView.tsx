@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Crosshair, Loader2 } from "lucide-react";
@@ -23,6 +23,8 @@ const calculateAverageScore = (loc: LocationData) => {
 
 interface MapViewProps {
   activeCategory?: string | null;
+  activeRegion?: string | null;
+  searchQuery?: string;
   places?: LocationData[];
 }
 
@@ -36,7 +38,7 @@ const categoryMap: Record<string, string | null> = {
   "📸 Manzara": "Manzara",
 };
 
-export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
+export function MapView({ activeCategory = null, activeRegion = null, searchQuery = "", places = [] }: MapViewProps) {
   const router = useRouter();
   const [userLocation, setUserLocation] = useState<{ top: string; left: string } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
@@ -44,9 +46,7 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Placeholder: convert real GPS coordinates to map percentages
-  // TODO: Calibrate with the actual bounding box of the Ayvalık map image
   const mapGpsToPixels = (lat: number, lng: number): { top: string; left: string } => {
-    // Approximate bounding box for Ayvalık region
     const bounds = {
       north: 39.38,
       south: 39.28,
@@ -103,11 +103,25 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
     router.push(`/mekan/${slug}`, { scroll: false });
   };
 
-  // Local filter bar takes precedence; falls back to parent prop
-  const effectiveCategory = categoryMap[activeFilter] ?? activeCategory;
-  const filteredLocations = places.filter(
-    (location) => !effectiveCategory || location.category === effectiveCategory
-  );
+  // ── Combined filtering: Category (local bar OR parent) + Region + Search ──
+  const filteredLocations = useMemo(() => {
+    const effectiveCategory = categoryMap[activeFilter] ?? activeCategory;
+    const query = searchQuery.toLowerCase().trim();
+
+    return places.filter((location) => {
+      // Category filter
+      if (effectiveCategory && location.category !== effectiveCategory) return false;
+      // Region filter
+      if (activeRegion && location.region !== activeRegion) return false;
+      // Search filter
+      if (query) {
+        const matchesTitle = location.title.toLowerCase().includes(query);
+        const matchesDesc = location.description?.toLowerCase().includes(query);
+        if (!matchesTitle && !matchesDesc) return false;
+      }
+      return true;
+    });
+  }, [places, activeFilter, activeCategory, activeRegion, searchQuery]);
 
   return (
     <div className="relative w-full">
@@ -116,7 +130,6 @@ export function MapView({ activeCategory = null, places = [] }: MapViewProps) {
         className="absolute top-6 left-0 w-full z-[60] overflow-x-auto touch-pan-x pointer-events-auto"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" } as React.CSSProperties}
       >
-        {/* Added pr-8 to ensure enough space after the last item */}
         <div className="flex gap-2 w-max px-4 pb-2 pr-8">
           {categories.map((cat) => (
             <button

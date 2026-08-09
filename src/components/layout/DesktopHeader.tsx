@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MapPin, Newspaper, Vote, Route } from "lucide-react";
-import { useRouteStore } from "@/store/useRouteStore";
+import { useRouteStore, useStoreHydration } from "@/store/useRouteStore";
 
 const navLinks = [
   { href: "/", label: "Harita", icon: MapPin },
@@ -14,6 +14,8 @@ const navLinks = [
 export function DesktopHeader() {
   const pathname = usePathname();
   const { routeList } = useRouteStore();
+  const hasHydrated = useStoreHydration();
+  const routeCount = hasHydrated ? routeList.length : 0;
 
   return (
     <header className="hidden lg:block sticky top-0 z-[var(--z-header)] glass border-b border-card-border/60">
@@ -68,9 +70,9 @@ export function DesktopHeader() {
             >
               <Route size={16} strokeWidth={2.5} />
               Rotam
-              {routeList.length > 0 && (
+              {routeCount > 0 && (
                 <span className="ml-0.5 bg-white/20 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full leading-none">
-                  {routeList.length}
+                  {routeCount}
                 </span>
               )}
             </Link>

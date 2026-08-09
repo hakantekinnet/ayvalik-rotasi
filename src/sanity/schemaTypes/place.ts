@@ -40,6 +40,22 @@ export const place = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'region',
+      title: 'Bölge',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Merkez', value: 'Merkez' },
+          { title: 'Cunda', value: 'Cunda' },
+          { title: 'Sarımsaklı', value: 'Sarımsaklı' },
+          { title: 'Küçükköy', value: 'Küçükköy' },
+          { title: 'Altınova', value: 'Altınova' },
+          { title: 'Şeytan Sofrası', value: 'Şeytan Sofrası' },
+        ],
+        layout: 'dropdown',
+      },
+    }),
+    defineField({
       name: 'description',
       title: 'Açıklama',
       type: 'text',

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { Search, X } from "lucide-react";
 import { MapView } from "@/components/features/MapView";
 import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
@@ -9,6 +10,8 @@ import {
   CuratedRoute,
 } from "@/components/CuratedRoutesList";
 
+const regions = ["Merkez", "Cunda", "Sarımsaklı", "Küçükköy", "Altınova", "Şeytan Sofrası"];
+
 interface HomeClientProps {
   places: LocationData[];
   curatedRoutes?: CuratedRoute[];
@@ -16,10 +19,25 @@ interface HomeClientProps {
 
 export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory((prev) => (prev === category ? null : category));
   };
+
+  const handleRegionClick = (region: string) => {
+    setActiveRegion((prev) => (prev === region ? null : region));
+  };
+
+  // Count per region (for chips)
+  const regionCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const r of regions) {
+      counts[r] = places.filter((p) => p.region === r).length;
+    }
+    return counts;
+  }, [places]);
 
   return (
     <div className="min-h-screen">
@@ -48,15 +66,79 @@ export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
           <div className="lg:hidden">
             <WindWidget />
           </div>
-          <MapView activeCategory={activeCategory} places={places} />
+          <MapView
+            activeCategory={activeCategory}
+            activeRegion={activeRegion}
+            searchQuery={searchQuery}
+            places={places}
+          />
         </section>
 
-        {/* ── Right Column: Sidebar (desktop only becomes side, stacks below on mobile) ── */}
+        {/* ── Right Column: Sidebar ── */}
         <aside className="lg:pt-0">
           {/* WindWidget: in sidebar flow on desktop, hidden on mobile */}
           <div className="hidden lg:block mb-4">
             <WindWidget />
           </div>
+
+          {/* Search Bar */}
+          <section className="px-5 lg:px-0 mb-4">
+            <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="text"
+                placeholder="Mekan veya bölge ara..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-10 py-3 bg-white rounded-xl border border-gray-200 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-aegean-500/20 focus:border-aegean-500 transition-all shadow-sm"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label="Aramayı temizle"
+                >
+                  <X size={14} className="text-gray-400" />
+                </button>
+              )}
+            </div>
+          </section>
+
+          {/* Region Chips */}
+          <section className="px-5 lg:px-0 mb-5">
+            <h2 className="font-heading text-sm font-bold text-foreground-muted uppercase tracking-wider mb-2.5">
+              Bölge
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {regions.map((region) => (
+                <button
+                  key={region}
+                  onClick={() => handleRegionClick(region)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                    activeRegion === region
+                      ? "bg-aegean-500 text-white border-aegean-500 shadow-sm shadow-aegean-500/25"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-aegean-300 hover:text-aegean-700"
+                  }`}
+                >
+                  {region}
+                  {regionCounts[region] > 0 && (
+                    <span
+                      className={`ml-1.5 text-[10px] ${
+                        activeRegion === region
+                          ? "text-white/70"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {regionCounts[region]}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </section>
 
           {/* Quick Discovery */}
           <section className="px-5 py-6 lg:px-0 lg:py-0 lg:mb-6">

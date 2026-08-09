@@ -20,6 +20,8 @@ export interface RouteLocation {
 
 export interface RouteState {
   routeList: RouteLocation[];
+  _hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
   addToRoute: (location: RouteLocation) => void;
   addMultipleToRoute: (locations: RouteLocation[]) => void;
   removeFromRoute: (id: string) => void;
@@ -32,6 +34,8 @@ export const useRouteStore = create<RouteState>()(
   persist(
     (set, get) => ({
       routeList: [],
+      _hasHydrated: false,
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
 
       addToRoute: (location) => {
         const exists = get().routeList.some((l) => l._id === location._id);
@@ -71,9 +75,19 @@ export const useRouteStore = create<RouteState>()(
       },
     }),
     {
-      name: "ayvalik-route-storage", // localStorage key
+      name: "ayvalik-route-storage",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
+
+// ── Hydration hook ──────────────────────────────────────────────────────────
+// Use this in components that render store data to prevent SSR mismatch.
+// Example: const hasHydrated = useStoreHydration();
+//          if (!hasHydrated) return <Skeleton />;
+
+export const useStoreHydration = () => useRouteStore((s) => s._hasHydrated);
 
 export default useRouteStore;

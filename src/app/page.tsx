@@ -10,6 +10,7 @@ export interface SanityPlace {
   slug?: string;
   title: string;
   category: string;
+  region?: string;
   description: string;
   imageUrls?: string[];
   location?: { lat: number; lng: number; alt?: number };
@@ -47,6 +48,7 @@ async function getPlaces(): Promise<LocationData[]> {
         "slug": coalesce(slug.current, _id),
         title,
         category,
+        region,
         description,
         "imageUrls": images[].asset->url,
         location,
@@ -86,6 +88,7 @@ async function getPlaces(): Promise<LocationData[]> {
           slug: place.slug || place._id,
           title: place.title || "",
           category: (place.category as LocationData["category"]) || "Mekan",
+          region: place.region,
           description: place.description || "",
           top: coords.top,
           left: coords.left,
