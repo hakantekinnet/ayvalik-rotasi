@@ -25,6 +25,7 @@ export interface RouteState {
   addToRoute: (location: RouteLocation) => void;
   addMultipleToRoute: (locations: RouteLocation[]) => void;
   removeFromRoute: (id: string) => void;
+  reorderRoute: (oldIndex: number, newIndex: number) => void;
   clearRoute: () => void;
 }
 
@@ -68,6 +69,15 @@ export const useRouteStore = create<RouteState>()(
         set((state) => ({
           routeList: state.routeList.filter((l) => l._id !== id),
         }));
+      },
+
+      reorderRoute: (oldIndex, newIndex) => {
+        set((state) => {
+          const items = [...state.routeList];
+          const [moved] = items.splice(oldIndex, 1);
+          items.splice(newIndex, 0, moved);
+          return { routeList: items };
+        });
       },
 
       clearRoute: () => {

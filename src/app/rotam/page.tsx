@@ -2,17 +2,162 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouteStore } from "@/store/useRouteStore";
+import { useRouteStore, RouteLocation } from "@/store/useRouteStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, MapPin, Navigation, ChevronLeft, Route } from "lucide-react";
+import {
+  Trash2,
+  MapPin,
+  Navigation,
+  ChevronLeft,
+  Route,
+  GripVertical,
+} from "lucide-react";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// ── Sortable Route Item ────────────────────────────────────────────────────
+
+interface SortableRouteItemProps {
+  location: RouteLocation;
+  index: number;
+  onRemove: (id: string) => void;
+}
+
+function SortableRouteItem({
+  location,
+  index,
+  onRemove,
+}: SortableRouteItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: location._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    position: "relative" as const,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white rounded-2xl border shadow-sm overflow-hidden transition-shadow duration-200 ${
+        isDragging
+          ? "shadow-xl border-aegean-300 ring-2 ring-aegean-400/30 scale-[1.02]"
+          : "border-slate-100 hover:shadow-md"
+      }`}
+    >
+      <div className="flex items-center gap-3 px-4 py-4">
+        {/* Drag Handle */}
+        <button
+          className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300 hover:text-slate-500 hover:bg-slate-100 transition-colors cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+          aria-label="Sırala"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical size={16} />
+        </button>
+
+        {/* Order number */}
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0F766E] to-[#0D9488] flex items-center justify-center flex-shrink-0 shadow-sm">
+          <span className="text-white text-sm font-extrabold">
+            {index + 1}
+          </span>
+        </div>
+
+        {/* Location info */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-bold text-slate-800 truncate">
+            {location.title}
+          </h3>
+          {location.geopoint?.lat && location.geopoint?.lng && (
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">
+              {location.geopoint.lat.toFixed(4)}°N,{" "}
+              {location.geopoint.lng.toFixed(4)}°E
+            </p>
+          )}
+          {location.isOpportunity && location.opportunityText && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md w-fit border border-amber-200">
+              <span>🎁 {location.opportunityText}</span>
+              {location.opportunityCode && (
+                <span className="font-bold text-amber-700">
+                  (Kod: {location.opportunityCode})
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Remove button */}
+        <button
+          onClick={() => onRemove(location._id)}
+          className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400 hover:bg-red-100 hover:text-red-500 transition-all duration-200 active:scale-90 flex-shrink-0"
+          aria-label={`${location.title} mekanını rotadan çıkar`}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </li>
+  );
+}
+
+// ── Main Page ──────────────────────────────────────────────────────────────
 
 export default function RotamPage() {
   const [mounted, setMounted] = useState(false);
-  const { routeList, removeFromRoute, clearRoute } = useRouteStore();
+  const { routeList, removeFromRoute, reorderRoute, clearRoute } =
+    useRouteStore();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // DnD sensors — pointer (mouse), touch, and keyboard
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 150, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = routeList.findIndex((l) => l._id === active.id);
+    const newIndex = routeList.findIndex((l) => l._id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      reorderRoute(oldIndex, newIndex);
+    }
+  };
 
   if (!mounted) return null;
 
@@ -85,7 +230,7 @@ export default function RotamPage() {
                 Rotam
               </h1>
               <p className="text-xs text-slate-400 font-medium">
-                {routeList.length} mekan seçildi
+                {routeList.length} mekan seçildi · Sürükle & bırak ile sırala
               </p>
             </div>
           </div>
@@ -100,64 +245,47 @@ export default function RotamPage() {
         </div>
       </div>
 
-      {/* Location List */}
+      {/* Location List — DnD enabled */}
       <div className="max-w-lg mx-auto px-5 pt-4">
-        <ul className="space-y-3">
-          <AnimatePresence initial={false}>
-            {routeList.map((loc, index) => (
-              <motion.li
-                key={loc._id}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 60, transition: { duration: 0.2 } }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
-              >
-                <div className="flex items-center gap-4 px-5 py-4">
-                  {/* Order number */}
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0F766E] to-[#0D9488] flex items-center justify-center flex-shrink-0 shadow-sm">
-                    <span className="text-white text-sm font-extrabold">
-                      {index + 1}
-                    </span>
-                  </div>
-
-                  {/* Location info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-bold text-slate-800 truncate">
-                      {loc.title}
-                    </h3>
-                    {loc.geopoint?.lat && loc.geopoint?.lng && (
-                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                        {loc.geopoint.lat.toFixed(4)}°N,{" "}
-                        {loc.geopoint.lng.toFixed(4)}°E
-                      </p>
-                    )}
-                    {loc.isOpportunity && loc.opportunityText && (
-                      <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md w-fit border border-amber-200">
-                        <span>🎁 {loc.opportunityText}</span>
-                        {loc.opportunityCode && (
-                          <span className="font-bold text-amber-700">
-                            (Kod: {loc.opportunityCode})
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Remove button */}
-                  <button
-                    onClick={() => removeFromRoute(loc._id)}
-                    className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-400 hover:bg-red-100 hover:text-red-500 transition-all duration-200 active:scale-90 flex-shrink-0"
-                    aria-label={`${loc.title} mekanını rotadan çıkar`}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={routeList.map((l) => l._id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <ul className="space-y-3">
+              <AnimatePresence initial={false}>
+                {routeList.map((loc, index) => (
+                  <motion.div
+                    key={loc._id}
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{
+                      opacity: 0,
+                      x: 60,
+                      transition: { duration: 0.2 },
+                    }}
+                    transition={{
+                      type: "spring",
+                      damping: 25,
+                      stiffness: 300,
+                    }}
                   >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </motion.li>
-            ))}
-          </AnimatePresence>
-        </ul>
+                    <SortableRouteItem
+                      location={loc}
+                      index={index}
+                      onRemove={removeFromRoute}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </ul>
+          </SortableContext>
+        </DndContext>
 
         {/* Route path connector (visual decoration) */}
         <div className="flex flex-col items-center mt-6 mb-2">
@@ -168,7 +296,12 @@ export default function RotamPage() {
       {/* Sticky CTA */}
       <div className="fixed bottom-[88px] left-0 right-0 z-30 px-5 pb-4 pt-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
         <div className="max-w-lg mx-auto pointer-events-auto flex flex-col gap-3">
-          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="block">
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
