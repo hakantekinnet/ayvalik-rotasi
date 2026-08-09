@@ -4,6 +4,7 @@ import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { DesktopHeader } from "@/components/layout/DesktopHeader";
 import { RouteFAB } from "@/components/RouteFAB";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Toaster } from "sonner";
 
 const manrope = Manrope({
@@ -69,6 +70,30 @@ export const viewport: Viewport = {
   themeColor: "#FAFAFA",
 };
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Ayvalık Rotası",
+  alternateName: "Ayvalik Rotasi",
+  url: "https://ayvalik-rotasi.vercel.app",
+  description:
+    "Ayvalık, Cunda ve çevresindeki en iyi mekanları keşfedin, kendi rotanızı oluşturun ve yerel esnaf fırsatlarından yararlanın.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate:
+        "https://ayvalik-rotasi.vercel.app/?q={search_term_string}",
+    },
+    "query-input": "required name=search_term_string",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Ayvalık Rotası",
+    url: "https://ayvalik-rotasi.vercel.app",
+  },
+};
+
 export default function RootLayout({
   children,
   modal,
@@ -82,6 +107,7 @@ export default function RootLayout({
         className={`${manrope.className} antialiased text-slate-800 min-h-full flex flex-col`}
       >
         <DesktopHeader />
+        <JsonLd schema={websiteSchema} />
         <main className="flex-1 pb-safe-nav lg:pb-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {children}
