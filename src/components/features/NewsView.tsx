@@ -9,6 +9,7 @@ import { Sun, Waves, Sunset, Clock, ChevronRight, Eye } from "lucide-react";
 import type { SanityNewsItem, SanityEvent } from "@/app/feed/page";
 import { useRouteStore } from "@/store/useRouteStore";
 import { urlFor } from "@/sanity/lib/image";
+import { AddToCalendar } from "@/components/ui/AddToCalendar";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -174,6 +175,16 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
 
           {/* CTAs */}
           <div className="mt-auto flex flex-col gap-1.5">
+            {/* Add to Calendar */}
+            <AddToCalendar
+              title={evt.title}
+              description={evt.description}
+              startsAt={evt.startsAt}
+              endsAt={evt.endsAt}
+              location={evt.location?.title}
+              compact
+            />
+
             {/* Always show "Detayları Gör" */}
             <button className="w-full text-[11px] font-bold py-2 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-1 cursor-pointer">
               <Eye size={12} /> Detayları Gör
