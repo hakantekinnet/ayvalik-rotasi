@@ -1,5 +1,5 @@
 import { client } from "@/sanity/lib/client";
-export const revalidate = 60;
+export const revalidate = 3600;
 import { LocationData } from "@/lib/types";
 import { locations as staticLocations } from "@/data/locations";
 import { HomeClient } from "@/components/features/HomeClient";

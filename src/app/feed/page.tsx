@@ -2,7 +2,7 @@ import { client } from "@/sanity/lib/client";
 import { Suspense } from "react";
 import { NewsView } from "@/components/features/NewsView";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 export interface SanityNewsItem {
   _id: string;
@@ -12,20 +12,15 @@ export interface SanityNewsItem {
   _createdAt: string;
 }
 
-export interface SanityWeeklyEvent {
-  _id: string;
-  title: string;
-  summary?: string;
-  imageUrl?: string;
-}
-
 export interface SanityEvent {
   _id: string;
   title: string;
-  eventDate: string;
+  startsAt: string;
+  endsAt?: string;
   description?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   coverImage?: any;
+  routeEnabled?: boolean;
   location?: {
     _id: string;
     title: string;
@@ -55,36 +50,21 @@ async function getNews(): Promise<SanityNewsItem[]> {
   }
 }
 
-async function getWeeklyEvent(): Promise<SanityWeeklyEvent | null> {
-  try {
-    const data = await client.fetch(
-      `*[_type == "news" && isWeeklyEvent == true][0]{
-        _id,
-        title,
-        summary,
-        "imageUrl": mainImage.asset->url
-      }`
-    );
-    return data || null;
-  } catch (err) {
-    console.warn("Sanity weekly event fetch failed:", err);
-    return null;
-  }
-}
-
 async function getEvents(): Promise<SanityEvent[]> {
   try {
     const data = await client.fetch(
-      `*[_type == "event"] | order(eventDate asc){
+      `*[_type == "event"] | order(startsAt asc){
         _id,
         title,
-        eventDate,
+        startsAt,
+        endsAt,
         description,
         coverImage,
+        routeEnabled,
         "location": location->{
           _id,
           title,
-          "slug": _id,
+          "slug": coalesce(slug.current, _id),
           "geopoint": location,
           isOpportunity,
           opportunityText,
@@ -100,16 +80,12 @@ async function getEvents(): Promise<SanityEvent[]> {
 }
 
 export default async function FeedPage() {
-  const [sanityNews, weeklyEvent, events] = await Promise.all([
+  const [sanityNews, events] = await Promise.all([
     getNews(),
-    getWeeklyEvent(),
     getEvents(),
   ]);
 
   const serializedNews = JSON.parse(JSON.stringify(sanityNews));
-  const serializedEvent = weeklyEvent
-    ? JSON.parse(JSON.stringify(weeklyEvent))
-    : null;
   const serializedEvents = JSON.parse(JSON.stringify(events));
 
   return (
@@ -128,10 +104,10 @@ export default async function FeedPage() {
       <Suspense>
         <NewsView
           sanityNews={serializedNews}
-          weeklyEvent={serializedEvent}
           events={serializedEvents}
         />
       </Suspense>
     </div>
   );
+}
 }

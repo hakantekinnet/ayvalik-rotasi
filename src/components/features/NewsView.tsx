@@ -6,7 +6,7 @@ import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Sun, Waves, Sunset, Clock, ChevronRight, Eye } from "lucide-react";
-import type { SanityNewsItem, SanityWeeklyEvent, SanityEvent } from "@/app/feed/page";
+import type { SanityNewsItem, SanityEvent } from "@/app/feed/page";
 import { useRouteStore } from "@/store/useRouteStore";
 import { urlFor } from "@/sanity/lib/image";
 
@@ -67,11 +67,10 @@ function sanitizeSummary(summary: string | undefined): string {
 
 interface NewsViewProps {
   sanityNews?: SanityNewsItem[];
-  weeklyEvent?: SanityWeeklyEvent | null;
   events?: SanityEvent[];
 }
 
-export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps) {
+export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
   const { addToRoute, routeList } = useRouteStore();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -119,7 +118,7 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
 
   // ── Event Card Component ──
   const renderEventCard = (evt: SanityEvent) => {
-    const dateObj = new Date(evt.eventDate);
+    const dateObj = new Date(evt.startsAt);
     const day = dateObj.toLocaleDateString("tr-TR", { day: "numeric" });
     const month = dateObj.toLocaleDateString("tr-TR", { month: "short" });
     const time = dateObj.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
@@ -180,8 +179,8 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
               <Eye size={12} /> Detayları Gör
             </button>
 
-            {/* Show "Rotaya Ekle" only if location exists */}
-            {evt.location && (
+            {/* Show "Rotaya Ekle" only if routeEnabled and location exists */}
+            {evt.routeEnabled && evt.location && (
               <button
                 onClick={() =>
                   addToRoute({
@@ -310,8 +309,8 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
   // ── Featured Hero Card ──
   const heroCard = (
     <>
-      {weeklyEvent ? (
-        <Link href={`/news/${weeklyEvent._id}`}>
+      {events.length > 0 && events[0].coverImage ? (
+        <Link href={`/news/${events[0]._id}`}>
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -320,8 +319,8 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
             className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md group cursor-pointer"
           >
             <Image
-              src={weeklyEvent.imageUrl || "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"}
-              alt={weeklyEvent.title}
+              src={urlFor(events[0].coverImage).url()}
+              alt={events[0].title}
               fill
               sizes="(max-width: 768px) 100vw, 600px"
               className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -330,16 +329,16 @@ export function NewsView({ sanityNews, weeklyEvent, events = [] }: NewsViewProps
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute top-4 left-4">
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
-                ✨ Haftanın Etkinliği
+                ✨ Öne Çıkan Etkinlik
               </span>
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-5">
               <h2 className="text-white text-xl font-bold leading-tight mb-1">
-                {weeklyEvent.title}
+                {events[0].title}
               </h2>
-              {weeklyEvent.summary && (
+              {events[0].description && (
                 <p className="text-white/70 text-xs">
-                  {weeklyEvent.summary}
+                  {events[0].description}
                 </p>
               )}
             </div>

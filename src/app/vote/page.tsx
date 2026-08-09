@@ -8,10 +8,14 @@ export interface SanityPoll {
   title: string;
   category: "versus" | "classic";
   emoji?: string;
+  startsAt?: string;
+  endsAt?: string;
   optionA_title: string;
   optionA_emoji?: string;
   optionB_title: string;
   optionB_emoji?: string;
+  votesA?: number;
+  votesB?: number;
 }
 
 async function getPolls(): Promise<SanityPoll[]> {
@@ -22,10 +26,14 @@ async function getPolls(): Promise<SanityPoll[]> {
         title,
         category,
         emoji,
+        startsAt,
+        endsAt,
         optionA_title,
         optionA_emoji,
         optionB_title,
-        optionB_emoji
+        optionB_emoji,
+        votesA,
+        votesB
       }`
     );
     return data || [];

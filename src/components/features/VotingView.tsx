@@ -113,7 +113,33 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
     fetchTopLocations();
   }, []);
 
-  const getResults = () => ({ a: 65, b: 35 });
+  // Calculate real vote percentages from Sanity data
+  const getResults = (poll: SanityPoll) => {
+    const a = poll.votesA || 0;
+    const b = poll.votesB || 0;
+    const total = a + b;
+    if (total === 0) return { a: 50, b: 50, total: 0 };
+    return {
+      a: Math.round((a / total) * 100),
+      b: Math.round((b / total) * 100),
+      total,
+    };
+  };
+
+  // Calculate remaining time for active polls
+  const getRemainingTime = (endsAt?: string): string | null => {
+    if (!endsAt) return null;
+    const now = new Date();
+    const end = new Date(endsAt);
+    const diff = end.getTime() - now.getTime();
+    if (diff <= 0) return "Sona erdi";
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    if (days > 0) return `Kalan: ${days} Gün`;
+    if (hours > 0) return `Kalan: ${hours} Saat`;
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `Kalan: ${minutes} dk`;
+  };
 
   const handlePollVote = (pollId: string, option: "a" | "b") => {
     if (votes[pollId]) return;
@@ -425,7 +451,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
 
                 {polls.map((poll) => {
                   const voted = votes[poll._id];
-                  const results = getResults();
+                  const results = getResults(poll);
                   const isVersus = poll.category === "versus";
                   const IconComp = isVersus ? Swords : UtensilsCrossed;
                   const iconColor = isVersus ? "text-rose-500" : "text-orange-500";
@@ -436,11 +462,22 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                       key={poll._id}
                       className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5"
                     >
-                      <div className="flex items-center gap-2 mb-4">
+                      <div className="flex items-center gap-2 mb-1">
                         <IconComp size={18} className={iconColor} />
-                        <h3 className="text-lg font-bold text-gray-800">
+                        <h3 className="text-lg font-bold text-gray-800 flex-1">
                           {poll.title}
                         </h3>
+                      </div>
+                      {/* Meta: total votes + countdown */}
+                      <div className="flex items-center gap-3 text-[11px] text-gray-400 font-medium mb-4">
+                        {results.total > 0 && (
+                          <span>🗳️ {results.total} oy</span>
+                        )}
+                        {getRemainingTime(poll.endsAt) && (
+                          <span className="flex items-center gap-1">
+                            ⏱️ {getRemainingTime(poll.endsAt)}
+                          </span>
+                        )}
                       </div>
 
                       {isVersus ? (
@@ -644,7 +681,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                           transition={{ delay: 0.8 }}
                           className="text-center text-[11px] text-gray-400 mt-3"
                         >
-                          Oyun kaydedildi ✓
+                          Oyun kaydedildi ✓ · Toplam {results.total} oy
                         </motion.p>
                       )}
                     </div>

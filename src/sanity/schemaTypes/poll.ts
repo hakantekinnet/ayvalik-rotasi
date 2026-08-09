@@ -33,6 +33,18 @@ export const poll = defineType({
       description: 'Anket kartının yanında gösterilecek emoji (ör: ⚔️, 🍽️)',
     }),
     defineField({
+      name: 'startsAt',
+      title: 'Başlangıç Tarihi',
+      type: 'datetime',
+      description: 'Oylamanın başladığı tarih ve saat.',
+    }),
+    defineField({
+      name: 'endsAt',
+      title: 'Bitiş Tarihi',
+      type: 'datetime',
+      description: 'Oylamanın kapandığı tarih ve saat. Kalan süre bu tarihe göre hesaplanır.',
+    }),
+    defineField({
       name: 'optionA_title',
       title: 'Seçenek A — Başlık',
       type: 'string',
