@@ -16,6 +16,7 @@ export interface SanityNewsItem {
 
 export interface SanityEvent {
   _id: string;
+  slug: string;
   title: string;
   startsAt: string;
   endsAt?: string;
@@ -57,6 +58,7 @@ async function getEvents(): Promise<SanityEvent[]> {
     const data = await client.fetch(
       `*[_type == "event"] | order(startsAt asc){
         _id,
+        "slug": coalesce(slug.current, _id),
         title,
         startsAt,
         endsAt,

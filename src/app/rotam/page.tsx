@@ -168,7 +168,7 @@ export default function RotamPage() {
 
   let mapsUrl = "https://www.google.com/maps/dir/?api=1&travelmode=walking";
   if (validStops.length === 1) {
-    mapsUrl += `&destination=${encodeURIComponent(validStops[0])}`;
+    mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(validStops[0])}&travelmode=walking&dir_action=navigate`;
   } else if (validStops.length >= 2) {
     const origin = validStops[0];
     const destination = validStops[validStops.length - 1];

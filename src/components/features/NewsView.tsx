@@ -186,9 +186,12 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
             />
 
             {/* Always show "Detayları Gör" */}
-            <button className="w-full text-[11px] font-bold py-2 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-1 cursor-pointer">
+            <Link
+              href={`/event/${evt.slug || evt._id}`}
+              className="w-full text-[11px] font-bold py-2 rounded-xl bg-slate-50 text-slate-600 border border-slate-100 hover:bg-slate-100 transition-colors flex items-center justify-center gap-1 cursor-pointer"
+            >
               <Eye size={12} /> Detayları Gör
-            </button>
+            </Link>
 
             {/* Show "Rotaya Ekle" only if routeEnabled and location exists */}
             {evt.routeEnabled && evt.location && (
@@ -321,7 +324,7 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
   const heroCard = (
     <>
       {events.length > 0 && events[0].coverImage ? (
-        <Link href={`/news/${events[0]._id}`}>
+        <Link href={`/event/${events[0].slug || events[0]._id}`}>
           <motion.div
             variants={fadeUp}
             initial="hidden"

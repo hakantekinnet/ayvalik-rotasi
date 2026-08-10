@@ -1,18 +1,19 @@
 import { client } from "@/sanity/lib/client";
 import { PortableText } from "@portabletext/react";
+import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar } from "lucide-react";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 interface NewsDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
-  const { id } = await params;
-
-  const article = await client.fetch(
+async function getNewsById(id: string) {
+  const data = await client.fetch(
     `*[_type == "news" && _id == $id][0]{
+      _id,
       title,
       summary,
       _createdAt,
@@ -21,6 +22,38 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
     }`,
     { id }
   );
+  return data;
+}
+
+// Dynamic SEO metadata
+export async function generateMetadata({
+  params,
+}: NewsDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const article = await getNewsById(id);
+
+  if (!article) {
+    return { title: "Haber Bulunamadı" };
+  }
+
+  return {
+    title: `${article.title} | Ayvalık Rotası`,
+    description:
+      article.summary?.slice(0, 160) ||
+      `${article.title} — Ayvalık'tan son haberler.`,
+    openGraph: {
+      title: `${article.title} | Ayvalık Rotası`,
+      description:
+        article.summary?.slice(0, 160) ||
+        `Ayvalık haberleri: ${article.title}`,
+      images: article.imageUrl ? [{ url: article.imageUrl }] : undefined,
+    },
+  };
+}
+
+export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
+  const { id } = await params;
+  const article = await getNewsById(id);
 
   if (!article) {
     return (
@@ -58,8 +91,29 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
     article.imageUrl ||
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000&q=80";
 
+  // JSON-LD structured data
+  const newsSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    datePublished: article._createdAt,
+    image: imageUrl,
+    author: {
+      "@type": "Organization",
+      name: "Ayvalık Rotası",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Ayvalık Rotası",
+      url: "https://ayvalik-rotasi.vercel.app",
+    },
+    ...(article.summary ? { description: article.summary } : {}),
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
+      <JsonLd schema={newsSchema} />
+
       {/* Hero Image */}
       <div className="relative w-full h-72 overflow-hidden">
         <Image
