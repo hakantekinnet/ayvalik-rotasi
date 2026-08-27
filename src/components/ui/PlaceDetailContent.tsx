@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { MapPin, Check } from "lucide-react";
 import { useRouteStore } from "@/store/useRouteStore";
@@ -35,6 +36,39 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
   const { routeList, addToRoute, removeFromRoute } = useRouteStore();
   const isAdded = routeList.some((item) => item._id === place._id);
   const hasImages = place.imageUrls && place.imageUrls.length > 0;
+  const imageCount = place.imageUrls?.length || 0;
+
+  // Carousel active index tracking via IntersectionObserver
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const setSlideRef = useCallback(
+    (el: HTMLDivElement | null, idx: number) => {
+      slideRefs.current[idx] = el;
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!hasImages || imageCount <= 1) return;
+
+    const observers: IntersectionObserver[] = [];
+    slideRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveImageIndex(idx);
+          }
+        },
+        { threshold: 0.6 }
+      );
+      observer.observe(el);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, [hasImages, imageCount]);
 
   const handleRouteToggle = () => {
     if (isAdded) {
@@ -79,13 +113,14 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
         {place.title}
       </h2>
 
-      {/* Image Gallery */}
+      {/* Image Gallery with Dot Indicators */}
       {hasImages && (
         <div className="mb-4">
           <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 hide-scrollbar">
             {place.imageUrls!.map((src, idx) => (
               <div
                 key={idx}
+                ref={(el) => setSlideRef(el, idx)}
                 className="relative w-full flex-shrink-0 aspect-[4/3] rounded-2xl snap-center overflow-hidden shadow-sm border border-gray-100"
               >
                 <Image
@@ -100,6 +135,22 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
               </div>
             ))}
           </div>
+
+          {/* Dot Indicators */}
+          {imageCount > 1 && (
+            <div className="flex items-center justify-center gap-1.5 mt-3">
+              {place.imageUrls!.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`rounded-full transition-all duration-300 ${
+                    idx === activeImageIndex
+                      ? "w-5 h-2 bg-aegean-500"
+                      : "w-2 h-2 bg-slate-300"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

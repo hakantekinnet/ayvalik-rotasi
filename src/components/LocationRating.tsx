@@ -128,8 +128,8 @@ export default function LocationRating({
       </div>
       <button
         onClick={handleSubmit}
-        disabled={isSubmitting}
-        className="w-full py-2.5 bg-slate-800 text-white text-sm font-bold rounded-lg shadow hover:bg-slate-700 transition disabled:opacity-50 cursor-pointer"
+        disabled={isSubmitting || Object.keys(scores).length < criteria.length}
+        className="w-full py-2.5 bg-slate-800 text-white text-sm font-bold rounded-lg shadow hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isSubmitting ? "Gönderiliyor..." : "Puanı Gönder"}
       </button>

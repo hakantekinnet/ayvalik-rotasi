@@ -123,6 +123,33 @@ export function MapView({ activeCategory = null, activeRegion = null, searchQuer
     });
   }, [places, activeFilter, activeCategory, activeRegion, searchQuery]);
 
+  // Auto-pan to single search result
+  useEffect(() => {
+    if (
+      filteredLocations.length === 1 &&
+      searchQuery.trim().length > 0 &&
+      scrollContainerRef.current
+    ) {
+      const loc = filteredLocations[0];
+      if (!loc.geopoint?.lat || !loc.geopoint?.lng) return;
+
+      const mapped = mapGpsToPixels(loc.geopoint.lat, loc.geopoint.lng);
+      const container = scrollContainerRef.current;
+      const topPct = parseFloat(mapped.top) / 100;
+      const leftPct = parseFloat(mapped.left) / 100;
+
+      // Calculate the scroll position to center the pin in the viewport
+      const targetX = container.scrollWidth * leftPct - container.clientWidth / 2;
+      const targetY = container.scrollHeight * topPct - container.clientHeight / 2;
+
+      container.scrollTo({
+        left: Math.max(0, targetX),
+        top: Math.max(0, targetY),
+        behavior: "smooth",
+      });
+    }
+  }, [filteredLocations, searchQuery]);
+
   return (
     <div className="relative w-full">
       {/* Floating Category Filter Bar */}

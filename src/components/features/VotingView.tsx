@@ -305,9 +305,17 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                     className="relative bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100"
                   >
                     {photo.photo && (
-                      <div
-                        className="relative aspect-[4/5] overflow-hidden rounded-t-2xl cursor-pointer group"
+                      <button
+                        type="button"
+                        className="relative aspect-[4/5] w-full overflow-hidden rounded-t-2xl cursor-pointer group text-left"
                         onClick={() => setSelectedPhoto(photo)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedPhoto(photo);
+                          }
+                        }}
+                        aria-label={`${photo.photographer || "Kullanıcı"} fotoğrafını büyüt`}
                       >
                         <Image
                           src={urlFor(photo.photo).url()}
@@ -317,7 +325,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                           sizes="(max-width: 768px) 50vw, 33vw"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors z-10" />
-                      </div>
+                      </button>
                     )}
                     <div className="p-2.5 flex items-center justify-between bg-white">
                       <span className="text-[10px] font-bold text-slate-700 truncate mr-2">
@@ -836,6 +844,9 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
       {/* Photo Lightbox Modal */}
       {selectedPhoto && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Fotoğraf önizleme"
           className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4"
           onClick={() => setSelectedPhoto(null)}
         >
