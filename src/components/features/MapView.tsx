@@ -131,12 +131,11 @@ export function MapView({ activeCategory = null, activeRegion = null, searchQuer
       scrollContainerRef.current
     ) {
       const loc = filteredLocations[0];
-      if (!loc.geopoint?.lat || !loc.geopoint?.lng) return;
+      if (!loc.top || !loc.left) return;
 
-      const mapped = mapGpsToPixels(loc.geopoint.lat, loc.geopoint.lng);
       const container = scrollContainerRef.current;
-      const topPct = parseFloat(mapped.top) / 100;
-      const leftPct = parseFloat(mapped.left) / 100;
+      const topPct = parseFloat(loc.top) / 100;
+      const leftPct = parseFloat(loc.left) / 100;
 
       // Calculate the scroll position to center the pin in the viewport
       const targetX = container.scrollWidth * leftPct - container.clientWidth / 2;
