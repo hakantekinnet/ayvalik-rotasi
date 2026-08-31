@@ -325,9 +325,9 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
       {sortedEvents.length > 0 ? (
         <>
           {/* Mobile: horizontal carousel */}
-          <div className="xl:hidden flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar items-stretch h-[280px] -mx-4 px-4">
+          <div className="xl:hidden flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar items-stretch h-[300px] -mx-4 px-4">
             {sortedEvents.map((evt) => (
-              <div key={evt._id} className="w-[calc(50%-6px)] min-w-[160px] shrink-0 snap-center">
+              <div key={evt._id} className="w-[85vw] sm:w-[300px] shrink-0 snap-center">
                 {renderEventCard(evt)}
               </div>
             ))}

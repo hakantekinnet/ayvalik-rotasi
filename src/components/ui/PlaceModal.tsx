@@ -43,7 +43,7 @@ export function PlaceModal({ children }: PlaceModalProps) {
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         role="dialog"
         aria-modal="true"
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[var(--z-modal)] w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[var(--z-modal)] w-[calc(100%-24px)] max-w-2xl max-h-[90dvh] overflow-y-auto bg-white rounded-2xl shadow-2xl"
       >
         {/* Close Button */}
         <button

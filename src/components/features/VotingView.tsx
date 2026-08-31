@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Swords, UtensilsCrossed, Upload, X, Loader2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { toast } from "sonner";
@@ -77,6 +78,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
         const locationsData = await client.fetch(
           `*[_type == "place" && voteCount > 0]{
             _id, title, category, voteCount,
+            "slug": coalesce(slug.current, _id),
             ratingLezzet, ratingFiyat, ratingAtmosfer,
             ratingDeniz, ratingTemizlik, ratingTesis,
             ratingGenel
@@ -430,9 +432,10 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                       }
 
                       return (
-                        <div
+                        <Link
+                          href={`/mekan/${loc.slug || loc._id}`}
                           key={loc._id}
-                          className={`flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border ${border} transition-all`}
+                          className={`flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border ${border} transition-all hover:shadow-md`}
                         >
                           <div className="flex items-center gap-4">
                             <div
@@ -461,7 +464,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                               {loc.voteCount} değerlendirme
                             </span>
                           </div>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>

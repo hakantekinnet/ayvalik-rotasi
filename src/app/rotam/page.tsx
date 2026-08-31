@@ -291,11 +291,9 @@ export default function RotamPage() {
         <div className="flex flex-col items-center mt-6 mb-2">
           <div className="w-px h-8 bg-gradient-to-b from-slate-200 to-transparent" />
         </div>
-      </div>
 
-      {/* Sticky CTA */}
-      <div className="fixed bottom-[88px] left-0 right-0 z-30 px-5 pb-4 pt-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
-        <div className="max-w-lg mx-auto pointer-events-auto flex flex-col gap-3">
+        {/* Action Buttons — inline under list */}
+        <div className="mt-10 flex flex-col gap-3 pb-32">
           <a
             href={mapsUrl}
             target="_blank"

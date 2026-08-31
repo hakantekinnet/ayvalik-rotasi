@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, MapPin } from "lucide-react";
+import Link from "next/link";
 import { MapView } from "@/components/features/MapView";
 import { WindWidget } from "@/components/features/WindWidget";
 import { LocationData } from "@/lib/types";
@@ -11,6 +12,14 @@ import {
 } from "@/components/CuratedRoutesList";
 
 const regions = ["Merkez", "Cunda", "Sarımsaklı", "Küçükköy", "Altınova", "Şeytan Sofrası"];
+
+const categoryEmojis: Record<string, string> = {
+  Plaj: "🏖️",
+  Tarihi: "🏛️",
+  Manzara: "📸",
+  Mekan: "🍽️",
+  Eğlence: "🎭",
+};
 
 interface HomeClientProps {
   places: LocationData[];
@@ -39,6 +48,20 @@ export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
     return counts;
   }, [places]);
 
+  // Search results for peek dropdown (max 5)
+  const searchResults = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (q.length < 2) return [];
+    return places
+      .filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q) ||
+          p.region?.toLowerCase().includes(q)
+      )
+      .slice(0, 5);
+  }, [places, searchQuery]);
+
   return (
     <div className="min-h-screen">
       {/* Mobile Header — hidden on desktop (DesktopHeader handles it) */}
@@ -48,6 +71,7 @@ export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
             <span className="text-white text-sm font-bold">AR</span>
           </div>
           <div>
+
             <h1 className="font-heading text-xl font-extrabold text-foreground tracking-tight">
               Ayvalık Rotası
             </h1>
@@ -103,6 +127,40 @@ export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
                 >
                   <X size={14} className="text-gray-400" />
                 </button>
+              )}
+
+              {/* Search Results Peek Dropdown */}
+              {searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-xl border border-gray-100 shadow-xl z-40 overflow-hidden">
+                  {searchResults.map((place) => (
+                    <Link
+                      key={place.id}
+                      href={`/mekan/${place.slug || place.id}`}
+                      onClick={() => setSearchQuery("")}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors border-b border-gray-50 last:border-b-0"
+                    >
+                      <span className="text-lg flex-shrink-0">
+                        {categoryEmojis[place.category] || "📍"}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-800 truncate">
+                          {place.title}
+                        </p>
+                        {place.region && (
+                          <p className="text-[10px] text-slate-400 font-medium">
+                            {place.region}
+                          </p>
+                        )}
+                      </div>
+                      <MapPin size={14} className="text-slate-300 flex-shrink-0" />
+                    </Link>
+                  ))}
+                  {searchQuery.trim().length >= 2 && (
+                    <div className="px-4 py-2 bg-slate-50 text-[10px] text-slate-400 font-medium text-center">
+                      {searchResults.length} sonuç · Haritada da filtrelendi
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </section>
