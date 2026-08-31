@@ -120,9 +120,19 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
   // ── Event Card Component ──
   const renderEventCard = (evt: SanityEvent) => {
     const dateObj = new Date(evt.startsAt);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const eventYear = dateObj.getFullYear();
+
     const day = dateObj.toLocaleDateString("tr-TR", { day: "numeric" });
     const month = dateObj.toLocaleDateString("tr-TR", { month: "short" });
+    const yearLabel = eventYear !== currentYear ? ` ${eventYear}` : "";
     const time = dateObj.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+
+    // Check if event is in the past
+    const endOrStart = evt.endsAt ? new Date(evt.endsAt) : dateObj;
+    const isPast = endOrStart < now;
+
     const isInRoute = evt.location
       ? routeList.some((r) => r._id === evt.location!._id)
       : false;
@@ -130,7 +140,9 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
     return (
       <div
         key={evt._id}
-        className="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden"
+        className={`bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col overflow-hidden transition-opacity ${
+          isPast ? "opacity-60" : ""
+        }`}
       >
         {/* Image */}
         <div className="relative h-28 xl:h-36 w-full shrink-0 bg-slate-100">
@@ -149,8 +161,13 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
           )}
           <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white px-2 py-1 rounded flex flex-col items-center justify-center min-w-[34px]">
             <span className="text-sm font-bold leading-none">{day}</span>
-            <span className="text-[9px] uppercase tracking-wider mt-0.5">{month}</span>
+            <span className="text-[9px] uppercase tracking-wider mt-0.5">{month}{yearLabel}</span>
           </div>
+          {isPast && (
+            <div className="absolute top-2 right-2 bg-slate-700/80 backdrop-blur-md text-white/90 px-2 py-0.5 rounded text-[9px] font-bold">
+              Geçmiş Etkinlik
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -293,13 +310,23 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
   );
 
   // ── Calendar Section ──
+  const sortedEvents = [...events].sort((a, b) => {
+    const now = Date.now();
+    const aEnd = new Date(a.endsAt || a.startsAt).getTime();
+    const bEnd = new Date(b.endsAt || b.startsAt).getTime();
+    const aIsPast = aEnd < now;
+    const bIsPast = bEnd < now;
+    if (aIsPast !== bIsPast) return aIsPast ? 1 : -1; // active first
+    return new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(); // then by start date
+  });
+
   const calendarSection = (
     <div className="w-full">
-      {events.length > 0 ? (
+      {sortedEvents.length > 0 ? (
         <>
           {/* Mobile: horizontal carousel */}
           <div className="xl:hidden flex overflow-x-auto gap-3 pb-2 snap-x hide-scrollbar items-stretch h-[280px] -mx-4 px-4">
-            {events.map((evt) => (
+            {sortedEvents.map((evt) => (
               <div key={evt._id} className="w-[calc(50%-6px)] min-w-[160px] shrink-0 snap-center">
                 {renderEventCard(evt)}
               </div>
@@ -307,7 +334,7 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
           </div>
           {/* Desktop: 3-column grid */}
           <div className="hidden xl:grid xl:grid-cols-3 gap-4">
-            {events.map((evt) => renderEventCard(evt))}
+            {sortedEvents.map((evt) => renderEventCard(evt))}
           </div>
         </>
       ) : (

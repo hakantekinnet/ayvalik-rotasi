@@ -43,6 +43,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
 
   const [activeTab, setActiveTab] = useState<"kadraj" | "mekan">("kadraj");
   const [votes, setVotes] = useState<Record<string, "a" | "b">>({});
+  const [mounted, setMounted] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [photos, setPhotos] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,6 +112,20 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
 
     fetchPhotos();
     fetchTopLocations();
+
+    // Restore poll votes from localStorage (hydration-safe)
+    const restoredVotes: Record<string, "a" | "b"> = {};
+    polls.forEach((poll) => {
+      const saved = localStorage.getItem(`ayvalik_poll_${poll._id}`);
+      if (saved === "a" || saved === "b") {
+        restoredVotes[poll._id] = saved;
+      }
+    });
+    if (Object.keys(restoredVotes).length > 0) {
+      setVotes(restoredVotes);
+    }
+    setMounted(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Calculate real vote percentages from Sanity data
@@ -144,6 +159,12 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
   const handlePollVote = (pollId: string, option: "a" | "b") => {
     if (votes[pollId]) return;
     setVotes((prev) => ({ ...prev, [pollId]: option }));
+    // Persist to localStorage
+    try {
+      localStorage.setItem(`ayvalik_poll_${pollId}`, option);
+    } catch {
+      // localStorage may be full or unavailable
+    }
   };
 
   const handlePhotoVote = async (photoId: string) => {
@@ -458,7 +479,7 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
                 </div>
 
                 {polls.map((poll) => {
-                  const voted = votes[poll._id];
+                  const voted = mounted ? votes[poll._id] : undefined;
                   const results = getResults(poll);
                   const isVersus = poll.category === "versus";
                   const IconComp = isVersus ? Swords : UtensilsCrossed;
