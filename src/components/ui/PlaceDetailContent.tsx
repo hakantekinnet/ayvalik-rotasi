@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MapPin, Check } from "lucide-react";
 import { useRouteStore } from "@/store/useRouteStore";
 import LocationRating from "@/components/LocationRating";
+import { InstagramEmbed } from "@/components/ui/InstagramEmbed";
 
 interface PlaceData {
   _id: string;
@@ -221,21 +222,7 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
               @ayvalik&apos;tan İncele
             </h3>
           </div>
-          <div className="w-full relative rounded-2xl overflow-hidden bg-gray-50 shadow-inner flex justify-center items-center">
-            <iframe
-              src={
-                place.reelUrl.endsWith("embed")
-                  ? place.reelUrl
-                  : `${place.reelUrl}embed`
-              }
-              width="100%"
-              height="580"
-              frameBorder="0"
-              scrolling="no"
-              allowTransparency={true}
-              className="w-full max-w-[400px] rounded-2xl shadow-sm"
-            />
-          </div>
+          <InstagramEmbed url={place.reelUrl} />
         </div>
       )}
     </div>
