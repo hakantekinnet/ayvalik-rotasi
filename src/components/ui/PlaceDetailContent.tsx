@@ -2,7 +2,20 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { MapPin, Check } from "lucide-react";
+import {
+  MapPin,
+  Check,
+  Clock,
+  CalendarClock,
+  Banknote,
+  Car,
+  Bus,
+  Accessibility,
+  Baby,
+  CloudSun,
+  CalendarCheck,
+  ExternalLink,
+} from "lucide-react";
 import { useRouteStore } from "@/store/useRouteStore";
 import LocationRating from "@/components/LocationRating";
 import { InstagramEmbed } from "@/components/ui/InstagramEmbed";
@@ -19,6 +32,17 @@ interface PlaceData {
   opportunityText?: string;
   opportunityCode?: string;
   voteCount?: number;
+  // Visit & Accessibility info
+  recommendedDuration?: string;
+  visitHours?: string;
+  feeInfo?: string;
+  parkingInfo?: string;
+  publicTransport?: string;
+  accessibility?: string;
+  childFriendly?: string;
+  seasonalNote?: string;
+  lastVerified?: string;
+  officialSource?: string;
 }
 
 interface PlaceDetailContentProps {
@@ -33,11 +57,65 @@ const categoryColors: Record<string, string> = {
   Eğlence: "bg-pink-100 text-pink-700",
 };
 
+function formatVerifiedDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("tr-TR", {
+      year: "numeric",
+      month: "long",
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+// Individual info item for the visit info grid
+function VisitInfoItem({
+  icon: Icon,
+  label,
+  value,
+  iconColor = "text-aegean-500",
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  value: string;
+  iconColor?: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:bg-slate-50 transition-colors">
+      <div className={`mt-0.5 flex-shrink-0 ${iconColor}`}>
+        <Icon size={18} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
+          {label}
+        </p>
+        <p className="text-sm font-medium text-slate-700 leading-snug">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
   const { routeList, addToRoute, removeFromRoute } = useRouteStore();
   const isAdded = routeList.some((item) => item._id === place._id);
   const hasImages = place.imageUrls && place.imageUrls.length > 0;
   const imageCount = place.imageUrls?.length || 0;
+
+  // Check if any visit info exists
+  const hasVisitInfo =
+    place.recommendedDuration ||
+    place.visitHours ||
+    place.feeInfo ||
+    place.parkingInfo ||
+    place.publicTransport ||
+    place.accessibility ||
+    place.childFriendly ||
+    place.seasonalNote ||
+    place.lastVerified ||
+    place.officialSource;
 
   // Carousel active index tracking via IntersectionObserver
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -174,6 +252,106 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
         <p className="text-foreground-muted text-sm leading-relaxed mb-5">
           {place.description}
         </p>
+      )}
+
+      {/* ── Visit & Accessibility Info Section ── */}
+      {hasVisitInfo && (
+        <div className="mb-6 border-t border-gray-100 pt-5">
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <CalendarClock size={15} className="text-aegean-500" />
+            Ziyaret & Erişim Bilgileri
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {place.recommendedDuration && (
+              <VisitInfoItem
+                icon={Clock}
+                label="Önerilen Süre"
+                value={place.recommendedDuration}
+              />
+            )}
+            {place.visitHours && (
+              <VisitInfoItem
+                icon={CalendarClock}
+                label="Ziyaret Saatleri"
+                value={place.visitHours}
+              />
+            )}
+            {place.feeInfo && (
+              <VisitInfoItem
+                icon={Banknote}
+                label="Ücret"
+                value={place.feeInfo}
+                iconColor="text-emerald-500"
+              />
+            )}
+            {place.parkingInfo && (
+              <VisitInfoItem
+                icon={Car}
+                label="Otopark"
+                value={place.parkingInfo}
+              />
+            )}
+            {place.publicTransport && (
+              <VisitInfoItem
+                icon={Bus}
+                label="Toplu Taşıma"
+                value={place.publicTransport}
+              />
+            )}
+            {place.accessibility && (
+              <VisitInfoItem
+                icon={Accessibility}
+                label="Erişilebilirlik"
+                value={place.accessibility}
+                iconColor="text-blue-500"
+              />
+            )}
+            {place.childFriendly && (
+              <VisitInfoItem
+                icon={Baby}
+                label="Çocuklu Aileler"
+                value={place.childFriendly}
+                iconColor="text-pink-500"
+              />
+            )}
+            {place.seasonalNote && (
+              <VisitInfoItem
+                icon={CloudSun}
+                label="Mevsimsel Not"
+                value={place.seasonalNote}
+                iconColor="text-amber-500"
+              />
+            )}
+            {place.lastVerified && (
+              <VisitInfoItem
+                icon={CalendarCheck}
+                label="Son Doğrulama"
+                value={formatVerifiedDate(place.lastVerified)}
+                iconColor="text-green-500"
+              />
+            )}
+            {place.officialSource && (
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:bg-aegean-50/50 transition-colors group">
+                <div className="mt-0.5 flex-shrink-0 text-aegean-500">
+                  <ExternalLink size={18} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
+                    Resmî Kaynak
+                  </p>
+                  <a
+                    href={place.officialSource}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-aegean-600 hover:text-aegean-700 underline decoration-aegean-300 underline-offset-2 transition-colors"
+                  >
+                    Kaynağı Ziyaret Et →
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Route Toggle */}
