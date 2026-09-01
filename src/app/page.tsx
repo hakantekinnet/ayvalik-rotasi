@@ -1,5 +1,5 @@
 import { client } from "@/sanity/lib/client";
-export const revalidate = 3600;
+export const revalidate = 60;
 import type { Metadata } from "next";
 import { LocationData } from "@/lib/types";
 import { absoluteUrl } from "@/lib/site";

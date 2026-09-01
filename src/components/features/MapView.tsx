@@ -28,7 +28,7 @@ interface MapViewProps {
   places?: LocationData[];
 }
 
-const categories = ["Tümü", "🏖️ Plajlar", "🏛️ Tarih", "🍽️ Lezzet", "📸 Manzara"];
+const categories = ["Tümü", "🏖️ Plajlar", "🏛️ Tarih", "🍽️ Lezzet", "📸 Manzara", "🎭 Eğlence"];
 
 const categoryMap: Record<string, string | null> = {
   "Tümü": null,
@@ -36,6 +36,7 @@ const categoryMap: Record<string, string | null> = {
   "🏛️ Tarih": "Tarihi",
   "🍽️ Lezzet": "Mekan",
   "📸 Manzara": "Manzara",
+  "🎭 Eğlence": "Eğlence",
 };
 
 export function MapView({ activeCategory = null, activeRegion = null, searchQuery = "", places = [] }: MapViewProps) {
