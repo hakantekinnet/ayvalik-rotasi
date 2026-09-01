@@ -12,6 +12,14 @@ export interface SanityNewsItem {
   summary?: string;
   imageUrl?: string;
   _createdAt: string;
+  // Source & editorial (E-E-A-T)
+  sourceName?: string;
+  sourceUrl?: string;
+  originalPublishedAt?: string;
+  verifiedAt?: string;
+  expiresAt?: string;
+  imageCredit?: string;
+  editorNote?: string;
 }
 
 export interface SanityEvent {
@@ -33,6 +41,14 @@ export interface SanityEvent {
     opportunityText?: string;
     opportunityCode?: string;
   };
+  // Source & editorial (E-E-A-T)
+  sourceName?: string;
+  sourceUrl?: string;
+  originalPublishedAt?: string;
+  verifiedAt?: string;
+  expiresAt?: string;
+  imageCredit?: string;
+  editorNote?: string;
 }
 
 async function getNews(): Promise<SanityNewsItem[]> {

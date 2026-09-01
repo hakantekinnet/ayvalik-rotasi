@@ -5,6 +5,13 @@ export const news = defineType({
   title: 'Haberler',
   type: 'document',
   icon: () => '📰',
+  groups: [
+    {
+      name: 'sourceInfo',
+      title: 'Kaynak ve Yayın Bilgileri',
+      icon: () => '📎',
+    },
+  ],
   fields: [
     defineField({
       name: 'title',
@@ -43,6 +50,58 @@ export const news = defineType({
       type: 'boolean',
       initialValue: false,
       description: 'Bu haberi "Haftanın Etkinliği" olarak öne çıkarır.',
+    }),
+
+    // --- KAYNAK VE YAYIN BİLGİLERİ ---
+
+    defineField({
+      name: 'sourceName',
+      title: 'Kaynak Adı',
+      type: 'string',
+      description: 'Örn: Ayvalık Belediyesi',
+      group: 'sourceInfo',
+    }),
+    defineField({
+      name: 'sourceUrl',
+      title: "Kaynak URL'si",
+      type: 'url',
+      group: 'sourceInfo',
+    }),
+    defineField({
+      name: 'originalPublishedAt',
+      title: 'Orijinal Yayın Tarihi',
+      type: 'datetime',
+      group: 'sourceInfo',
+    }),
+    defineField({
+      name: 'verifiedAt',
+      title: 'Son Doğrulama Tarihi',
+      type: 'date',
+      options: {
+        dateFormat: 'YYYY-MM-DD',
+      },
+      group: 'sourceInfo',
+    }),
+    defineField({
+      name: 'expiresAt',
+      title: 'Sona Erme Tarihi',
+      type: 'datetime',
+      description: 'Bu tarihten sonra içerik "Sona Erdi" olarak işaretlenecek.',
+      group: 'sourceInfo',
+    }),
+    defineField({
+      name: 'imageCredit',
+      title: 'Görsel Kaynağı / Telif',
+      type: 'string',
+      description: 'Örn: Ayvalık Belediyesi Basın Birimi',
+      group: 'sourceInfo',
+    }),
+    defineField({
+      name: 'editorNote',
+      title: 'Ayvalık Rotası Notu',
+      type: 'text',
+      description: 'Habere katacağımız özgün değer, rota uyarıları veya ziyaretçi tavsiyeleri.',
+      group: 'sourceInfo',
     }),
   ],
   preview: {
