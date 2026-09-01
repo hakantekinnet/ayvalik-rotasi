@@ -15,6 +15,7 @@ import {
   CloudSun,
   CalendarCheck,
   ExternalLink,
+  ChevronDown,
 } from "lucide-react";
 import { useRouteStore } from "@/store/useRouteStore";
 import LocationRating from "@/components/LocationRating";
@@ -254,110 +255,10 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
         </p>
       )}
 
-      {/* ── Visit & Accessibility Info Section ── */}
-      {hasVisitInfo && (
-        <div className="mb-6 border-t border-gray-100 pt-5">
-          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <CalendarClock size={15} className="text-aegean-500" />
-            Ziyaret & Erişim Bilgileri
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {place.recommendedDuration && (
-              <VisitInfoItem
-                icon={Clock}
-                label="Önerilen Süre"
-                value={place.recommendedDuration}
-              />
-            )}
-            {place.visitHours && (
-              <VisitInfoItem
-                icon={CalendarClock}
-                label="Ziyaret Saatleri"
-                value={place.visitHours}
-              />
-            )}
-            {place.feeInfo && (
-              <VisitInfoItem
-                icon={Banknote}
-                label="Ücret"
-                value={place.feeInfo}
-                iconColor="text-emerald-500"
-              />
-            )}
-            {place.parkingInfo && (
-              <VisitInfoItem
-                icon={Car}
-                label="Otopark"
-                value={place.parkingInfo}
-              />
-            )}
-            {place.publicTransport && (
-              <VisitInfoItem
-                icon={Bus}
-                label="Toplu Taşıma"
-                value={place.publicTransport}
-              />
-            )}
-            {place.accessibility && (
-              <VisitInfoItem
-                icon={Accessibility}
-                label="Erişilebilirlik"
-                value={place.accessibility}
-                iconColor="text-blue-500"
-              />
-            )}
-            {place.childFriendly && (
-              <VisitInfoItem
-                icon={Baby}
-                label="Çocuklu Aileler"
-                value={place.childFriendly}
-                iconColor="text-pink-500"
-              />
-            )}
-            {place.seasonalNote && (
-              <VisitInfoItem
-                icon={CloudSun}
-                label="Mevsimsel Not"
-                value={place.seasonalNote}
-                iconColor="text-amber-500"
-              />
-            )}
-            {place.lastVerified && (
-              <VisitInfoItem
-                icon={CalendarCheck}
-                label="Son Doğrulama"
-                value={formatVerifiedDate(place.lastVerified)}
-                iconColor="text-green-500"
-              />
-            )}
-            {place.officialSource && (
-              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:bg-aegean-50/50 transition-colors group">
-                <div className="mt-0.5 flex-shrink-0 text-aegean-500">
-                  <ExternalLink size={18} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
-                    Resmî Kaynak
-                  </p>
-                  <a
-                    href={place.officialSource}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-aegean-600 hover:text-aegean-700 underline decoration-aegean-300 underline-offset-2 transition-colors"
-                  >
-                    Kaynağı Ziyaret Et →
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Route Toggle */}
+      {/* Route Toggle — Primary CTA, always above the fold */}
       <button
         onClick={handleRouteToggle}
-        className={`w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 active:scale-[0.97] mb-6 ${
+        className={`w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-sm tracking-wide transition-all duration-300 active:scale-[0.97] mb-5 ${
           isAdded
             ? "bg-[#0F766E] text-white shadow-lg shadow-[#0F766E]/25"
             : "bg-white text-[#0F766E] border-2 border-[#0F766E]/30 hover:border-[#0F766E] hover:bg-[#0F766E]/5"
@@ -375,6 +276,114 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
           </>
         )}
       </button>
+
+      {/* ── Visit & Accessibility Info — Collapsible Accordion ── */}
+      {hasVisitInfo && (
+        <details className="group mb-5 rounded-2xl border border-slate-200 bg-white overflow-hidden">
+          <summary className="flex items-center justify-between gap-2 px-4 py-3.5 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden hover:bg-slate-50 transition-colors">
+            <span className="flex items-center gap-2 text-sm font-bold text-slate-600">
+              <CalendarClock size={16} className="text-aegean-500" />
+              Ziyaret & Erişim Bilgileri
+            </span>
+            <ChevronDown
+              size={16}
+              className="text-slate-400 transition-transform duration-300 group-open:rotate-180"
+            />
+          </summary>
+          <div className="px-4 pb-4 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {place.recommendedDuration && (
+                <VisitInfoItem
+                  icon={Clock}
+                  label="Önerilen Süre"
+                  value={place.recommendedDuration}
+                />
+              )}
+              {place.visitHours && (
+                <VisitInfoItem
+                  icon={CalendarClock}
+                  label="Ziyaret Saatleri"
+                  value={place.visitHours}
+                />
+              )}
+              {place.feeInfo && (
+                <VisitInfoItem
+                  icon={Banknote}
+                  label="Ücret"
+                  value={place.feeInfo}
+                  iconColor="text-emerald-500"
+                />
+              )}
+              {place.parkingInfo && (
+                <VisitInfoItem
+                  icon={Car}
+                  label="Otopark"
+                  value={place.parkingInfo}
+                />
+              )}
+              {place.publicTransport && (
+                <VisitInfoItem
+                  icon={Bus}
+                  label="Toplu Taşıma"
+                  value={place.publicTransport}
+                />
+              )}
+              {place.accessibility && (
+                <VisitInfoItem
+                  icon={Accessibility}
+                  label="Erişilebilirlik"
+                  value={place.accessibility}
+                  iconColor="text-blue-500"
+                />
+              )}
+              {place.childFriendly && (
+                <VisitInfoItem
+                  icon={Baby}
+                  label="Çocuklu Aileler"
+                  value={place.childFriendly}
+                  iconColor="text-pink-500"
+                />
+              )}
+              {place.seasonalNote && (
+                <VisitInfoItem
+                  icon={CloudSun}
+                  label="Mevsimsel Not"
+                  value={place.seasonalNote}
+                  iconColor="text-amber-500"
+                />
+              )}
+              {place.lastVerified && (
+                <VisitInfoItem
+                  icon={CalendarCheck}
+                  label="Son Doğrulama"
+                  value={formatVerifiedDate(place.lastVerified)}
+                  iconColor="text-green-500"
+                />
+              )}
+              {place.officialSource && (
+                <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 hover:bg-aegean-50/50 transition-colors group/link">
+                  <div className="mt-0.5 flex-shrink-0 text-aegean-500">
+                    <ExternalLink size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
+                      Resmî Kaynak
+                    </p>
+                    <a
+                      href={place.officialSource}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-aegean-600 hover:text-aegean-700 underline decoration-aegean-300 underline-offset-2 transition-colors"
+                    >
+                      Kaynağı Ziyaret Et →
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </details>
+      )}
 
       {/* Rating */}
       {place._id && place.category && (

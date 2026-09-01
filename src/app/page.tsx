@@ -38,6 +38,9 @@ export interface SanityPlace {
   ratingTemizlik?: number;
   ratingTesis?: number;
   ratingGenel?: number;
+  recommendedDuration?: string;
+  visitHours?: string;
+  feeInfo?: string;
 }
 
 // Bounding box for Ayvalık region — converts GPS to map percentages
@@ -75,7 +78,10 @@ async function getPlaces(): Promise<LocationData[]> {
         ratingDeniz,
         ratingTemizlik,
         ratingTesis,
-        ratingGenel
+        ratingGenel,
+        recommendedDuration,
+        visitHours,
+        feeInfo
       }`
     );
 
@@ -117,6 +123,9 @@ async function getPlaces(): Promise<LocationData[]> {
           ratingTemizlik: place.ratingTemizlik || 0,
           ratingTesis: place.ratingTesis || 0,
           ratingGenel: place.ratingGenel || 0,
+          recommendedDuration: place.recommendedDuration,
+          visitHours: place.visitHours,
+          feeInfo: place.feeInfo,
         };
       });
     }

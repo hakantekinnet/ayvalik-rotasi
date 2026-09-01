@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { X, Upload, Loader2, MapPin, Check } from "lucide-react";
+import { X, Upload, Loader2, MapPin, Check, Clock, Banknote } from "lucide-react";
 import Image from "next/image";
 import { LocationData } from "@/lib/types";
 import { useRouteStore } from "@/store/useRouteStore";
@@ -376,6 +376,29 @@ export function LocationCard({ location, isOpen, onClose }: LocationCardProps) {
                   <p className="text-foreground-muted text-sm leading-relaxed mb-4">
                     {location.description}
                   </p>
+                  {/* Compact visit info chips */}
+                  {(location.recommendedDuration || location.visitHours || location.feeInfo) && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {location.recommendedDuration && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-xs font-medium text-slate-600">
+                          <Clock size={12} className="text-aegean-500" />
+                          {location.recommendedDuration}
+                        </span>
+                      )}
+                      {location.visitHours && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-100 text-xs font-medium text-slate-600">
+                          <Clock size={12} className="text-amber-500" />
+                          {location.visitHours}
+                        </span>
+                      )}
+                      {location.feeInfo && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-xs font-medium text-emerald-700">
+                          <Banknote size={12} />
+                          {location.feeInfo}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Right Column: Actions & details */}
