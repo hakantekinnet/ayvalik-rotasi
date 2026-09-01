@@ -1,48 +1,70 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
 import { client } from "@/sanity/lib/client";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://ayvalik-rotasi.vercel.app";
+  // Fetch dynamic content in parallel
+  const [news, events, places] = await Promise.all([
+    client
+      .fetch<{ slug: string; _updatedAt: string }[]>(
+        `*[_type == "news"]{ "slug": _id, _updatedAt }`
+      )
+      .catch(() => []),
+    client
+      .fetch<{ slug: string; _updatedAt: string }[]>(
+        `*[_type == "event"]{ "slug": coalesce(slug.current, _id), _updatedAt }`
+      )
+      .catch(() => []),
+    client
+      .fetch<{ slug: string; _updatedAt: string }[]>(
+        `*[_type == "place"]{ "slug": _id, _updatedAt }`
+      )
+      .catch(() => []),
+  ]);
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
-    { url: `${baseUrl}/feed`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${baseUrl}/vote`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-    { url: `${baseUrl}/rotam`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
+    {
+      url: absoluteUrl("/"),
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: absoluteUrl("/feed"),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: absoluteUrl("/vote"),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
   ];
 
-  // Dynamic place pages
-  let placePages: MetadataRoute.Sitemap = [];
-  try {
-    const places = await client.fetch<{ slug: string; _updatedAt: string }[]>(
-      `*[_type == "place"]{ "slug": coalesce(slug.current, _id), _updatedAt }`
-    );
-    placePages = places.map((p) => ({
-      url: `${baseUrl}/mekan/${p.slug}`,
-      lastModified: new Date(p._updatedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }));
-  } catch {
-    // Sanity may be unreachable during build
-  }
+  const newsPages: MetadataRoute.Sitemap = news.map((item) => ({
+    url: absoluteUrl(`/news/${item.slug}`),
+    lastModified: item._updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
 
-  // Dynamic event pages
-  let eventPages: MetadataRoute.Sitemap = [];
-  try {
-    const events = await client.fetch<{ slug: string; _updatedAt: string }[]>(
-      `*[_type == "event"]{ "slug": coalesce(slug.current, _id), _updatedAt }`
-    );
-    eventPages = events.map((e) => ({
-      url: `${baseUrl}/event/${e.slug}`,
-      lastModified: new Date(e._updatedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    }));
-  } catch {
-    // Sanity may be unreachable during build
-  }
+  const eventPages: MetadataRoute.Sitemap = events.map((event) => ({
+    url: absoluteUrl(`/event/${event.slug}`),
+    lastModified: event._updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
 
-  return [...staticPages, ...placePages, ...eventPages];
+  const placePages: MetadataRoute.Sitemap = places.map((place) => ({
+    url: absoluteUrl(`/mekan/${place.slug}`),
+    lastModified: place._updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [
+    ...staticPages,
+    ...newsPages,
+    ...eventPages,
+    ...placePages,
+  ];
 }

@@ -85,7 +85,7 @@ export function generateIcsContent(event: CalendarEventInput): string {
 
   lines.push(
     `DTSTAMP:${formatDateToUTC(new Date())}`,
-    `UID:${Date.now()}@ayvalik-rotasi.vercel.app`,
+    `UID:${Date.now()}@ayvalikrotasi.com`,
     "END:VEVENT",
     "END:VCALENDAR"
   );

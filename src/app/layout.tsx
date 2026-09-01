@@ -4,9 +4,14 @@ import "./globals.css";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { DesktopHeader } from "@/components/layout/DesktopHeader";
 import { RouteFAB } from "@/components/RouteFAB";
-import { JsonLd } from "@/components/seo/JsonLd";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  absoluteUrl,
+} from "@/lib/site";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -22,12 +27,15 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+
   title: {
     default: "Ayvalık Rotası | Dijital Rehber ve Fırsatlar",
-    template: "%s | Ayvalık Rotası",
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Ayvalık, Cunda ve çevresindeki en iyi mekanları keşfedin, kendi rotanızı oluşturun ve yerel esnaf fırsatlarından yararlanın.",
+
+  description: SITE_DESCRIPTION,
+
   keywords: [
     "Ayvalık",
     "Cunda",
@@ -39,29 +47,29 @@ export const metadata: Metadata = {
     "rota planlama",
     "esnaf fırsatları",
   ],
-  authors: [{ name: "Ayvalık Rotası" }],
+  authors: [{ name: SITE_NAME }],
+
   openGraph: {
-    title: "Ayvalık Rotası | Kendi Tatilini Planla",
-    description:
-      "Ayvalık ve Cunda sokaklarında kaybolmadan önce kendi dijital rotanı oluştur, özel indirimleri yakala.",
-    url: "https://ayvalik-rotasi.vercel.app",
-    siteName: "Ayvalık Rotası",
+    type: "website",
+    locale: "tr_TR",
+    siteName: SITE_NAME,
+    title: "Ayvalık Rotası | Dijital Rehber ve Fırsatlar",
+    description: SITE_DESCRIPTION,
     images: [
       {
-        url: "/og-image.png",
+        url: absoluteUrl("/og-image.png"),
         width: 1200,
         height: 630,
-        alt: "Ayvalık Rotası Önizleme",
+        alt: "Ayvalık Rotası",
       },
     ],
-    locale: "tr_TR",
-    type: "website",
   },
+
   twitter: {
     card: "summary_large_image",
-    title: "Ayvalık Rotası | Dijital Rehber",
-    description:
-      "Ayvalık, Cunda ve çevresindeki en iyi mekanları keşfedin, rotanızı planlayın.",
+    title: "Ayvalık Rotası | Dijital Rehber ve Fırsatlar",
+    description: SITE_DESCRIPTION,
+    images: [absoluteUrl("/og-image.png")],
   },
 };
 
@@ -71,27 +79,29 @@ export const viewport: Viewport = {
   themeColor: "#FAFAFA",
 };
 
-const websiteSchema = {
+const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "Ayvalık Rotası",
+  name: SITE_NAME,
   alternateName: "Ayvalik Rotasi",
-  url: "https://ayvalik-rotasi.vercel.app",
-  description:
-    "Ayvalık, Cunda ve çevresindeki en iyi mekanları keşfedin, kendi rotanızı oluşturun ve yerel esnaf fırsatlarından yararlanın.",
+  url: SITE_URL,
+  description: SITE_DESCRIPTION,
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate:
-        "https://ayvalik-rotasi.vercel.app/?q={search_term_string}",
+      urlTemplate: `${SITE_URL}/?q={search_term_string}`,
     },
     "query-input": "required name=search_term_string",
   },
   publisher: {
     "@type": "Organization",
-    name: "Ayvalık Rotası",
-    url: "https://ayvalik-rotasi.vercel.app",
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl("/logo.png"),
+    },
   },
 };
 
@@ -108,7 +118,15 @@ export default function RootLayout({
         className={`${manrope.className} antialiased text-slate-800 min-h-full flex flex-col`}
       >
         <DesktopHeader />
-        <JsonLd schema={websiteSchema} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteJsonLd).replace(
+              /</g,
+              "\\u003c",
+            ),
+          }}
+        />
         <main className="flex-1 pb-safe-nav lg:pb-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {children}

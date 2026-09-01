@@ -5,7 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
-import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  createPageMetadata,
+  truncateDescription,
+  absoluteUrl,
+  SITE_URL,
+  SITE_NAME,
+} from "@/lib/site";
 import { formatDateFull, formatTime, isPastDate } from "@/utils/dateUtils";
 
 async function getEventBySlug(slug: string) {
@@ -41,24 +47,25 @@ export async function generateMetadata({
   const event = await getEventBySlug(slug);
 
   if (!event) {
-    return { title: "Etkinlik Bulunamadı" };
+    return {
+      title: "Etkinlik Bulunamadı",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 
-  const imageUrl = event.coverImage ? urlFor(event.coverImage).url() : undefined;
+  const eventPath = `/event/${event.slug || event._id}`;
 
-  return {
+  return createPageMetadata({
     title: event.title,
-    description:
-      event.description?.slice(0, 160) ||
-      `${event.title} — Ayvalık'ta yaklaşan etkinlik.`,
-    openGraph: {
-      title: event.title,
-      description:
-        event.description?.slice(0, 160) ||
-        `Ayvalık'ta etkinlik: ${event.title}`,
-      images: imageUrl ? [{ url: imageUrl }] : undefined,
-    },
-  };
+    description: truncateDescription(
+      event.description || `${event.title} — Ayvalık'ta yaklaşan etkinlik.`
+    ),
+    path: eventPath,
+    image: event.coverImage ? urlFor(event.coverImage).url() : "/og-image.png",
+  });
 }
 
 export default async function EventPage({
@@ -103,7 +110,7 @@ export default async function EventPage({
 
   // JSON-LD structured data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const eventSchema: Record<string, any> = {
+  const eventJsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Event",
     name: event.title,
@@ -113,11 +120,17 @@ export default async function EventPage({
       ? "https://schema.org/EventCompleted"
       : "https://schema.org/EventScheduled",
     image: imageUrl,
+    url: absoluteUrl(`/event/${event.slug || event._id}`),
+    organizer: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
   };
-  if (event.endsAt) eventSchema.endDate = event.endsAt;
-  if (event.description) eventSchema.description = event.description;
+  if (event.endsAt) eventJsonLd.endDate = event.endsAt;
+  if (event.description) eventJsonLd.description = event.description;
   if (event.location) {
-    eventSchema.location = {
+    eventJsonLd.location = {
       "@type": "Place",
       name: event.location.title,
       address: {
@@ -127,11 +140,37 @@ export default async function EventPage({
         addressCountry: "TR",
       },
     };
+    if (event.location.geopoint?.lat && event.location.geopoint?.lng) {
+      eventJsonLd.location.geo = {
+        "@type": "GeoCoordinates",
+        latitude: event.location.geopoint.lat,
+        longitude: event.location.geopoint.lng,
+      };
+    }
   }
+
+  // WhatsApp share message
+  const shareMessage = [
+    `🎭 ${event.title}`,
+    `📅 ${formattedDate} ${formattedTime}`,
+    event.location ? `📍 ${event.location.title}` : "",
+    "",
+    "Detaylar için:",
+    absoluteUrl(`/event/${event.slug || event._id}`),
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <JsonLd schema={eventSchema} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(eventJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* Hero Image */}
       <div className="relative w-full h-72 overflow-hidden">
@@ -227,17 +266,7 @@ export default async function EventPage({
         {/* WhatsApp Share */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <a
-            href={`https://wa.me/?text=${encodeURIComponent(
-              "🎭 " +
-                event.title +
-                "\n📅 " +
-                formattedDate +
-                " " +
-                formattedTime +
-                (event.location ? "\n📍 " + event.location.title : "") +
-                "\n\nDetaylar için tıkla:\nhttps://ayvalik-rotasi.vercel.app/event/" +
-                (event.slug || event._id)
-            )}`}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] text-white py-3.5 px-6 rounded-2xl font-bold text-sm shadow-lg shadow-[#25D366]/25 hover:scale-[1.02] active:scale-95 transition-transform"

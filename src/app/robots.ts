@@ -1,14 +1,17 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { SITE_URL, absoluteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: ["/api/", "/sanity/"],
-      },
-    ],
-    sitemap: "https://ayvalik-rotasi.vercel.app/sitemap.xml",
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: [
+        "/api/",
+        "/studio/",
+      ],
+    },
+    sitemap: absoluteUrl("/sitemap.xml"),
+    host: SITE_URL,
   };
 }

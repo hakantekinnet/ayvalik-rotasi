@@ -17,6 +17,33 @@ const nextConfig: NextConfig = {
     // Allow unoptimized local placeholder images during development
     unoptimized: process.env.NODE_ENV === "development",
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.ayvalikrotasi.com",
+          },
+        ],
+        destination: "https://ayvalikrotasi.com/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "ayvalik-rotasi.vercel.app",
+          },
+        ],
+        destination: "https://ayvalikrotasi.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

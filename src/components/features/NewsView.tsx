@@ -11,6 +11,7 @@ import { useRouteStore } from "@/store/useRouteStore";
 import { urlFor } from "@/sanity/lib/image";
 import { AddToCalendar } from "@/components/ui/AddToCalendar";
 import { formatDateShort, formatTime, isPastDate } from "@/utils/dateUtils";
+import { absoluteUrl } from "@/lib/site";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -280,8 +281,8 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
                 item.title +
                 "\n\n" +
                 item.description +
-                "\n\nDetaylar için tıkla:\nhttps://ayvalik-rotasi.vercel.app/news/" +
-                item.id
+                "\n\nDetaylar için tıkla:\n" +
+                absoluteUrl(`/news/${item.id}`)
             )}`}
             target="_blank"
             rel="noopener noreferrer"

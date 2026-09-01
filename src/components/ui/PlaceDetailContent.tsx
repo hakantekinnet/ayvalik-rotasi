@@ -110,9 +110,9 @@ export function PlaceDetailContent({ place }: PlaceDetailContentProps) {
       </div>
 
       {/* Title */}
-      <h2 className="font-editorial text-2xl font-bold text-foreground mb-4">
+      <h1 className="font-editorial text-2xl font-bold text-foreground mb-4">
         {place.title}
-      </h2>
+      </h1>
 
       {/* Image Gallery with Dot Indicators */}
       {hasImages && (

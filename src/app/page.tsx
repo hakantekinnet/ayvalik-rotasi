@@ -1,9 +1,20 @@
 import { client } from "@/sanity/lib/client";
 export const revalidate = 3600;
+import type { Metadata } from "next";
 import { LocationData } from "@/lib/types";
+import { absoluteUrl } from "@/lib/site";
 import { locations as staticLocations } from "@/data/locations";
 import { HomeClient } from "@/components/features/HomeClient";
 import type { CuratedRoute } from "@/components/CuratedRoutesList";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: absoluteUrl("/"),
+  },
+  openGraph: {
+    url: absoluteUrl("/"),
+  },
+};
 
 export interface SanityPlace {
   _id: string;

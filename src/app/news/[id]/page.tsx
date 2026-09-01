@@ -4,7 +4,13 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar } from "lucide-react";
-import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  createPageMetadata,
+  truncateDescription,
+  absoluteUrl,
+  SITE_URL,
+  SITE_NAME,
+} from "@/lib/site";
 
 interface NewsDetailPageProps {
   params: Promise<{ id: string }>;
@@ -17,6 +23,7 @@ async function getNewsById(id: string) {
       title,
       summary,
       _createdAt,
+      _updatedAt,
       "imageUrl": mainImage.asset->url,
       content
     }`,
@@ -33,22 +40,24 @@ export async function generateMetadata({
   const article = await getNewsById(id);
 
   if (!article) {
-    return { title: "Haber Bulunamadı" };
+    return {
+      title: "Haber Bulunamadı",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 
-  return {
+  return createPageMetadata({
     title: article.title,
-    description:
-      article.summary?.slice(0, 160) ||
-      `${article.title} — Ayvalık'tan son haberler.`,
-    openGraph: {
-      title: article.title,
-      description:
-        article.summary?.slice(0, 160) ||
-        `Ayvalık haberleri: ${article.title}`,
-      images: article.imageUrl ? [{ url: article.imageUrl }] : undefined,
-    },
-  };
+    description: truncateDescription(
+      article.summary || `${article.title} — Ayvalık'tan son haberler.`
+    ),
+    path: `/news/${id}`,
+    image: article.imageUrl || "/og-image.png",
+    type: "article",
+  });
 }
 
 export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
@@ -92,27 +101,54 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000&q=80";
 
   // JSON-LD structured data
-  const newsSchema = {
+  const newsJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: article.title,
+    description: article.summary,
+    image: [imageUrl],
     datePublished: article._createdAt,
-    image: imageUrl,
+    dateModified: article._updatedAt,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": absoluteUrl(`/news/${article._id}`),
+    },
     author: {
       "@type": "Organization",
-      name: "Ayvalık Rotası",
+      name: SITE_NAME,
+      url: SITE_URL,
     },
     publisher: {
       "@type": "Organization",
-      name: "Ayvalık Rotası",
-      url: "https://ayvalik-rotasi.vercel.app",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/logo.png"),
+      },
     },
-    ...(article.summary ? { description: article.summary } : {}),
   };
+
+  // WhatsApp share message
+  const shareMessage = [
+    `📢 ${article.title}`,
+    "",
+    article.summary || "",
+    "",
+    "Detaylar için:",
+    absoluteUrl(`/news/${id}`),
+  ].join("\n");
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <JsonLd schema={newsSchema} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(newsJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* Hero Image */}
       <div className="relative w-full h-72 overflow-hidden">
@@ -202,12 +238,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
         {/* WhatsApp Share */}
         <div className="mt-10 pt-6 border-t border-gray-200">
           <a
-            href={`https://wa.me/?text=${encodeURIComponent(
-              "📢 " +
-                article.title +
-                "\n\nHaberi okumak için tıkla:\nhttps://ayvalik-rotasi.vercel.app/news/" +
-                id
-            )}`}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2.5 bg-[#25D366] text-white py-3.5 px-6 rounded-2xl font-bold text-sm shadow-lg shadow-[#25D366]/25 hover:scale-[1.02] active:scale-95 transition-transform"

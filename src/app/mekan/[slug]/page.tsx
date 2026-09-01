@@ -4,7 +4,12 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Map } from "lucide-react";
 import { PlaceDetailContent } from "@/components/ui/PlaceDetailContent";
-import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  createPageMetadata,
+  truncateDescription,
+  absoluteUrl,
+  SITE_NAME,
+} from "@/lib/site";
 
 async function getPlaceBySlug(slug: string) {
   const data = await client.fetch(
@@ -69,29 +74,31 @@ export async function generateMetadata({
   const place = await getPlaceBySlug(slug);
 
   if (!place) {
-    return { title: "Mekan Bulunamadı" };
+    return {
+      title: "Mekân Bulunamadı",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 
-  return {
-    title: `${place.title} — ${place.category}`,
-    description:
-      place.description?.slice(0, 160) ||
-      `${place.title} hakkında detaylı bilgi, fotoğraflar ve değerlendirmeler.`,
-    openGraph: {
-      title: `${place.title} — ${place.category}`,
-      description:
-        place.description?.slice(0, 160) ||
-        `Ayvalık'ta keşfet: ${place.title}`,
-      images: place.ogImage ? [{ url: place.ogImage }] : undefined,
-    },
-  };
+  return createPageMetadata({
+    title: place.title,
+    description: truncateDescription(
+      place.description ||
+        `${place.title} hakkında detaylı bilgi, fotoğraflar ve değerlendirmeler.`
+    ),
+    path: `/mekan/${place._id}`,
+    image: place.ogImage || "/og-image.png",
+  });
 }
 
 // Build JSON-LD schema for place
 function buildPlaceSchema(place: Record<string, unknown>) {
   const isFood = (place.category as string) === "Mekan";
   const avgRating = calculateAvgRating(place);
-  const slug = (place.slug as string) || (place._id as string);
+  const placeId = place._id as string;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const schema: Record<string, any> = {
@@ -99,9 +106,13 @@ function buildPlaceSchema(place: Record<string, unknown>) {
     "@type": isFood ? "LocalBusiness" : "TouristAttraction",
     name: place.title,
     description: place.description || `${place.title} — Ayvalık'ta keşfedilecek bir yer.`,
-    url: `https://ayvalik-rotasi.vercel.app/mekan/${slug}`,
+    url: absoluteUrl(`/mekan/${placeId}`),
     isAccessibleForFree: true,
     touristType: "Leisure",
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
   };
 
   // Image
@@ -157,7 +168,12 @@ export default async function PlacePage({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <JsonLd schema={placeSchema} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(placeSchema).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* Back Navigation */}
       <div className="max-w-2xl mx-auto px-4 pt-6">
