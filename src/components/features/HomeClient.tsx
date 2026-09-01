@@ -31,9 +31,6 @@ export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleCategoryClick = (category: string) => {
-    setActiveCategory((prev) => (prev === category ? null : category));
-  };
 
   const handleRegionClick = (region: string) => {
     setActiveRegion((prev) => (prev === region ? null : region));
@@ -198,44 +195,8 @@ export function HomeClient({ places, curatedRoutes = [] }: HomeClientProps) {
             </div>
           </section>
 
-          {/* Quick Discovery */}
-          <section className="px-5 py-6 lg:px-0 lg:py-0 lg:mb-6">
-            <h2 className="font-heading text-sm font-bold text-foreground-muted uppercase tracking-wider mb-3">
-              Hızlı Keşif
-            </h2>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { emoji: "🏖️", label: "Plajlar", category: "Plaj", count: "12" },
-                { emoji: "🏛️", label: "Tarihi", category: "Tarihi", count: "8" },
-                { emoji: "🌅", label: "Manzara", category: "Manzara", count: "6" },
-              ].map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => handleCategoryClick(item.category)}
-                  className={`rounded-xl border p-3 text-center transition-all duration-300 cursor-pointer ${
-                    activeCategory === item.category
-                      ? "bg-aegean-50 border-aegean-400 shadow-md shadow-aegean-500/15 ring-1 ring-aegean-400/50"
-                      : "bg-card-bg border-card-border hover:shadow-sm"
-                  }`}
-                >
-                  <span className="text-2xl">{item.emoji}</span>
-                  <p
-                    className={`text-xs font-semibold mt-1 transition-colors duration-300 ${
-                      activeCategory === item.category
-                        ? "text-aegean-700"
-                        : "text-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </p>
-                  <p className="text-[10px] text-foreground-muted">
-                    {item.count} nokta
-                  </p>
-                </button>
-              ))}
-            </div>
-
-            {/* Curated Routes from Sanity */}
+          {/* Curated Routes from Sanity */}
+          <section className="px-5 py-4 lg:px-0 lg:py-0 lg:mb-6">
             <CuratedRoutesList routes={curatedRoutes} />
           </section>
         </aside>
