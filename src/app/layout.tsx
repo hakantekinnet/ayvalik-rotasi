@@ -6,6 +6,7 @@ import { DesktopHeader } from "@/components/layout/DesktopHeader";
 import { RouteFAB } from "@/components/RouteFAB";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Toaster } from "sonner";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -119,6 +120,7 @@ export default function RootLayout({
         <div className="lg:hidden">
           <BottomNav />
         </div>
+        <GoogleAnalytics gaId="G-SZKLTWQZVB" />
       </body>
     </html>
   );
