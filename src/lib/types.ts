@@ -29,6 +29,17 @@ export interface LocationData {
   ratingTemizlik?: number;
   ratingTesis?: number;
   ratingGenel?: number;
+  // Visit & Accessibility info (E-E-A-T)
+  recommendedDuration?: string;
+  visitHours?: string;
+  feeInfo?: string;
+  parkingInfo?: string;
+  publicTransport?: string;
+  accessibility?: string;
+  childFriendly?: string;
+  seasonalNote?: string;
+  lastVerified?: string;
+  officialSource?: string;
 }
 
 export interface NewsArticle {

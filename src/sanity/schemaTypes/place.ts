@@ -7,6 +7,13 @@ export const place = defineType({
   title: 'Mekanlar',
   type: 'document',
   icon: () => '📍',
+  groups: [
+    {
+      name: 'visitInfo',
+      title: 'Ziyaret ve Erişim Bilgileri',
+      icon: () => '🕐',
+    },
+  ],
   fields: [
     defineField({
       name: 'title',
@@ -133,6 +140,80 @@ export const place = defineType({
       type: 'string',
       description: 'Örn: ROTA10 (Kullanıcı bu kodu esnafa gösterecek)',
       hidden: ({ document }) => !document?.isOpportunity,
+    }),
+
+    // --- ZİYARET VE ERİŞİM BİLGİLERİ ---
+
+    defineField({
+      name: 'recommendedDuration',
+      title: 'Önerilen Ziyaret Süresi',
+      type: 'string',
+      description: 'Örn: 30–45 dakika',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'visitHours',
+      title: 'Çalışma / Ziyaret Saatleri',
+      type: 'string',
+      description: 'Örn: Her gün 10.00–17.00',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'feeInfo',
+      title: 'Ücret Bilgisi',
+      type: 'string',
+      description: 'Örn: Ücretsiz, 150 TL',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'parkingInfo',
+      title: 'Otopark Durumu',
+      type: 'string',
+      description: 'Örn: Park alanı sınırlı',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'publicTransport',
+      title: 'Toplu Taşıma',
+      type: 'string',
+      description: 'Örn: Merkezden minibüs ile ulaşım mümkün',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'accessibility',
+      title: 'Erişilebilirlik',
+      type: 'string',
+      description: 'Örn: Son bölüm eğimli, tekerlekli sandalyeye uygun',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'childFriendly',
+      title: 'Çocuklu Ailelere Uygunluk',
+      type: 'string',
+      description: 'Örn: Evet, park alanı mevcut',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'seasonalNote',
+      title: 'Mevsimsel Not',
+      type: 'string',
+      description: 'Örn: Kış aylarında rüzgarlı olabilir',
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'lastVerified',
+      title: 'Son Doğrulama Tarihi',
+      type: 'date',
+      options: {
+        dateFormat: 'YYYY-MM',
+      },
+      group: 'visitInfo',
+    }),
+    defineField({
+      name: 'officialSource',
+      title: 'Resmî Kaynak Bağlantısı',
+      type: 'url',
+      group: 'visitInfo',
     }),
 
     // --- DEĞERLENDİRME SİSTEMİ SAYAÇLARI ---
