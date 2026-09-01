@@ -22,7 +22,17 @@ async function getPlaceBySlug(slug: string) {
       ratingDeniz,
       ratingTemizlik,
       ratingTesis,
-      ratingGenel
+      ratingGenel,
+      recommendedDuration,
+      visitHours,
+      feeInfo,
+      parkingInfo,
+      publicTransport,
+      accessibility,
+      childFriendly,
+      seasonalNote,
+      lastVerified,
+      officialSource
     }`,
     { slug }
   );
