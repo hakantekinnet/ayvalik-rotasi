@@ -10,6 +10,7 @@ import type { SanityNewsItem, SanityEvent } from "@/app/feed/page";
 import { useRouteStore } from "@/store/useRouteStore";
 import { urlFor } from "@/sanity/lib/image";
 import { AddToCalendar } from "@/components/ui/AddToCalendar";
+import { formatDateShort, formatTime, isPastDate } from "@/utils/dateUtils";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -119,19 +120,14 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
 
   // ── Event Card Component ──
   const renderEventCard = (evt: SanityEvent) => {
-    const dateObj = new Date(evt.startsAt);
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const eventYear = dateObj.getFullYear();
-
-    const day = dateObj.toLocaleDateString("tr-TR", { day: "numeric" });
-    const month = dateObj.toLocaleDateString("tr-TR", { month: "short" });
-    const yearLabel = eventYear !== currentYear ? ` ${eventYear}` : "";
-    const time = dateObj.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+    const dateParts = formatDateShort(evt.startsAt);
+    const day = dateParts?.day || "";
+    const month = dateParts?.month || "";
+    const yearLabel = dateParts?.yearLabel || "";
+    const time = formatTime(evt.startsAt) || "";
 
     // Check if event is in the past
-    const endOrStart = evt.endsAt ? new Date(evt.endsAt) : dateObj;
-    const isPast = endOrStart < now;
+    const isPast = isPastDate(evt.endsAt || evt.startsAt);
 
     const isInRoute = evt.location
       ? routeList.some((r) => r._id === evt.location!._id)
@@ -347,11 +343,14 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
     </div>
   );
 
-  // ── Featured Hero Card ──
+  // ── Featured Hero Card (exclude past events) ──
+  const upcomingEvents = events.filter((e) => !isPastDate(e.endsAt || e.startsAt));
+  const heroEvent = upcomingEvents.length > 0 && upcomingEvents[0].coverImage ? upcomingEvents[0] : null;
+
   const heroCard = (
     <>
-      {events.length > 0 && events[0].coverImage ? (
-        <Link href={`/event/${events[0].slug || events[0]._id}`}>
+      {heroEvent ? (
+        <Link href={`/event/${heroEvent.slug || heroEvent._id}`}>
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -360,8 +359,8 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
             className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md group cursor-pointer"
           >
             <Image
-              src={urlFor(events[0].coverImage).url()}
-              alt={events[0].title}
+              src={urlFor(heroEvent.coverImage!).url()}
+              alt={heroEvent.title}
               fill
               sizes="(max-width: 768px) 100vw, 600px"
               className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -375,47 +374,22 @@ export function NewsView({ sanityNews, events = [] }: NewsViewProps) {
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-5">
               <h2 className="text-white text-xl font-bold leading-tight mb-1">
-                {events[0].title}
+                {heroEvent.title}
               </h2>
-              {events[0].description && (
+              {heroEvent.description && (
                 <p className="text-white/70 text-xs">
-                  {events[0].description}
+                  {heroEvent.description}
                 </p>
               )}
             </div>
           </motion.div>
         </Link>
       ) : (
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={1}
-          className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md group cursor-pointer"
-        >
-          <Image
-            src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop"
-            alt="Ayvalık Amfitiyatro Konseri"
-            fill
-            sizes="(max-width: 768px) 100vw, 600px"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <div className="absolute top-4 left-4">
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-semibold rounded-full border border-white/30">
-              ✨ Haftanın Etkinliği
-            </span>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-5">
-            <h2 className="text-white text-xl font-bold leading-tight mb-1">
-              Amfitiyatro&apos;da Yaz Konseri
-            </h2>
-            <p className="text-white/70 text-xs">
-              Bu cuma akşamı, Ayvalık açık hava sahnesinde unutulmaz bir gece
-            </p>
-          </div>
-        </motion.div>
+        <div className="relative w-full h-64 rounded-3xl overflow-hidden shadow-md bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center">
+          <span className="text-4xl mb-3">🌟</span>
+          <h2 className="text-lg font-bold text-slate-600">Yeni etkinlikler yakında</h2>
+          <p className="text-xs text-slate-400 mt-1">Konserler, festivaller ve daha fazlası</p>
+        </div>
       )}
     </>
   );

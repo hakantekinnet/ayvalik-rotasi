@@ -34,6 +34,69 @@ const staticPolls: SanityPoll[] = [
   },
 ];
 
+// ── Lightbox Component with Escape key + focus trap ──
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function LightboxOverlay({ photo, urlFor, onClose }: { photo: any; urlFor: any; onClose: () => void }) {
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    // Auto-focus close button for focus trapping
+    closeBtnRef.current?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Fotoğraf önizleme"
+      className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <button
+        ref={closeBtnRef}
+        className="absolute top-4 right-4 md:top-6 md:right-6 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full w-10 h-10 flex items-center justify-center transition-all z-50 cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        aria-label="Kapat"
+      >
+        <X size={24} />
+      </button>
+
+      <div
+        className="relative w-full max-w-4xl max-h-[85vh] flex items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={urlFor(photo.photo).url()}
+          alt={photo.photographer || "Ayvalık"}
+          className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+        />
+      </div>
+
+      <div
+        className="mt-4 text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <p className="text-white font-bold text-lg">
+          {photo.photographer || "@anonim"}
+        </p>
+        <p className="text-white/60 text-sm mt-1">
+          {photo.votes || 0} beğeni
+        </p>
+      </div>
+    </div>
+  );
+}
+
 interface VotingViewProps {
   sanityPolls?: SanityPoll[];
 }
@@ -865,51 +928,8 @@ export function VotingView({ sanityPolls }: VotingViewProps) {
         )}
       </AnimatePresence>
 
-      {/* Photo Lightbox Modal */}
-      {selectedPhoto && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Fotoğraf önizleme"
-          className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4"
-          onClick={() => setSelectedPhoto(null)}
-        >
-          <button
-            className="absolute top-4 right-4 md:top-6 md:right-6 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full w-10 h-10 flex items-center justify-center transition-all z-50 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedPhoto(null);
-            }}
-            aria-label="Kapat"
-          >
-            <X size={24} />
-          </button>
-
-          <div
-            className="relative w-full max-w-4xl max-h-[85vh] flex items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={urlFor(selectedPhoto.photo).url()}
-              alt={selectedPhoto.photographer || "Ayvalık"}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-            />
-          </div>
-
-          <div
-            className="mt-4 text-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="text-white font-bold text-lg">
-              {selectedPhoto.photographer || "@anonim"}
-            </p>
-            <p className="text-white/60 text-sm mt-1">
-              {selectedPhoto.votes || 0} beğeni
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Photo Lightbox Modal — Escape key to close */}
+      {selectedPhoto && <LightboxOverlay photo={selectedPhoto} urlFor={urlFor} onClose={() => setSelectedPhoto(null)} />}
     </div>
   );
 }

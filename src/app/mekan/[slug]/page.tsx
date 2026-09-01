@@ -78,7 +78,7 @@ export async function generateMetadata({
       place.description?.slice(0, 160) ||
       `${place.title} hakkında detaylı bilgi, fotoğraflar ve değerlendirmeler.`,
     openGraph: {
-      title: `${place.title} | Ayvalık Rotası`,
+      title: `${place.title} — ${place.category}`,
       description:
         place.description?.slice(0, 160) ||
         `Ayvalık'ta keşfet: ${place.title}`,

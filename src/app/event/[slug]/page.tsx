@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { formatDateFull, formatTime, isPastDate } from "@/utils/dateUtils";
 
 async function getEventBySlug(slug: string) {
   const data = await client.fetch(
@@ -46,12 +47,12 @@ export async function generateMetadata({
   const imageUrl = event.coverImage ? urlFor(event.coverImage).url() : undefined;
 
   return {
-    title: `${event.title} | Ayvalık Rotası`,
+    title: event.title,
     description:
       event.description?.slice(0, 160) ||
       `${event.title} — Ayvalık'ta yaklaşan etkinlik.`,
     openGraph: {
-      title: `${event.title} | Ayvalık Rotası`,
+      title: event.title,
       description:
         event.description?.slice(0, 160) ||
         `Ayvalık'ta etkinlik: ${event.title}`,
@@ -80,7 +81,7 @@ export default async function EventPage({
             Aradığınız etkinlik silinmiş veya taşınmış olabilir.
           </p>
           <Link
-            href="/feed?tab=etkinlikler"
+            href="/feed?tab=takvim"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#0F766E] text-white rounded-full font-semibold text-sm shadow-lg hover:bg-[#0d6b63] transition-colors"
           >
             <ArrowLeft size={16} />
@@ -95,24 +96,10 @@ export default async function EventPage({
     ? urlFor(event.coverImage).url()
     : "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1000&q=80";
 
-  const startDate = new Date(event.startsAt);
-  const formattedDate = startDate.toLocaleDateString("tr-TR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-  const formattedTime = startDate.toLocaleTimeString("tr-TR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  let formattedEndTime: string | null = null;
-  if (event.endsAt) {
-    formattedEndTime = new Date(event.endsAt).toLocaleTimeString("tr-TR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+  const formattedDate = formatDateFull(event.startsAt) || "";
+  const formattedTime = formatTime(event.startsAt) || "";
+  const formattedEndTime = formatTime(event.endsAt);
+  const eventIsPast = isPastDate(event.endsAt || event.startsAt);
 
   // JSON-LD structured data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,7 +109,9 @@ export default async function EventPage({
     name: event.title,
     startDate: event.startsAt,
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    eventStatus: "https://schema.org/EventScheduled",
+    eventStatus: eventIsPast
+      ? "https://schema.org/EventCompleted"
+      : "https://schema.org/EventScheduled",
     image: imageUrl,
   };
   if (event.endsAt) eventSchema.endDate = event.endsAt;
@@ -158,7 +147,7 @@ export default async function EventPage({
 
         {/* Back Button */}
         <Link
-          href="/feed?tab=etkinlikler"
+          href="/feed?tab=takvim"
           className="absolute top-6 left-4 z-10 flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md text-white text-sm font-semibold rounded-full border border-white/30 hover:bg-white/30 transition-colors"
         >
           <ArrowLeft size={16} />

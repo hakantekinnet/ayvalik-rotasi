@@ -37,12 +37,12 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${article.title} | Ayvalık Rotası`,
+    title: article.title,
     description:
       article.summary?.slice(0, 160) ||
       `${article.title} — Ayvalık'tan son haberler.`,
     openGraph: {
-      title: `${article.title} | Ayvalık Rotası`,
+      title: article.title,
       description:
         article.summary?.slice(0, 160) ||
         `Ayvalık haberleri: ${article.title}`,
