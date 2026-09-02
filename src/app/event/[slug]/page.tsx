@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
 import { EditorialMeta } from "@/components/ui/EditorialMeta";
+import { AddToCalendar } from "@/components/ui/AddToCalendar";
 import { urlFor } from "@/sanity/lib/image";
 import {
   createPageMetadata,
@@ -275,6 +276,16 @@ export default async function EventPage({
                 <span className="font-semibold">{event.location.title}</span>
               </div>
             )}
+          </div>
+          {/* Add to Calendar */}
+          <div className="mt-4 pt-3 border-t border-slate-100">
+            <AddToCalendar
+              title={event.title}
+              description={event.description}
+              startsAt={event.startsAt}
+              endsAt={event.endsAt}
+              location={event.location?.title}
+            />
           </div>
         </div>
 
