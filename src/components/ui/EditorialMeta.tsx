@@ -87,27 +87,27 @@ export function EditorialMeta({
 
       {/* ── Source & Credits Footer ── */}
       {hasSourceFooter && (
-        <div className="rounded-2xl bg-slate-50 border border-slate-200 px-5 py-4 mt-8">
+        <div className="rounded-2xl bg-slate-50 border border-slate-200 px-5 py-4 mt-8 overflow-hidden">
           <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">
             Kaynak & Telif Bilgileri
           </h3>
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 min-w-0">
             {sourceName && (
               <div className="flex items-center gap-2.5 text-sm text-slate-600">
                 <LinkIcon size={14} className="text-aegean-500 flex-shrink-0" />
-                <span>
+                <span className="min-w-0">
                   <span className="font-medium text-slate-500">Kaynak: </span>
                   {sourceUrl ? (
                     <a
                       href={sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-aegean-600 hover:text-aegean-700 underline decoration-aegean-300 underline-offset-2 transition-colors"
+                      className="font-semibold text-aegean-600 hover:text-aegean-700 underline decoration-aegean-300 underline-offset-2 transition-colors break-all"
                     >
                       {sourceName} →
                     </a>
                   ) : (
-                    <span className="font-semibold">{sourceName}</span>
+                    <span className="font-semibold break-words">{sourceName}</span>
                   )}
                 </span>
               </div>
@@ -118,7 +118,7 @@ export function EditorialMeta({
                   size={14}
                   className="text-blue-500 flex-shrink-0"
                 />
-                <span>
+                <span className="min-w-0 break-words">
                   <span className="font-medium text-slate-500">
                     Orijinal Yayın:{" "}
                   </span>
@@ -134,7 +134,7 @@ export function EditorialMeta({
                   size={14}
                   className="text-green-500 flex-shrink-0"
                 />
-                <span>
+                <span className="min-w-0 break-words">
                   <span className="font-medium text-slate-500">
                     Son Doğrulama:{" "}
                   </span>
@@ -147,7 +147,7 @@ export function EditorialMeta({
             {imageCredit && (
               <div className="flex items-center gap-2.5 text-sm text-slate-600">
                 <Camera size={14} className="text-purple-500 flex-shrink-0" />
-                <span>
+                <span className="min-w-0 break-words">
                   <span className="font-medium text-slate-500">
                     Görsel Kaynağı:{" "}
                   </span>
