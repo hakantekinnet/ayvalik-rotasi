@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar } from "lucide-react";
+import { EditorialMeta } from "@/components/ui/EditorialMeta";
 import {
   createPageMetadata,
   truncateDescription,
@@ -25,7 +26,14 @@ async function getNewsById(id: string) {
       _createdAt,
       _updatedAt,
       "imageUrl": mainImage.asset->url,
-      content
+      content,
+      sourceName,
+      sourceUrl,
+      originalPublishedAt,
+      verifiedAt,
+      expiresAt,
+      imageCredit,
+      editorNote
     }`,
     { id }
   );
@@ -192,6 +200,13 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
           </p>
         )}
 
+        {/* Expired banner + Editor's Note */}
+        <EditorialMeta
+          expiresAt={article.expiresAt}
+          editorNote={article.editorNote}
+          expiredLabel="Bu duyuru"
+        />
+
         {/* Rich text content */}
         {article.content && (
           <div className="mt-8 text-gray-800 leading-relaxed space-y-4 prose prose-sm prose-gray max-w-none">
@@ -234,6 +249,15 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
             />
           </div>
         )}
+
+        {/* Source & Credits Footer */}
+        <EditorialMeta
+          sourceName={article.sourceName}
+          sourceUrl={article.sourceUrl}
+          originalPublishedAt={article.originalPublishedAt}
+          verifiedAt={article.verifiedAt}
+          imageCredit={article.imageCredit}
+        />
 
         {/* WhatsApp Share */}
         <div className="mt-10 pt-6 border-t border-gray-200">

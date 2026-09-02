@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
+import { EditorialMeta } from "@/components/ui/EditorialMeta";
 import { urlFor } from "@/sanity/lib/image";
 import {
   createPageMetadata,
@@ -30,7 +31,14 @@ async function getEventBySlug(slug: string) {
         title,
         "slug": coalesce(slug.current, _id),
         "geopoint": location
-      }
+      },
+      sourceName,
+      sourceUrl,
+      originalPublishedAt,
+      verifiedAt,
+      expiresAt,
+      imageCredit,
+      editorNote
     }`,
     { slug }
   );
@@ -232,10 +240,17 @@ export default async function EventPage({
 
         {/* Description */}
         {event.description && (
-          <p className="text-base text-gray-700 leading-relaxed border-l-4 border-[#0F766E] pl-4 mb-8">
+          <p className="text-base text-gray-700 leading-relaxed border-l-4 border-[#0F766E] pl-4 mb-6">
             {event.description}
           </p>
         )}
+
+        {/* Expired banner + Editor's Note */}
+        <EditorialMeta
+          expiresAt={event.expiresAt}
+          editorNote={event.editorNote}
+          expiredLabel="Bu etkinlik"
+        />
 
         {/* Event Info Card */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 mb-8">
@@ -262,6 +277,15 @@ export default async function EventPage({
             )}
           </div>
         </div>
+
+        {/* Source & Credits Footer */}
+        <EditorialMeta
+          sourceName={event.sourceName}
+          sourceUrl={event.sourceUrl}
+          originalPublishedAt={event.originalPublishedAt}
+          verifiedAt={event.verifiedAt}
+          imageCredit={event.imageCredit}
+        />
 
         {/* WhatsApp Share */}
         <div className="mt-6 pt-6 border-t border-gray-200">
